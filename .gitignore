@@ -1,18 +1,26 @@
-# APK files (excluding release versions)
-# *.apk
+# Flutter/Dart
+# Build outputs (exclude to save space)
+/build/
+/.dart_tool/
+.packages
+.pub-cache/
+.pub/
 
-# Build files
-build/
-*.class
+# IDE
+.vscode/
+.idea/
+*.iml
 
-# Log files
-*.log
-
-# OS files
+# OS Files
 .DS_Store
 Thumbs.db
 
-# IDE files
-.idea/
-.vscode/
-*.iml
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Keep lib/ directory for source code!
+
