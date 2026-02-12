@@ -305,8 +305,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 unselectedLabelColor: Colors.grey,
                 indicatorColor: Theme.of(context).primaryColor,
                 tabs: const [
-                  Tab(icon: Icon(Icons.emoji_emotions), text: '이모티콘'),
                   Tab(icon: Icon(Icons.pets), text: '스티커'),
+                  Tab(icon: Icon(Icons.emoji_emotions), text: '이모티콘'),
                 ],
               ),
               
@@ -315,11 +315,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 height: 350,
                 child: TabBarView(
                   children: [
-                    // 😊 일반 이모티콘 탭
-                    _buildEmojiGrid(),
-                    
                     // 🐱 Firebase 스티커 탭
                     _buildFirebaseStickerGrid(),
+                    
+                    // 😊 일반 이모티콘 탭
+                    _buildEmojiGrid(),
                   ],
                 ),
               ),
