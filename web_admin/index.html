@@ -516,11 +516,15 @@
         }
 
         window.deleteSticker = async function(docId, stickerIndex, storagePath) {
+            console.log('🔴 DELETE STARTED:', { docId, stickerIndex, storagePath });
+            
             if (!confirm('정말 이 스티커를 삭제하시겠습니까?')) {
+                console.log('❌ User cancelled deletion');
                 return;
             }
 
             try {
+                console.log('📄 Step 1: Fetching Firestore document...');
                 // 1. Firestore 문서 가져오기
                 const docRef = doc(db, 'sticker_packs', docId);
                 const docSnap = await getDoc(docRef);
@@ -531,30 +535,47 @@
 
                 const docData = docSnap.data();
                 const stickers = docData.stickers || [];
+                console.log(`✅ Document fetched. Total stickers: ${stickers.length}`);
 
+                console.log('🗑️ Step 2: Deleting file from Storage...');
                 // 2. Storage에서 파일 삭제
                 const storageRef = ref(storage, storagePath);
                 await deleteObject(storageRef);
+                console.log('✅ File deleted from Storage');
 
+                console.log('📝 Step 3: Updating Firestore document...');
                 // 3. Firestore 업데이트 (스티커 배열에서 제거)
                 const updatedStickers = stickers.filter((_, index) => index !== stickerIndex);
+                console.log(`Filtered stickers. Before: ${stickers.length}, After: ${updatedStickers.length}`);
                 
                 if (updatedStickers.length === 0) {
                     // 마지막 스티커인 경우 문서 전체 삭제
+                    console.log('🗑️ Last sticker - deleting entire document');
                     await deleteDoc(docRef);
+                    console.log('✅ Document deleted');
                     showAlert('마지막 스티커가 삭제되어 스티커팩이 제거되었습니다', 'success');
                 } else {
                     // 나머지 스티커로 배열 업데이트
+                    console.log('📝 Updating document with remaining stickers...');
                     await updateDoc(docRef, {
                         stickers: updatedStickers
                     });
+                    console.log('✅ Document updated');
                     showAlert('스티커가 삭제되었습니다', 'success');
                 }
                 
+                console.log('🔄 Reloading sticker list...');
                 loadStickers();
+                console.log('✅ DELETE COMPLETED');
 
             } catch (error) {
-                console.error('Delete error:', error);
+                console.error('❌ DELETE ERROR:', error);
+                console.error('Error details:', {
+                    name: error.name,
+                    message: error.message,
+                    code: error.code,
+                    stack: error.stack
+                });
                 showAlert('삭제 실패: ' + error.message, 'error');
             }
         };
