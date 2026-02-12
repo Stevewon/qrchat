@@ -740,7 +740,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
-                        Icons.phone,
+                        Icons.people,
                         color: Colors.green,
                         size: 24,  // 아이콘 크기 축소
                       ),
@@ -751,14 +751,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Securet 보안 통화',
+                            '참여자 및 초대',
                             style: TextStyle(
                               fontSize: 17,  // 폰트 크기 축소
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            '누구와 1:1 보안 통화를 하시겠습니까?',
+                            '친구 초대 또는 보안 통화',
                             style: TextStyle(
                               fontSize: 12,  // 폰트 크기 축소
                               color: Colors.grey,
@@ -770,6 +770,28 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
+                
+                // ⭐ 친구 초대 버튼
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _inviteFriends();
+                    },
+                    icon: const Icon(Icons.person_add),
+                    label: const Text('친구 초대'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
 
                 // 참여자 목록 (스크롤 가능, 하단 여백 추가)
                 Expanded(
@@ -973,16 +995,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ],
         ),
         actions: [
-          // ⭐ 친구 초대 버튼
-          IconButton(
-            icon: const Icon(Icons.person_add),
-            tooltip: '친구 초대',
-            onPressed: _inviteFriends,
-          ),
-          // 참여자 목록 및 Securet 통화
+          // 참여자 목록 및 친구 초대
           IconButton(
             icon: const Icon(Icons.people),
-            tooltip: '참여자 목록',
+            tooltip: '참여자 및 초대',
             onPressed: _startSecuretDirectCall,
           ),
           // 추가 메뉴
