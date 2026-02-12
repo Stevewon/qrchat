@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../services/securet_auth_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
@@ -17,6 +18,23 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _errorMessage;
+  String _appVersion = ''; // 앱 버전
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppVersion();
+  }
+  
+  /// 앱 버전 로드
+  Future<void> _loadAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -238,6 +256,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('회원가입'),
                   ),
                 ],
+              ),
+              
+              // Version Display
+              const SizedBox(height: 8),
+              Text(
+                _appVersion.isEmpty ? '' : 'Version $_appVersion',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey[600],
+                ),
               ),
 
               // 키보드 높이만큼 여백 추가 (로그인 버튼이 항상 보이도록)

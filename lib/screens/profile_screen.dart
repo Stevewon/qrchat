@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode, debugPrint;
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'dart:io';
 import '../services/securet_auth_service.dart';
 // import '../screens/invite_friends_screen.dart'; // 파일 없음 - 임시 비활성화
@@ -25,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _notificationSoundEnabled = true;
   final NotificationService _notificationService = NotificationService();
   String _statusMessage = ''; // 상태 메시지
+  String _appVersion = ''; // 앱 버전
 
   @override
   void initState() {
@@ -36,6 +38,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     _loadUserProfile();
     _loadNotificationSettings();
+    _loadAppVersion();
+  }
+  
+  /// 앱 버전 로드
+  Future<void> _loadAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+      });
+    }
   }
   
   /// 알림음 설정 로드
@@ -676,9 +689,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ListTile(
                 leading: const Icon(Icons.info_outline, color: Colors.black87),
                 title: const Text('About', style: TextStyle(fontSize: 16)),
-                subtitle: const Text(
-                  'Version 9.16.0 - 🎨 Sticker transparent background + Group/1:1 unified',
-                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                subtitle: Text(
+                  _appVersion.isEmpty 
+                    ? 'Loading version...' 
+                    : 'Version $_appVersion - 🎨 Sticker/Emoji UI improved',
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
                 ),
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                 onTap: () {},
