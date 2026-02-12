@@ -130,7 +130,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       
       final Map<String, SecuretUser> participantsMap = {};
       
-      for (final participantId in widget.chatRoom.participantIds) {
+      // ⭐ 수정: _currentChatRoom 사용 (최신 데이터)
+      for (final participantId in _currentChatRoom.participantIds) {
         if (participantId == widget.currentUserId) continue; // 자신 제외
         
         final user = await _friendService.getUserById(participantId);
@@ -157,14 +158,19 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     _chatRoomSubscription = _chatService.getChatRoomStream(widget.chatRoom.id).listen(
       (chatRoom) {
         if (chatRoom != null && mounted) {
+          final previousParticipantCount = _currentChatRoom.participantIds.length;
+          
           setState(() {
             _currentChatRoom = chatRoom;
           });
           
           debugPrint('🔄 [채팅방 업데이트] 참여자 수: ${chatRoom.participantIds.length}');
           
-          // 참여자가 변경되면 다시 로드
-          _loadParticipants();
+          // ⭐ 참여자 수가 변경되었을 때만 다시 로드
+          if (chatRoom.participantIds.length != previousParticipantCount) {
+            debugPrint('🔄 [참여자 변경 감지] 다시 로드');
+            _loadParticipants();
+          }
         }
       },
       onError: (error) {
