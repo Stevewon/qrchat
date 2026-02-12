@@ -998,7 +998,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     
     // 자신을 제외한 참여자 목록
     final otherParticipants = _participantsMap.values
-        .where((user) => user.userId != widget.currentUserId)
+        .where((user) => user.id != widget.currentUserId)
         .toList();
     
     if (otherParticipants.isEmpty) {
