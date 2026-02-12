@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 import '../services/securet_auth_service.dart';
-import '../screens/invite_friends_screen.dart';
+// import '../screens/invite_friends_screen.dart'; // 파일 없음 - 임시 비활성화
 import '../services/notification_service.dart';
 import '../models/securet_user.dart';
 import 'login_screen.dart';
@@ -612,23 +612,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const Divider(height: 1, indent: 56),
               
               // 친구 초대 (NEW!)
-              ListTile(
-                leading: const Icon(Icons.person_add, color: Colors.green),
-                title: const Text('친구 초대', style: TextStyle(fontSize: 16)),
-                subtitle: const Text(
-                  'QRChat을 친구들에게 소개하세요',
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
-                ),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const InviteFriendsScreen(),
-                    ),
-                  );
-                },
-              ),
+              // 친구 초대 기능 - 임시 비활성화
+              // ListTile(
+              //   leading: const Icon(Icons.person_add, color: Colors.green),
+              //   title: const Text('친구 초대', style: TextStyle(fontSize: 16)),
+              //   subtitle: const Text(
+              //     'QRChat을 친구들에게 소개하세요',
+              //     style: TextStyle(fontSize: 13, color: Colors.grey),
+              //   ),
+              //   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+              //   onTap: () {
+              //     // Navigator.push(
+              //     //   context,
+              //     //   MaterialPageRoute(
+              //     //     builder: (context) => const InviteFriendsScreen(),
+              //     //   ),
+              //     // );
+              //   },
+              // ),
               
               const Divider(height: 1, indent: 56),
               
