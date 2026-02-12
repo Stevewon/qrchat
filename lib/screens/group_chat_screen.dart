@@ -17,6 +17,7 @@ import '../services/notification_service.dart';
 import '../services/app_badge_service.dart';
 import '../services/safe_browsing_service.dart';
 import '../services/chat_state_service.dart';
+import '../widgets/invite_friends_dialog.dart'; // ⭐ 초대 다이얼로그
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/url_launcher.dart' as url_launcher;
 import 'package:image_picker/image_picker.dart';
@@ -620,6 +621,76 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     }
   }
 
+  /// 친구 초대 기능
+  Future<void> _inviteFriends() async {
+    // 초대 가능한 친구 목록 (현재 참여자 제외)
+    final allFriends = await _friendService.getFriends(widget.currentUserId);
+    final availableFriends = allFriends
+        .where((friend) => !_currentChatRoom.participantIds.contains(friend.id))
+        .toList();
+    
+    if (availableFriends.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('초대할 수 있는 친구가 없습니다'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return;
+    }
+    
+    // 초대 다이얼로그 표시
+    if (!mounted) return;
+    final selectedFriends = await showDialog<List<SecuretUser>>(
+      context: context,
+      builder: (context) => InviteFriendsDialog(
+        friends: availableFriends,
+        chatRoomId: widget.chatRoom.id,
+      ),
+    );
+    
+    if (selectedFriends == null || selectedFriends.isEmpty) return;
+    
+    // Firebase에 참여자 추가
+    try {
+      final updatedParticipantIds = [
+        ..._currentChatRoom.participantIds,
+        ...selectedFriends.map((f) => f.id),
+      ];
+      
+      await FirebaseFirestore.instance
+          .collection('chat_rooms')
+          .doc(widget.chatRoom.id)
+          .update({
+        'participantIds': updatedParticipantIds,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${selectedFriends.length}명의 친구를 초대했습니다'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ 친구 초대 실패: $e');
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('친구 초대에 실패했습니다'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
 
   /// Securet 보안 통화 참여자 선택
   void _startSecuretDirectCall() {
@@ -894,10 +965,16 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ],
         ),
         actions: [
+          // ⭐ 친구 초대 버튼
+          IconButton(
+            icon: const Icon(Icons.person_add),
+            tooltip: '친구 초대',
+            onPressed: _inviteFriends,
+          ),
           // 참여자 목록 및 Securet 통화
           IconButton(
             icon: const Icon(Icons.people),
-            tooltip: 'Securet 보안 통화',
+            tooltip: '참여자 목록',
             onPressed: _startSecuretDirectCall,
           ),
           // 추가 메뉴
