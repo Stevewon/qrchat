@@ -530,21 +530,17 @@
                 const docSnap = await getDoc(docRef);
                 
                 if (!docSnap.exists()) {
+                    console.error('❌ Document does not exist!');
                     throw new Error('스티커팩 문서를 찾을 수 없습니다');
                 }
 
                 const docData = docSnap.data();
                 const stickers = docData.stickers || [];
                 console.log(`✅ Document fetched. Total stickers: ${stickers.length}`);
+                console.log('Current stickers array:', stickers);
 
-                console.log('🗑️ Step 2: Deleting file from Storage...');
-                // 2. Storage에서 파일 삭제
-                const storageRef = ref(storage, storagePath);
-                await deleteObject(storageRef);
-                console.log('✅ File deleted from Storage');
-
-                console.log('📝 Step 3: Updating Firestore document...');
-                // 3. Firestore 업데이트 (스티커 배열에서 제거)
+                // 2. Firestore 먼저 업데이트 (Storage 삭제 전에)
+                console.log('📝 Step 2: Updating Firestore document FIRST...');
                 const updatedStickers = stickers.filter((_, index) => index !== stickerIndex);
                 console.log(`Filtered stickers. Before: ${stickers.length}, After: ${updatedStickers.length}`);
                 
@@ -553,19 +549,36 @@
                     console.log('🗑️ Last sticker - deleting entire document');
                     await deleteDoc(docRef);
                     console.log('✅ Document deleted');
-                    showAlert('마지막 스티커가 삭제되어 스티커팩이 제거되었습니다', 'success');
                 } else {
                     // 나머지 스티커로 배열 업데이트
                     console.log('📝 Updating document with remaining stickers...');
+                    console.log('Updated stickers array:', updatedStickers);
                     await updateDoc(docRef, {
                         stickers: updatedStickers
                     });
-                    console.log('✅ Document updated');
-                    showAlert('스티커가 삭제되었습니다', 'success');
+                    console.log('✅ Document updated successfully');
+                    
+                    // 업데이트 확인
+                    const verifySnap = await getDoc(docRef);
+                    const verifyData = verifySnap.data();
+                    console.log('✅ Verification - new sticker count:', verifyData.stickers.length);
+                }
+
+                // 3. Storage에서 파일 삭제 (나중에)
+                console.log('🗑️ Step 3: Deleting file from Storage...');
+                try {
+                    const storageRef = ref(storage, storagePath);
+                    await deleteObject(storageRef);
+                    console.log('✅ File deleted from Storage');
+                } catch (storageError) {
+                    console.warn('⚠️ Storage deletion failed (file might not exist):', storageError.message);
+                    // Storage 삭제 실패해도 계속 진행 (Firestore는 이미 업데이트됨)
                 }
                 
+                showAlert('스티커가 삭제되었습니다!', 'success');
+                
                 console.log('🔄 Reloading sticker list...');
-                loadStickers();
+                await loadStickers();
                 console.log('✅ DELETE COMPLETED');
 
             } catch (error) {
