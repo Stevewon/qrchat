@@ -272,7 +272,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       background: Container(
         alignment: Alignment.centerLeft, // ⭐ 왼쪽 정렬
         padding: const EdgeInsets.only(left: 20), // ⭐ 왼쪽 패딩
-        color: Colors.red,
+        color: Colors.lightGreen[200], // 연한 연두색
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
