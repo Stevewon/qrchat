@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/friend.dart';
 import '../models/chat_room.dart';
 import '../services/firebase_friend_service.dart';
