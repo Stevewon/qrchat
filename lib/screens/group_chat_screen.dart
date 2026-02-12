@@ -83,9 +83,25 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   
   /// 채팅 초기화 (재진입 시에도 안전)
   Future<void> _initializeChat() async {
+    debugPrint('🔵 [초기화] 시작...');
+    
     // 기존 구독 정리
     await _messagesSubscription?.cancel();
     await _chatRoomSubscription?.cancel();
+    
+    // ⭐ 핵심: Firebase에서 최신 채팅방 정보를 먼저 가져오기
+    final latestChatRoom = await _chatService.getChatRoom(widget.chatRoom.id);
+    
+    if (latestChatRoom != null && mounted) {
+      setState(() {
+        _currentChatRoom = latestChatRoom;
+      });
+      debugPrint('✅ [초기화] 최신 채팅방 정보 로드 완료');
+      debugPrint('   채팅방 이름: ${latestChatRoom.groupName}');
+      debugPrint('   참여자 수: ${latestChatRoom.participantIds.length}');
+    } else {
+      debugPrint('⚠️ [초기화] 채팅방 정보를 가져올 수 없음');
+    }
     
     // 순차 로딩: 참여자 정보 로드 완료 후 메시지 렌더링
     _listenToChatRoom();

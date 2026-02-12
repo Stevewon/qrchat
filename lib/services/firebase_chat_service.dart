@@ -619,6 +619,41 @@ class FirebaseChatService {
     });
   }
 
+  /// 채팅방 정보 가져오기 (일회성)
+  Future<ChatRoom?> getChatRoom(String chatRoomId) async {
+    try {
+      if (kDebugMode) {
+        debugPrint('📥 [채팅방 조회] 시작: $chatRoomId');
+      }
+      
+      final snapshot = await _chatRoomsCollection.doc(chatRoomId).get();
+      
+      if (!snapshot.exists) {
+        if (kDebugMode) {
+          debugPrint('⚠️ [채팅방 조회] 채팅방이 존재하지 않음: $chatRoomId');
+        }
+        return null;
+      }
+      
+      final data = snapshot.data() as Map<String, dynamic>;
+      final chatRoom = ChatRoom.fromFirestore(data, snapshot.id);
+      
+      if (kDebugMode) {
+        debugPrint('✅ [채팅방 조회] 성공: ${chatRoom.id}');
+        debugPrint('   채팅방 이름: ${chatRoom.groupName}');
+        debugPrint('   참여자 수: ${chatRoom.participantIds.length}');
+        debugPrint('   참여자 목록: ${chatRoom.participantIds.join(", ")}');
+      }
+      
+      return chatRoom;
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ [채팅방 조회] 실패: $e');
+      }
+      return null;
+    }
+  }
+
   /// 모든 채팅방 조회 (호환성을 위한 일반 메서드)
   Future<List<ChatRoom>> getAllChatRooms(String userId) async {
     try {
