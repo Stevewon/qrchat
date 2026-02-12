@@ -85,17 +85,51 @@ class _ChatScreenState extends State<ChatScreen> {
     // ⭐ 채팅방 진입 추적 (알림 차단용)
     ChatStateService().enterChatRoom(widget.chatRoom.id);
     
+    // 🔥 FIX: 재진입 시 안전한 초기화
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _initializeChat();
+      }
+    });
+  }
+  
+  /// 채팅 초기화 (재진입 시에도 안전)
+  Future<void> _initializeChat() async {
+    // 기존 구독 정리
+    await _messagesSubscription?.cancel();
+    await _chatRoomSubscription?.cancel();
+    
+    // 🔥 FIX: 먼저 최신 채팅방 데이터를 Firestore에서 가져와서 _currentChatRoom 업데이트
+    try {
+      final latestChatRoom = await _chatService.getChatRoom(widget.chatRoom.id);
+      if (latestChatRoom != null && mounted) {
+        setState(() {
+          _currentChatRoom = latestChatRoom;
+        });
+        if (kDebugMode) {
+          debugPrint('✅ [초기화] 최신 채팅방 데이터 로드 완료');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('⚠️ [초기화] 채팅방 데이터 로드 실패, 기존 데이터 사용: $e');
+      }
+    }
+    
     // 채팅방 정보 실시간 업데이트
     _listenToChatRoom();
     
-    // 먼저 메시지 리스닝 시작
+    // 메시지 리스닝 시작
     _listenToMessages();
     
-    // 그 다음 읽음 처리 (약간의 딜레이 후)
+    // 읽음 처리 (약간의 딜레이 후)
     Future.delayed(const Duration(milliseconds: 500), () {
-      _markMessagesAsRead();
+      if (mounted) {
+        _markMessagesAsRead();
+      }
     });
   }
+  
   @override
   void dispose() {
     // ⭐ 채팅방 나가기 추적 (알림 재개용)

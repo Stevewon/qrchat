@@ -87,6 +87,19 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     await _messagesSubscription?.cancel();
     await _chatRoomSubscription?.cancel();
     
+    // 🔥 FIX: 먼저 최신 채팅방 데이터를 Firestore에서 가져와서 _currentChatRoom 업데이트
+    try {
+      final latestChatRoom = await _chatService.getChatRoom(widget.chatRoom.id);
+      if (latestChatRoom != null && mounted) {
+        setState(() {
+          _currentChatRoom = latestChatRoom;
+        });
+        debugPrint('✅ [초기화] 최신 채팅방 데이터 로드 완료 (참여자 ${latestChatRoom.participantIds.length}명)');
+      }
+    } catch (e) {
+      debugPrint('⚠️ [초기화] 채팅방 데이터 로드 실패, 기존 데이터 사용: $e');
+    }
+    
     // 순차 로딩: 참여자 정보 로드 완료 후 메시지 렌더링
     _listenToChatRoom();
     await _initializeDataSequentially();
@@ -130,7 +143,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       
       final Map<String, SecuretUser> participantsMap = {};
       
-      for (final participantId in widget.chatRoom.participantIds) {
+      // 🔥 FIX: widget.chatRoom 대신 _currentChatRoom 사용 (재진입 시 최신 데이터)
+      for (final participantId in _currentChatRoom.participantIds) {
         if (participantId == widget.currentUserId) continue; // 자신 제외
         
         final user = await _friendService.getUserById(participantId);
