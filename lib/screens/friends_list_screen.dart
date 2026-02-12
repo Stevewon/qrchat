@@ -156,7 +156,8 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        _showSnackBar('채팅방 생성에 실패했습니다', isError: true);
+        print('❌ [채팅방 생성 오류] $e');
+        _showSnackBar('채팅방 생성 실패: $e', isError: true);
       }
     }
   }

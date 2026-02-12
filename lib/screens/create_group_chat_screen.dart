@@ -158,7 +158,8 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        _showSnackBar('그룹 채팅방 생성에 실패했습니다', isError: true);
+        print('❌ [그룹 채팅 생성 오류] $e');
+        _showSnackBar('그룹 채팅 생성 실패: $e', isError: true);
       }
     }
   }
