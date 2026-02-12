@@ -44,21 +44,48 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
         setState(() {
           _isLoading = false;
         });
+        if (mounted) {
+          _showSnackBar('로그인 정보를 찾을 수 없습니다', isError: true);
+        }
         return;
       }
 
       _currentUserId = user.id;
       _currentUserNickname = user.nickname;
+      
+      debugPrint('🔍 [FriendsListScreen] 친구 목록 로딩 시작 - User: ${user.nickname} (${user.id})');
+      
       final friends = await _friendService.getFriends(user.id);
+      
+      debugPrint('✅ [FriendsListScreen] 친구 ${friends.length}명 로드 완료');
       
       setState(() {
         _friends = friends;
         _isLoading = false;
       });
+      
+      if (friends.isEmpty && mounted) {
+        _showSnackBar('친구 목록이 비어 있습니다. QR 코드로 친구를 추가해보세요!', isError: false);
+      }
     } catch (e) {
+      debugPrint('❌ [FriendsListScreen] 친구 목록 로드 실패: $e');
+      
       setState(() {
         _isLoading = false;
       });
+      
+      if (mounted) {
+        String errorMsg = '친구 목록을 불러오는데 실패했습니다.';
+        
+        if (e.toString().contains('permission') || e.toString().contains('PERMISSION_DENIED')) {
+          errorMsg = 'Firebase 권한 오류 - 관리자에게 문의하세요';
+          debugPrint('🔥 Firebase Security Rules 권한 문제 발생!');
+        } else if (e.toString().contains('network') || e.toString().contains('timeout')) {
+          errorMsg = '네트워크 연결을 확인해주세요';
+        }
+        
+        _showSnackBar(errorMsg, isError: true);
+      }
     }
   }
 

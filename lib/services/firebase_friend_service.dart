@@ -527,13 +527,30 @@ class FirebaseFriendService {
       
       final querySnapshot = await _friendsCollection
           .where('userId', isEqualTo: userId)
-          .get();
+          .get()
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              if (kDebugMode) {
+                debugPrint('⚠️ Firestore 조회 타임아웃 - 빈 목록 반환');
+              }
+              throw Exception('Firebase 연결 타임아웃');
+            },
+          );
+
+      if (kDebugMode) {
+        debugPrint('📊 Firestore 쿼리 결과: ${querySnapshot.docs.length}개 문서');
+      }
 
       // 각 친구의 프로필 정보를 Firestore에서 가져오기
       final friends = <Friend>[];
       for (var doc in querySnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
         final friendId = data['friendId'] ?? '';
+        
+        if (kDebugMode) {
+          debugPrint('   처리 중: 문서 ID ${doc.id}, friendId: $friendId');
+        }
         
         // Firestore에서 친구의 프로필 정보 가져오기
         String? profilePhoto;
@@ -572,8 +589,15 @@ class FirebaseFriendService {
 
       if (kDebugMode) {
         debugPrint('✅ 친구 ${friends.length}명 조회 완료');
-        for (var friend in friends) {
-          debugPrint('   - ${friend.friendNickname} (프로필: ${friend.profilePhoto != null ? "있음" : "없음"})');
+        if (friends.isEmpty) {
+          debugPrint('⚠️ 친구 목록이 비어 있습니다!');
+          debugPrint('   → Firestore "friends" 컬렉션에 데이터가 없습니다');
+          debugPrint('   → Firebase Security Rules를 확인하세요');
+          debugPrint('   → 또는 친구를 새로 추가해야 합니다');
+        } else {
+          for (var friend in friends) {
+            debugPrint('   - ${friend.friendNickname} (프로필: ${friend.profilePhoto != null ? "있음" : "없음"})');
+          }
         }
         debugPrint('========== 조회 완료 ==========\n');
       }
@@ -582,7 +606,22 @@ class FirebaseFriendService {
     } catch (e) {
       if (kDebugMode) {
         debugPrint('❌ 친구 목록 조회 실패: $e');
+        debugPrint('   오류 타입: ${e.runtimeType}');
+        debugPrint('   상세: $e');
+        if (e.toString().contains('permission') || e.toString().contains('PERMISSION_DENIED')) {
+          debugPrint('');
+          debugPrint('🔥 Firebase Security Rules 권한 오류 발생!');
+          debugPrint('   해결 방법:');
+          debugPrint('   1. Firebase Console 접속: https://console.firebase.google.com/project/qrchat-b7a67/firestore/rules');
+          debugPrint('   2. 다음 규칙 추가:');
+          debugPrint('      match /friends/{friendId} {');
+          debugPrint('        allow read, write: if true;  // 또는 request.auth != null');
+          debugPrint('      }');
+          debugPrint('   3. "게시" 버튼 클릭');
+          debugPrint('');
+        }
       }
+      // 빈 목록 대신 에러를 다시 던져서 UI에서 처리 가능하게
       rethrow;
     }
   }
