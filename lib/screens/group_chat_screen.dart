@@ -926,14 +926,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 );
 
                 if (confirm == true && mounted) {
-                  // 대화방 나가기
+                  // 대화방 나가기 (조용히 나가기)
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('대화방을 나갔습니다'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
                 }
               }
             },

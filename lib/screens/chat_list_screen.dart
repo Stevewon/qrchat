@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 import '../models/chat_room.dart';
 import '../models/securet_user.dart';
@@ -532,42 +533,24 @@ class _ChatListScreenState extends State<ChatListScreen> {
   /// 채팅방 나가기 실행
   Future<void> _leaveChatRoom(ChatRoom room) async {
     try {
-      // 채팅방 삭제
-      final success = await _chatService.deleteChatRoom(room.id);
+      // 채팅방 삭제 시도
+      await _chatService.deleteChatRoom(room.id);
       
-      if (success) {
-        if (mounted) {
-          // 채팅방 목록 새로고침
-          setState(() {
-            _chatRooms.remove(room);
-          });
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('채팅방 나가기 실패'),
-              backgroundColor: Colors.green[400],  // 연한 녹색
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          );
-        }
+      // 성공 여부와 관계없이 목록에서 제거 (사용자 경험 우선)
+      if (mounted) {
+        setState(() {
+          _chatRooms.remove(room);
+        });
       }
     } catch (e) {
+      // 에러가 발생해도 조용히 목록에서 제거
+      if (kDebugMode) {
+        debugPrint('⚠️ [채팅방 나가기] 오류 발생 (무시): $e');
+      }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('오류 발생: $e'),
-            backgroundColor: Colors.green[400],  // 연한 녹색
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
+        setState(() {
+          _chatRooms.remove(room);
+        });
       }
     }
   }
