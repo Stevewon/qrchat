@@ -590,6 +590,35 @@ class FirebaseChatService {
   }
 
   /// 특정 채팅방 실시간 스트림
+  /// 채팅방 정보 한 번 가져오기 (재진입 시 최신 데이터 로드용)
+  Future<ChatRoom?> getChatRoom(String chatRoomId) async {
+    try {
+      final snapshot = await _chatRoomsCollection.doc(chatRoomId).get();
+      
+      if (!snapshot.exists) {
+        if (kDebugMode) {
+          debugPrint('⚠️ [채팅방 조회] 채팅방이 존재하지 않음: $chatRoomId');
+        }
+        return null;
+      }
+      
+      final data = snapshot.data() as Map<String, dynamic>;
+      final chatRoom = ChatRoom.fromFirestore(data, snapshot.id);
+      
+      if (kDebugMode) {
+        debugPrint('✅ [채팅방 조회] 성공: ${chatRoom.id}');
+        debugPrint('   참여자 수: ${chatRoom.participantIds.length}');
+      }
+      
+      return chatRoom;
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ [채팅방 조회] 실패: $e');
+      }
+      return null;
+    }
+  }
+
   Stream<ChatRoom?> getChatRoomStream(String chatRoomId) {
     if (kDebugMode) {
       debugPrint('📡 [채팅방 스트림] 시작: $chatRoomId');
