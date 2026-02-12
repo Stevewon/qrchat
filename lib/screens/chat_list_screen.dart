@@ -55,7 +55,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('사용자 정보 로딩 실패: $e')),
+          SnackBar(
+            content: Text('사용자 정보 로딩 실패: $e'),
+            backgroundColor: Colors.orange[700],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
         );
       }
     }
@@ -87,7 +94,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
             _isLoading = false;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('채팅 목록 로딩 실패: $error')),
+            SnackBar(
+              content: Text('채팅 목록 로딩 실패: $error'),
+              backgroundColor: Colors.orange[700],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           );
         }
       },
@@ -126,7 +140,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('채팅 목록 로딩 실패: $e')),
+          SnackBar(
+            content: Text('채팅 목록 로딩 실패: $e'),
+            backgroundColor: Colors.orange[700],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
         );
       }
     }
@@ -524,9 +545,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('채팅방 나가기 실패'),
-              backgroundColor: Colors.red,
+            SnackBar(
+              content: const Text('채팅방 나가기 실패'),
+              backgroundColor: Colors.orange[700],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           );
         }
@@ -536,7 +561,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('오류 발생: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.orange[700],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
