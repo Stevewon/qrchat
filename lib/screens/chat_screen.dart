@@ -21,6 +21,7 @@ import '../services/app_badge_service.dart';
 import '../services/chat_state_service.dart';
 import '../widgets/invite_friends_dialog.dart';
 import 'debug_log_screen.dart';
+import 'video_player_screen.dart'; // 동영상 재생 화면
 import '../utils/url_launcher.dart' as url_launcher;
 import '../services/safe_browsing_service.dart';
 
@@ -2672,8 +2673,16 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildVideoMessage(String videoUrl, bool isMe) {
     return GestureDetector(
       onTap: () {
-        // 동영상 재생 (URL 열기)
-        url_launcher.openUrlInNewTab(videoUrl);
+        // 동영상 재생 화면으로 이동
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoPlayerScreen(
+              videoUrl: videoUrl,
+              title: '동영상',
+            ),
+          ),
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(12),
