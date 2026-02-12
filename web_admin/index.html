@@ -504,11 +504,30 @@
         function createStickerCard(sticker, packName, docId, index) {
             const card = document.createElement('div');
             card.className = 'sticker-card';
+            
+            // Storage 경로 추출 (URL에서 또는 직접 필드에서)
+            let storagePath = sticker.sticker_path;
+            if (!storagePath && sticker.sticker_url) {
+                // URL에서 경로 추출: https://...firebasestorage.../stickers/...
+                try {
+                    const url = new URL(sticker.sticker_url);
+                    const pathMatch = url.pathname.match(/\/o\/(.+?)(\?|$)/);
+                    if (pathMatch) {
+                        storagePath = decodeURIComponent(pathMatch[1]);
+                    }
+                } catch (e) {
+                    console.warn('Failed to extract storage path from URL:', e);
+                }
+            }
+            
+            // 경로를 JSON에 안전하게 인코딩
+            const safeStoragePath = JSON.stringify(storagePath || '');
+            
             card.innerHTML = `
                 <img src="${sticker.sticker_url}" class="sticker-image" alt="${sticker.sticker_name}">
                 <div class="sticker-name">${sticker.sticker_name}</div>
                 <div class="sticker-pack">📦 ${packName}</div>
-                <button class="btn btn-danger" style="width: 100%;" onclick="deleteSticker('${docId}', ${index}, '${sticker.sticker_path}')">
+                <button class="btn btn-danger" style="width: 100%;" onclick="deleteSticker('${docId}', ${index}, ${safeStoragePath})">
                     삭제
                 </button>
             `;
@@ -564,15 +583,22 @@
                     console.log('✅ Verification - new sticker count:', verifyData.stickers.length);
                 }
 
-                // 3. Storage에서 파일 삭제 (나중에)
-                console.log('🗑️ Step 3: Deleting file from Storage...');
-                try {
-                    const storageRef = ref(storage, storagePath);
-                    await deleteObject(storageRef);
-                    console.log('✅ File deleted from Storage');
-                } catch (storageError) {
-                    console.warn('⚠️ Storage deletion failed (file might not exist):', storageError.message);
-                    // Storage 삭제 실패해도 계속 진행 (Firestore는 이미 업데이트됨)
+                // 3. Storage에서 파일 삭제 (경로가 있을 때만)
+                if (storagePath && storagePath !== 'undefined' && storagePath !== '') {
+                    console.log('🗑️ Step 3: Deleting file from Storage...');
+                    console.log('Storage path:', storagePath);
+                    try {
+                        const storageRef = ref(storage, storagePath);
+                        await deleteObject(storageRef);
+                        console.log('✅ File deleted from Storage');
+                    } catch (storageError) {
+                        console.warn('⚠️ Storage deletion failed (file might not exist):', storageError.message);
+                        console.warn('This is OK - Firestore is already updated');
+                        // Storage 삭제 실패해도 계속 진행 (Firestore는 이미 업데이트됨)
+                    }
+                } else {
+                    console.warn('⚠️ No storage path provided - skipping Storage deletion');
+                    console.warn('Firestore has been updated successfully');
                 }
                 
                 showAlert('스티커가 삭제되었습니다!', 'success');
