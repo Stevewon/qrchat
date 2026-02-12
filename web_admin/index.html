@@ -438,6 +438,11 @@
             const packId = document.getElementById('stickerPackId').value.trim();
             const files = window.selectedFiles;
 
+            console.log('🔵 [업로드 시작]');
+            console.log('   Pack Name:', packName);
+            console.log('   Pack ID:', packId);
+            console.log('   Files:', files.length);
+
             if (!packName || !packId) {
                 showAlert('스티커팩 이름과 ID를 입력해주세요', 'error');
                 return;
@@ -459,27 +464,38 @@
             try {
                 const uploadedStickers = [];
 
-                // 각 스티커 업로드 (모바일 앱과 동일한 로직)
+                // 각 스티커 업로드 (모바일 앱과 EXACTLY 동일한 로직)
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     const fileExtension = file.name.split('.').pop();
+                    // 🔥 FIX: 모바일 앱처럼 i+1 사용 (1부터 시작)
                     const fileName = `sticker_${String(i + 1).padStart(3, '0')}.${fileExtension}`;
                     const storagePath = `stickers/${packId}/${fileName}`;
+                    
+                    console.log(`📤 [${i+1}/${files.length}] 업로드 중: ${fileName}`);
+                    console.log('   Storage Path:', storagePath);
+                    console.log('   File Type:', file.type);
+                    console.log('   File Size:', (file.size / 1024).toFixed(2), 'KB');
+
                     const storageRef = ref(storage, storagePath);
 
-                    // Content Type 설정
-                    const contentType = file.type || 'image/gif';
+                    // Content Type 설정 (모바일 앱은 항상 image/gif로 고정)
                     const metadata = {
-                        contentType: contentType
+                        contentType: file.type || 'image/gif'
                     };
 
                     // 업로드
+                    console.log('   ⬆️ Storage 업로드 시작...');
                     await uploadBytes(storageRef, file, metadata);
+                    console.log('   ✅ Storage 업로드 완료');
+                    
+                    console.log('   🔗 Download URL 가져오는 중...');
                     const downloadUrl = await getDownloadURL(storageRef);
+                    console.log('   ✅ Download URL:', downloadUrl);
 
-                    // 스티커 정보 저장 (모바일 앱과 동일한 구조)
+                    // 🔥 FIX: 모바일 앱과 정확히 동일한 구조
                     uploadedStickers.push({
-                        sticker_id: `${packId}_${i}`,
+                        sticker_id: `${packId}_${i}`,  // 모바일: ${packId}_${order}
                         sticker_name: file.name.split('.')[0],
                         image_url: downloadUrl,
                         order: i,
@@ -494,15 +510,20 @@
                     console.log(`✅ [스티커 업로드] ${fileName} → ${downloadUrl}`);
                 }
 
-                // Firestore에 저장 (모바일 앱과 동일한 구조)
+                console.log('📦 [Firestore 저장 시작]');
+                console.log('   Uploaded Stickers:', uploadedStickers);
+
+                // 🔥 FIX: Firestore Timestamp 대신 ISO 문자열 사용 (웹 호환성)
                 const stickerPackData = {
                     pack_id: packId,
                     pack_name: packName,
                     is_default: false,
-                    created_at: new Date().toISOString(),
+                    created_at: new Date().toISOString(),  // ISO string for web
                     sticker_count: uploadedStickers.length,
                     stickers: uploadedStickers
                 };
+
+                console.log('   Firestore Data:', JSON.stringify(stickerPackData, null, 2));
 
                 // Document ID를 packId로 지정 (모바일 앱과 동일)
                 await setDoc(doc(db, 'sticker_packs', packId), stickerPackData);
@@ -523,7 +544,11 @@
 
             } catch (error) {
                 console.error('❌ [업로드] 실패:', error);
-                showAlert('업로드 실패: ' + error.message, 'error');
+                console.error('   Error name:', error.name);
+                console.error('   Error message:', error.message);
+                console.error('   Error code:', error.code);
+                console.error('   Full error:', error);
+                showAlert('업로드 실패: ' + error.message + ' (자세한 내용은 콘솔 확인)', 'error');
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.textContent = '업로드';
