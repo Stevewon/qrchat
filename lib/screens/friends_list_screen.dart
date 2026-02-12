@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/friend.dart';
 import '../models/chat_room.dart';
 import '../services/firebase_friend_service.dart';
@@ -124,6 +125,17 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
     );
 
     try {
+      // 🔍 디버그: 사용자 인증 상태 확인
+      print('🔍 [인증 확인] currentUserId: $_currentUserId');
+      print('🔍 [인증 확인] currentUserNickname: $_currentUserNickname');
+      print('🔍 [인증 확인] friendId: ${friend.id}');
+      print('🔍 [인증 확인] friendNickname: ${friend.nickname}');
+      
+      // Firebase Auth 현재 사용자 확인
+      final currentUser = FirebaseAuth.instance.currentUser;
+      print('🔍 [Firebase Auth] currentUser: ${currentUser?.uid}');
+      print('🔍 [Firebase Auth] email: ${currentUser?.email}');
+      
       // 채팅방 생성 또는 가져오기
       final chatRoom = await _chatService.getOrCreateOneToOneChatRoom(
         _currentUserId!,
