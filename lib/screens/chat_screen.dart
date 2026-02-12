@@ -2669,7 +2669,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  /// 동영상 메시지 위젯
+  /// 동영상 메시지 위젯 (카카오톡 스타일 썸네일)
   Widget _buildVideoMessage(String videoUrl, bool isMe) {
     return GestureDetector(
       onTap: () {
@@ -2684,65 +2684,102 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isMe ? Colors.white.withValues(alpha: 0.2) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isMe ? Colors.white.withValues(alpha: 0.3) : Colors.grey[300]!,
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 동영상 아이콘
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isMe ? Colors.white.withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.play_circle_filled,
-                color: isMe ? Colors.white : Colors.red,
-                size: 32,
-              ),
-            ),
-            const SizedBox(width: 12),
-            // 동영상 정보
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 동영상 썸네일 (첫 프레임)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: 240,
+              height: 180,
+              color: Colors.black87,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Text(
-                    '동영상',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isMe ? Colors.white : Colors.black87,
+                  // 배경 (동영상 URL 표시 - 실제 썸네일 대신)
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.grey[800]!,
+                          Colors.grey[900]!,
+                        ],
+                      ),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.videocam,
+                        size: 48,
+                        color: Colors.white.withValues(alpha: 0.3),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '탭하여 재생',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isMe ? Colors.white.withValues(alpha: 0.7) : Colors.grey[600],
+                  // 그라데이션 오버레이
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.1),
+                          Colors.black.withValues(alpha: 0.3),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.play_arrow,
-              color: isMe ? Colors.white : Colors.grey[700],
-              size: 20,
+          ),
+          // 재생 버튼 오버레이 (카카오톡 스타일)
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.6),
+              shape: BoxShape.circle,
             ),
-          ],
-        ),
+            child: const Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+              size: 40,
+            ),
+          ),
+          // 하단 시간 표시 (선택사항)
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.videocam,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    '동영상',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
