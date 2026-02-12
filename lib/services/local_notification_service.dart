@@ -12,6 +12,9 @@ class LocalNotificationService {
   /// ⭐ 현재 열려있는 채팅방 ID (알림 음소거용)
   static String? _activeChatRoomId;
   
+  /// ⭐ 알림 카운터 (2회당 1회 알림음 재생용)
+  static int _notificationCount = 0;
+  
   /// 현재 활성 채팅방 설정 (채팅방 진입 시 호출)
   static void setActiveChatRoom(String? chatRoomId) {
     _activeChatRoomId = chatRoomId;
@@ -102,6 +105,16 @@ class LocalNotificationService {
         await initialize();
       }
 
+      // ⭐ 알림 카운터 증가
+      _notificationCount++;
+      
+      // ⭐ 2회당 1회만 알림음 재생 (2, 4, 6, 8... 번째 알림에서만 소리)
+      final shouldPlaySound = (_notificationCount % 2 == 0);
+      
+      if (kDebugMode) {
+        print('🔔 알림 #$_notificationCount: ${shouldPlaySound ? "🔊 소리 O" : "🔇 소리 X"}');
+      }
+
       // 1. 로컬 알림 표시 (음소거 모드 - 소리 없이 배지만)
       await _notifications.show(
         DateTime.now().millisecondsSinceEpoch.remainder(100000), // 고유 ID
@@ -114,7 +127,7 @@ class LocalNotificationService {
             channelDescription: '새로운 채팅 메시지 알림',
             importance: Importance.high,
             priority: Priority.high,
-            playSound: false,  // ⭐ 알림음 끄기
+            playSound: false,  // ⭐ 알림음 끄기 (수동으로 재생)
             enableVibration: false,  // ⭐ 진동 끄기
             icon: '@mipmap/ic_launcher',
             onlyAlertOnce: true,  // ⭐ 한 번만 알림
@@ -122,13 +135,23 @@ class LocalNotificationService {
           iOS: DarwinNotificationDetails(
             presentAlert: true,
             presentBadge: true,
-            presentSound: false,  // ⭐ 알림음 끄기
+            presentSound: false,  // ⭐ 알림음 끄기 (수동으로 재생)
           ),
         ),
         payload: payload,
       );
 
-      // ⭐ 알림음 재생 제거 (조용한 알림)
+      // ⭐ 2회당 1회만 알림음 재생
+      if (shouldPlaySound) {
+        await playNotificationSound();
+        if (kDebugMode) {
+          print('🔊 알림음 재생 (2회당 1회)');
+        }
+      } else {
+        if (kDebugMode) {
+          print('🔇 알림음 생략 (다음 알림에서 재생)');
+        }
+      }
 
       if (kDebugMode) {
         print('✅ 알림 표시 완료: $title - $body');
