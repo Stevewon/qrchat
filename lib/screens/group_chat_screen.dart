@@ -572,46 +572,38 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   /// 🐱 스티커 전송 (이미지 메시지로 전송)
   Future<void> _sendSticker(String stickerUrl) async {
+    if (kDebugMode) {
+      debugPrint('🎨 [스티커 전송] 시작: $stickerUrl');
+    }
+    
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) return;
-
-      // Firestore에서 사용자 정보 가져오기
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser.uid)
-          .get();
+      // ⭐ 일대일 채팅과 동일한 방식: _chatService 사용
+      final success = await _chatService.sendMessage(
+        widget.chatRoom.id,
+        widget.currentUserId,
+        widget.currentUserNickname,
+        stickerUrl,  // 스티커 URL
+        MessageType.image,  // 이미지 타입으로 전송
+      );
       
-      final profilePhoto = userDoc.data()?['profilePhoto'] as String?;
-
-      // 스티커를 이미지 메시지로 전송
-      await FirebaseFirestore.instance
-          .collection('group_chats')
-          .doc(widget.chatRoom.id)
-          .collection('messages')
-          .add({
-        'type': MessageType.image.toString().split('.').last,
-        'content': stickerUrl,  // GIF URL
-        'senderId': currentUser.uid,
-        'timestamp': FieldValue.serverTimestamp(),
-        'profilePhoto': profilePhoto,
-      });
-
-      // 마지막 메시지 업데이트
-      await FirebaseFirestore.instance
-          .collection('group_chats')
-          .doc(widget.chatRoom.id)
-          .update({
-        'last_message': '🐱 고양이 스티커',
-        'last_message_time': FieldValue.serverTimestamp(),
-      });
-
-      if (kDebugMode) {
-        debugPrint('✅ [스티커 전송] 성공: $stickerUrl');
+      if (success) {
+        if (kDebugMode) {
+          debugPrint('✅ [스티커 전송] 완료');
+        }
+      } else {
+        if (kDebugMode) {
+          debugPrint('❌ [스티커 전송] 실패');
+        }
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('스티커 전송 실패')),
+          );
+        }
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('❌ [스티커 전송] 실패: $e');
+        debugPrint('❌ [스티커 전송] 오류: $e');
       }
       
       if (mounted) {
