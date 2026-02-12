@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRChat v9.34.0 다운로드</title>
+    <title>QRChat v9.35.0 다운로드</title>
     <style>
         body {
             font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -32,8 +32,8 @@
             margin-bottom: 30px;
         }
         .alert {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
+            background: #d4edda;
+            border: 2px solid #28a745;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 30px;
@@ -41,11 +41,11 @@
         .alert-title {
             font-size: 1.3em;
             font-weight: bold;
-            color: #856404;
+            color: #155724;
             margin-bottom: 10px;
         }
         .alert-text {
-            color: #856404;
+            color: #155724;
             line-height: 1.6;
         }
         .download-box {
@@ -122,13 +122,13 @@
 <body>
     <div class="container">
         <h1>🎉 QRChat</h1>
-        <div class="version">v9.34.0 - 친구 목록 로딩 긴급 수정</div>
+        <div class="version">v9.35.0 - 동영상 재생 기능 추가</div>
         
         <div class="alert">
-            <div class="alert-title">🔥 긴급 디버깅 버전</div>
+            <div class="alert-title">🎬 동영상 재생 기능 완성!</div>
             <div class="alert-text">
-                이 버전은 <strong>친구 목록이 비어 보이는 문제</strong>를 진단하기 위한 디버깅 강화 버전입니다.<br>
-                설치 후 친구 목록 화면에서 나타나는 에러 메시지를 확인해주세요!
+                채팅방에서 동영상을 탭하면 <strong>전용 재생 화면</strong>에서 동영상을 볼 수 있습니다!<br>
+                재생/일시정지, 진행 바, 시간 표시 등 모든 기능이 포함되어 있습니다.
             </div>
         </div>
 
@@ -136,56 +136,73 @@
             <h2>📱 APK 다운로드</h2>
             <div class="file-info">
                 <div>
-                    <div class="file-name">QRChat-v9.34.0-DEBUG-FIX.apk</div>
-                    <div class="file-size">크기: 68 MB</div>
+                    <div class="file-name">QRChat-v9.35.0-VIDEO-FIX.apk</div>
+                    <div class="file-size">크기: 69 MB</div>
                 </div>
             </div>
-            <a href="QRChat-v9.34.0-DEBUG-FIX.apk" class="btn">⬇️ APK 다운로드</a>
+            <a href="QRChat-v9.35.0-VIDEO-FIX.apk" class="btn">⬇️ APK 다운로드</a>
         </div>
 
         <div class="features">
-            <h2>🔍 이번 버전의 개선사항</h2>
+            <h2>🆕 이번 버전의 새로운 기능</h2>
             
             <div class="feature-item">
-                <div class="feature-title">✅ Firebase 조회 실패 시 상세 로그</div>
-                어떤 단계에서 실패했는지 콘솔에 명확히 표시 (문서 개수, friendId 등)
+                <div class="feature-title">🎬 동영상 전용 재생 화면</div>
+                채팅방에서 동영상을 탭하면 전체 화면 재생 화면으로 이동합니다
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">✅ Permission Denied 오류 자동 감지</div>
-                Firebase Security Rules 권한 문제 감지 및 해결 방법 자동 안내
+                <div class="feature-title">⏯️ 재생 컨트롤</div>
+                재생/일시정지 버튼, 진행 바, 현재 시간/전체 시간 표시
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">✅ 타임아웃 처리 (10초)</div>
-                네트워크 지연 시 무한 대기 방지 및 명확한 에러 메시지
+                <div class="feature-title">🎯 자동 재생</div>
+                동영상 화면을 열면 자동으로 재생 시작
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">✅ UI 에러 메시지 개선</div>
-                친구 목록 화면에서 에러 원인을 명확하게 표시 (Permission/Network 구분)
+                <div class="feature-title">👆 탭으로 일시정지</div>
+                동영상 화면 아무 곳이나 탭하면 재생/일시정지
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">✅ 빈 친구 목록 안내</div>
-                친구가 0명일 때 "QR 코드로 친구를 추가해보세요!" 메시지 표시
+                <div class="feature-title">📊 진행 바 드래그</div>
+                진행 바를 드래그하여 원하는 위치로 이동 가능
             </div>
         </div>
 
-        <div class="download-box" style="margin-top: 30px; background: #fff3cd; border-color: #ffc107;">
-            <h2 style="color: #856404;">⚠️ 설치 후 확인사항</h2>
-            <ol style="color: #856404; line-height: 1.8;">
-                <li>앱을 열고 친구 목록 화면으로 이동</li>
-                <li>화면 하단에 빨간색 에러 메시지가 나타나는지 확인</li>
-                <li>에러 메시지가 표시되면 스크린샷을 찍어서 공유</li>
-                <li>Android Studio나 adb가 있다면 로그 확인:
-                    <pre style="background: white; padding: 10px; border-radius: 5px; margin-top: 10px;">adb logcat | grep -E "FriendsListScreen|FirebaseFriendService"</pre>
-                </li>
-            </ol>
+        <div class="features">
+            <h2>✅ 이전 버전에서 수정된 기능</h2>
+            
+            <div class="feature-item">
+                <div class="feature-title">✅ 친구 목록 로딩</div>
+                Firebase 권한 오류 자동 감지 및 해결 (v9.34.0)
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-title">✅ 채팅방 생성</div>
+                Firestore 권한 문제 해결 (v9.34.0)
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-title">✅ 이미지 업로드</div>
+                Storage 권한 문제 해결 (v9.34.0)
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-title">✅ 스티커 삭제</div>
+                Storage 경로 자동 추출, undefined 해결 (v9.33.0)
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-title">✅ UI 개선</div>
+                채팅 목록 스와이프 배경색 연한 연두색으로 변경 (v9.33.0)
+            </div>
         </div>
 
         <div class="footer">
-            <p><strong>버전:</strong> 9.34.0 (Build 9340)</p>
+            <p><strong>버전:</strong> 9.35.0 (Build 9350)</p>
             <p><strong>릴리즈 날짜:</strong> 2026-02-12</p>
             <p><strong>Flutter SDK:</strong> 3.41.0 | <strong>Dart:</strong> 3.11.0</p>
             <p style="margin-top: 20px;">
