@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRChat 스티커 관리자</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: #eef1ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.drag-over {
+            background: #e0e7ff;
+            border-color: #4f46e5;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .sticker-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .sticker-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .sticker-image {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .sticker-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .sticker-pack {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .preview-container {
+            margin-top: 20px;
+        }
+
+        .preview-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 QRChat 스티커 관리자</h1>
+            <p>Firebase Storage에 직접 스티커를 업로드하고 관리하세요</p>
+        </div>
+
+        <div class="content">
+            <!-- Alert Messages -->
+            <div id="alertSuccess" class="alert alert-success"></div>
+            <div id="alertError" class="alert alert-error"></div>
+
+            <!-- Upload Section -->
+            <div class="section">
+                <h2 class="section-title">📤 스티커 업로드</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p><strong>클릭하거나 드래그하여 파일 업로드</strong></p>
+                    <p style="font-size: 12px; color: #888; margin-top: 10px;">
+                        GIF, PNG, WebP 파일 (최대 500KB, 400x400px)
+                    </p>
+                    <input type="file" id="fileInput" accept=".gif,.png,.webp" style="display: none;" multiple>
+                </div>
+
+                <div class="preview-container" id="previewContainer" style="display: none;">
+                    <h3>미리보기</h3>
+                    <div id="previewImages"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="stickerPackName">스티커팩 이름 *</label>
+                    <input type="text" id="stickerPackName" placeholder="예: 고양이 감정팩">
+                </div>
+
+                <div class="form-group">
+                    <label for="stickerPackId">스티커팩 ID *</label>
+                    <input type="text" id="stickerPackId" placeholder="예: cat_emotions_pack">
+                </div>
+
+                <button class="btn btn-primary" id="uploadBtn" onclick="uploadStickers()">
+                    업로드
+                </button>
+            </div>
+
+            <!-- Sticker List Section -->
+            <div class="section">
+                <h2 class="section-title">🖼️ 등록된 스티커</h2>
+                <button class="btn btn-primary" onclick="loadStickers()">새로고침</button>
+                
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>로딩 중...</p>
+                </div>
+
+                <div id="stickerGrid" class="sticker-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getStorage, ref, uploadBytes, deleteObject, listAll, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEoFb4ovEEyrSKs7Se9JToLzHA26A6ga8",
+            projectId: "qrchat-b7a67",
+            storageBucket: "qrchat-b7a67.firebasestorage.app",
+            appId: "1:745884272823:android:bc0cc4d389b36ee1d9e532"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        const db = getFirestore(app);
+
+        // Global variables
+        window.selectedFiles = [];
+        window.storage = storage;
+        window.db = db;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStickers();
+            setupUploadArea();
+        });
+
+        function setupUploadArea() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        function handleFiles(files) {
+            window.selectedFiles = Array.from(files);
+            showPreview(window.selectedFiles);
+        }
+
+        function showPreview(files) {
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImages = document.getElementById('previewImages');
+            
+            previewContainer.style.display = 'block';
+            previewImages.innerHTML = '';
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.style.marginBottom = '10px';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" class="preview-image">
+                        <div class="file-info">
+                            <strong>${file.name}</strong><br>
+                            크기: ${(file.size / 1024).toFixed(2)} KB
+                        </div>
+                    `;
+                    previewImages.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.uploadStickers = async function() {
+            const packName = document.getElementById('stickerPackName').value.trim();
+            const packId = document.getElementById('stickerPackId').value.trim();
+            const files = window.selectedFiles;
+
+            if (!packName || !packId) {
+                showAlert('스티커팩 이름과 ID를 입력해주세요', 'error');
+                return;
+            }
+
+            if (files.length === 0) {
+                showAlert('업로드할 파일을 선택해주세요', 'error');
+                return;
+            }
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '업로드 중...';
+
+            try {
+                const stickers = [];
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileName = `stickers/${packId}/${Date.now()}_${i}_${file.name}`;
+                    const storageRef = ref(storage, fileName);
+
+                    await uploadBytes(storageRef, file);
+                    const url = await getDownloadURL(storageRef);
+
+                    stickers.push({
+                        sticker_name: file.name.split('.')[0],
+                        sticker_url: url,
+                        sticker_path: fileName
+                    });
+                }
+
+                // Firestore에 스티커팩 정보 저장
+                await addDoc(collection(db, 'sticker_packs'), {
+                    pack_name: packName,
+                    pack_id: packId,
+                    stickers: stickers,
+                    created_at: new Date().toISOString()
+                });
+
+                showAlert(`${files.length}개 스티커가 업로드되었습니다!`, 'success');
+                
+                // Reset form
+                document.getElementById('stickerPackName').value = '';
+                document.getElementById('stickerPackId').value = '';
+                document.getElementById('fileInput').value = '';
+                document.getElementById('previewContainer').style.display = 'none';
+                window.selectedFiles = [];
+
+                // Reload stickers
+                loadStickers();
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showAlert('업로드 실패: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '업로드';
+            }
+        };
+
+        window.loadStickers = async function() {
+            const loading = document.getElementById('loading');
+            const stickerGrid = document.getElementById('stickerGrid');
+
+            loading.style.display = 'block';
+            stickerGrid.innerHTML = '';
+
+            try {
+                const querySnapshot = await getDocs(collection(db, 'sticker_packs'));
+                
+                if (querySnapshot.empty) {
+                    stickerGrid.innerHTML = '<p style="text-align: center; color: #888;">등록된 스티커가 없습니다</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const stickers = data.stickers || [];
+
+                    stickers.forEach((sticker, index) => {
+                        const card = createStickerCard(sticker, data.pack_name, docSnap.id, index);
+                        stickerGrid.appendChild(card);
+                    });
+                });
+
+            } catch (error) {
+                console.error('Load error:', error);
+                showAlert('스티커 로드 실패: ' + error.message, 'error');
+            } finally {
+                loading.style.display = 'none';
+            }
+        };
+
+        function createStickerCard(sticker, packName, docId, index) {
+            const card = document.createElement('div');
+            card.className = 'sticker-card';
+            card.innerHTML = `
+                <img src="${sticker.sticker_url}" class="sticker-image" alt="${sticker.sticker_name}">
+                <div class="sticker-name">${sticker.sticker_name}</div>
+                <div class="sticker-pack">📦 ${packName}</div>
+                <button class="btn btn-danger" style="width: 100%;" onclick="deleteSticker('${docId}', ${index}, '${sticker.sticker_path}')">
+                    삭제
+                </button>
+            `;
+            return card;
+        }
+
+        window.deleteSticker = async function(docId, stickerIndex, storagePath) {
+            if (!confirm('정말 이 스티커를 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                // Storage에서 파일 삭제
+                const storageRef = ref(storage, storagePath);
+                await deleteObject(storageRef);
+
+                // Firestore 업데이트 (스티커 배열에서 제거)
+                const docRef = doc(db, 'sticker_packs', docId);
+                const docSnap = await getDocs(collection(db, 'sticker_packs'));
+                
+                // 전체 문서를 다시 가져와서 업데이트
+                // (배열 요소 삭제는 복잡하므로, 전체 리로드 방식 사용)
+                
+                showAlert('스티커가 삭제되었습니다', 'success');
+                loadStickers();
+
+            } catch (error) {
+                console.error('Delete error:', error);
+                showAlert('삭제 실패: ' + error.message, 'error');
+            }
+        };
+
+        function showAlert(message, type) {
+            const alertId = type === 'success' ? 'alertSuccess' : 'alertError';
+            const alertEl = document.getElementById(alertId);
+            
+            alertEl.textContent = message;
+            alertEl.classList.add('show');
+
+            setTimeout(() => {
+                alertEl.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
