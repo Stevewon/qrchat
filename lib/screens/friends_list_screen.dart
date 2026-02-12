@@ -101,7 +101,11 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
+        backgroundColor: isError ? Colors.green[400] : Colors.green,  // 에러도 연한 녹색
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -154,9 +158,13 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
         }
       }
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ [채팅방 생성] 실패: $e');
+        debugPrint('   Stack trace: ${StackTrace.current}');
+      }
       if (mounted) {
         Navigator.pop(context);
-        _showSnackBar('채팅방 생성에 실패했습니다', isError: true);
+        _showSnackBar('채팅방 생성에 실패했습니다: $e', isError: true);
       }
     }
   }

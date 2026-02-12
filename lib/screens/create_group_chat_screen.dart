@@ -200,7 +200,11 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.green[400],  // 연한 녹색
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
