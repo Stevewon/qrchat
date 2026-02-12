@@ -2386,8 +2386,18 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   /// 친구 초대 다이얼로그 표시
+  bool _isInviting = false; // 🔒 초대 중복 방지 플래그
+
   Future<void> _showInviteFriendsDialog() async {
+    // 🔒 이미 초대 진행 중이면 무시
+    if (_isInviting) {
+      debugPrint('⚠️ 이미 초대 진행 중입니다. 중복 클릭 방지!');
+      return;
+    }
+
     try {
+      _isInviting = true; // 🔒 초대 시작
+
       // 1. 내 친구 목록 가져오기
       final allFriends = await _friendService.getFriends(widget.currentUserId);
       
@@ -2405,6 +2415,7 @@ class _ChatScreenState extends State<ChatScreen> {
             backgroundColor: Colors.orange,
           ),
         );
+        _isInviting = false; // 🔒 초대 종료
         return;
       }
 
@@ -2418,6 +2429,7 @@ class _ChatScreenState extends State<ChatScreen> {
       );
 
       if (selectedFriends == null || selectedFriends.isEmpty) {
+        _isInviting = false; // 🔒 초대 취소
         return; // 취소 또는 선택 안 함
       }
 
@@ -2459,6 +2471,8 @@ class _ChatScreenState extends State<ChatScreen> {
       if (kDebugMode) {
         debugPrint('✅ 친구 초대 성공: $invitedNames');
       }
+
+      _isInviting = false; // 🔒 초대 완료
     } catch (e) {
       if (kDebugMode) {
         debugPrint('❌ 친구 초대 실패: $e');
@@ -2477,6 +2491,8 @@ class _ChatScreenState extends State<ChatScreen> {
           backgroundColor: Colors.red,
         ),
       );
+
+      _isInviting = false; // 🔒 초대 실패 시에도 플래그 해제
     }
   }
 
