@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../models/chat_room.dart';
 import '../models/chat_message.dart';
+import '../models/friend.dart'; // ⭐ Friend 모델
 import '../models/securet_user.dart';
 import '../services/firebase_chat_service.dart';
 import '../services/firebase_friend_service.dart';
@@ -625,8 +626,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   Future<void> _inviteFriends() async {
     // 초대 가능한 친구 목록 (현재 참여자 제외)
     final allFriends = await _friendService.getFriends(widget.currentUserId);
+    
+    // Friend 타입으로 변환 (현재 참여자 제외)
     final availableFriends = allFriends
-        .where((friend) => !_currentChatRoom.participantIds.contains(friend.id))
+        .where((friend) => !_currentChatRoom.participantIds.contains(friend.friendId))
         .toList();
     
     if (availableFriends.isEmpty) {
@@ -643,11 +646,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     
     // 초대 다이얼로그 표시
     if (!mounted) return;
-    final selectedFriends = await showDialog<List<SecuretUser>>(
+    final selectedFriends = await showDialog<List<dynamic>>(
       context: context,
       builder: (context) => InviteFriendsDialog(
-        friends: availableFriends,
-        chatRoomId: widget.chatRoom.id,
+        availableFriends: availableFriends,
+        currentChatRoom: _currentChatRoom,
       ),
     );
     
@@ -655,9 +658,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     
     // Firebase에 참여자 추가
     try {
+      // Friend 객체에서 friendId 추출
+      final selectedFriendIds = selectedFriends
+          .map((f) => f.friendId as String)
+          .toList();
+      
       final updatedParticipantIds = [
         ..._currentChatRoom.participantIds,
-        ...selectedFriends.map((f) => f.id),
+        ...selectedFriendIds,
       ];
       
       await FirebaseFirestore.instance
