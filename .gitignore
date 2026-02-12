@@ -1,5 +1,5 @@
-# APK files
-*.apk
+# APK files (excluding release versions)
+# *.apk
 
 # Build files
 build/
