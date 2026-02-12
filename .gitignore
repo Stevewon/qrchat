@@ -1,0 +1,18 @@
+# APK files
+*.apk
+
+# Build files
+build/
+*.class
+
+# Log files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.iml
