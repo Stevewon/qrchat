@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRChat v9.33.0 다운로드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .version {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .download-section {
+            margin-bottom: 40px;
+        }
+
+        .download-card {
+            background: #f8f9ff;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .download-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .download-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .download-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .download-info {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .download-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .features {
+            background: #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .features h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .features li {
+            padding: 8px 0;
+            color: #555;
+        }
+
+        .features li:before {
+            content: "✅ ";
+            margin-right: 10px;
+        }
+
+        .links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .link-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .link-button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .file-size {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 QRChat</h1>
+            <p class="version">v9.33.0 - 최신 버전</p>
+        </div>
+
+        <div class="content">
+            <div class="download-section">
+                <div class="download-card">
+                    <div class="download-icon">📦</div>
+                    <div class="download-title">
+                        소스 코드 다운로드
+                        <span class="file-size">527 KB</span>
+                    </div>
+                    <div class="download-info">
+                        QRChat v9.33.0 전체 소스 코드가 포함된 ZIP 파일입니다.
+                        <br>Flutter 환경에서 직접 빌드하여 사용할 수 있습니다.
+                    </div>
+                    <a href="QRChat-v9.33.0-source.zip" class="download-button" download>
+                        📥 ZIP 파일 다운로드
+                    </a>
+                </div>
+
+                <div class="features">
+                    <h3>🆕 v9.33.0 주요 변경사항</h3>
+                    <ul>
+                        <li><strong>스티커 삭제 기능 완전 수정</strong> - 관리자 페이지에서 삭제가 제대로 작동</li>
+                        <li><strong>UI 개선</strong> - 채팅 목록 스와이프 배경색을 연한 연두색으로 변경</li>
+                        <li><strong>Storage 경로 자동 추출</strong> - undefined 에러 해결</li>
+                        <li><strong>데이터 일관성 보장</strong> - Firestore 우선 업데이트 로직</li>
+                        <li><strong>에러 핸들링 강화</strong> - 더 안정적인 동작</li>
+                    </ul>
+                </div>
+
+                <div class="links">
+                    <a href="https://github.com/Stevewon/qrchat" class="link-button" target="_blank">
+                        🔗 GitHub 저장소
+                    </a>
+                    <a href="https://github.com/Stevewon/qrchat/releases/tag/v9.33.0" class="link-button" target="_blank">
+                        📋 릴리즈 노트
+                    </a>
+                    <a href="https://console.firebase.google.com/project/qrchat-b7a67" class="link-button" target="_blank">
+                        🔥 Firebase Console
+                    </a>
+                </div>
+            </div>
+
+            <div class="download-section">
+                <h2 style="margin-bottom: 20px; color: #333;">🚀 빌드 방법</h2>
+                <div style="background: #2d2d2d; color: #00ff00; padding: 20px; border-radius: 8px; font-family: monospace;">
+                    <div style="margin-bottom: 10px;"># 1. ZIP 파일 압축 해제</div>
+                    <div style="margin-bottom: 10px;">unzip QRChat-v9.33.0-source.zip</div>
+                    <div style="margin-bottom: 10px;">cd qrchat</div>
+                    <div style="margin-bottom: 20px;"></div>
+                    <div style="margin-bottom: 10px;"># 2. 의존성 설치</div>
+                    <div style="margin-bottom: 10px;">flutter pub get</div>
+                    <div style="margin-bottom: 20px;"></div>
+                    <div style="margin-bottom: 10px;"># 3. APK 빌드</div>
+                    <div style="margin-bottom: 10px;">flutter build apk --release</div>
+                    <div style="margin-bottom: 20px;"></div>
+                    <div style="margin-bottom: 10px;"># 4. APK 위치</div>
+                    <div>build/app/outputs/flutter-apk/app-release.apk</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
