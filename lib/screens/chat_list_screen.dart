@@ -57,7 +57,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('사용자 정보 로딩 실패: $e'),
-            backgroundColor: Colors.orange[700],
+            backgroundColor: Colors.green[400],  // 연한 녹색
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -96,7 +96,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('채팅 목록 로딩 실패: $error'),
-              backgroundColor: Colors.orange[700],
+              backgroundColor: Colors.green[400],  // 연한 녹색
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -142,7 +142,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('채팅 목록 로딩 실패: $e'),
-            backgroundColor: Colors.orange[700],
+            backgroundColor: Colors.green[400],  // 연한 녹색
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -547,7 +547,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('채팅방 나가기 실패'),
-              backgroundColor: Colors.orange[700],
+              backgroundColor: Colors.green[400],  // 연한 녹색
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -561,7 +561,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('오류 발생: $e'),
-            backgroundColor: Colors.orange[700],
+            backgroundColor: Colors.green[400],  // 연한 녹색
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
