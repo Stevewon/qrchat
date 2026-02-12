@@ -89,21 +89,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     await _messagesSubscription?.cancel();
     await _chatRoomSubscription?.cancel();
     
-    // ⭐ 핵심: Firebase에서 최신 채팅방 정보를 먼저 가져오기
-    final latestChatRoom = await _chatService.getChatRoom(widget.chatRoom.id);
+    // ⭐ 일대일 채팅 방식: Firebase 스트림이 자동으로 최신 데이터를 가져옴
+    // getChatRoom() 호출 제거 - 불필요한 중복 로딩 방지
+    // _listenToChatRoom()이 즉시 최신 데이터를 업데이트함
     
-    if (latestChatRoom != null && mounted) {
-      setState(() {
-        _currentChatRoom = latestChatRoom;
-      });
-      debugPrint('✅ [초기화] 최신 채팅방 정보 로드 완료');
-      debugPrint('   채팅방 이름: ${latestChatRoom.groupName}');
-      debugPrint('   참여자 수: ${latestChatRoom.participantIds.length}');
-    } else {
-      debugPrint('⚠️ [초기화] 채팅방 정보를 가져올 수 없음');
-    }
-    
-    // 순차 로딩: 참여자 정보 로드 완료 후 메시지 렌더링
+    // 순차 로딩: 스트림 시작 → 참여자 정보 로드 → 메시지 렌더링
     _listenToChatRoom();
     await _initializeDataSequentially();
   }
