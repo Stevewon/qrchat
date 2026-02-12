@@ -1,8 +1,8 @@
 name: qrchat
-description: "QR Code Chat App with Profile Photos - v9.29.0"
+description: "QR Code Chat App with Profile Photos - v9.29.1"
 publish_to: 'none'
 
-version: 9.29.0+9290
+version: 9.29.1+9291
 
 environment:
   sdk: ^3.9.2

@@ -952,7 +952,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       ),
       body: Column(
         children: [
-          // 그룹 채팅 안내 메시지 (Securet 통화 대신 그룹 정보 강조)
+          // 그룹 채팅 참여자 안내 (일대일 채팅 스타일)
           Container(
             padding: const EdgeInsets.all(12),
             color: Colors.teal.withValues(alpha: 0.05),
@@ -962,7 +962,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '${_currentChatRoom.participantIds.length}명이 참여 중인 그룹 채팅입니다',
+                    _buildParticipantNames(),
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.teal[800],
@@ -988,6 +988,36 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       ),
       ),
     );
+  }
+
+  /// 참여자 이름 표시 (일대일 채팅 스타일)
+  String _buildParticipantNames() {
+    if (_participantsMap.isEmpty) {
+      return '${_currentChatRoom.participantIds.length}명이 참여 중인 그룹 채팅입니다';
+    }
+    
+    // 자신을 제외한 참여자 목록
+    final otherParticipants = _participantsMap.values
+        .where((user) => user.userId != widget.currentUserId)
+        .toList();
+    
+    if (otherParticipants.isEmpty) {
+      return '나만 있는 그룹 채팅입니다';
+    }
+    
+    // 최대 3명까지 이름 표시
+    final displayCount = otherParticipants.length > 3 ? 3 : otherParticipants.length;
+    final names = otherParticipants
+        .take(displayCount)
+        .map((user) => user.nickname)
+        .join(', ');
+    
+    if (otherParticipants.length > 3) {
+      final remaining = otherParticipants.length - 3;
+      return '$names 외 ${remaining}명';
+    }
+    
+    return names;
   }
 
   /// 빈 상태 (1:1과 동일)
