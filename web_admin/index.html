@@ -321,7 +321,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getStorage, ref, uploadBytes, deleteObject, listAll, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase 설정
         const firebaseConfig = {
@@ -521,18 +521,36 @@
             }
 
             try {
-                // Storage에서 파일 삭제
+                // 1. Firestore 문서 가져오기
+                const docRef = doc(db, 'sticker_packs', docId);
+                const docSnap = await getDoc(docRef);
+                
+                if (!docSnap.exists()) {
+                    throw new Error('스티커팩 문서를 찾을 수 없습니다');
+                }
+
+                const docData = docSnap.data();
+                const stickers = docData.stickers || [];
+
+                // 2. Storage에서 파일 삭제
                 const storageRef = ref(storage, storagePath);
                 await deleteObject(storageRef);
 
-                // Firestore 업데이트 (스티커 배열에서 제거)
-                const docRef = doc(db, 'sticker_packs', docId);
-                const docSnap = await getDocs(collection(db, 'sticker_packs'));
+                // 3. Firestore 업데이트 (스티커 배열에서 제거)
+                const updatedStickers = stickers.filter((_, index) => index !== stickerIndex);
                 
-                // 전체 문서를 다시 가져와서 업데이트
-                // (배열 요소 삭제는 복잡하므로, 전체 리로드 방식 사용)
+                if (updatedStickers.length === 0) {
+                    // 마지막 스티커인 경우 문서 전체 삭제
+                    await deleteDoc(docRef);
+                    showAlert('마지막 스티커가 삭제되어 스티커팩이 제거되었습니다', 'success');
+                } else {
+                    // 나머지 스티커로 배열 업데이트
+                    await updateDoc(docRef, {
+                        stickers: updatedStickers
+                    });
+                    showAlert('스티커가 삭제되었습니다', 'success');
+                }
                 
-                showAlert('스티커가 삭제되었습니다', 'success');
                 loadStickers();
 
             } catch (error) {
