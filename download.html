@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRChat v9.39.0 다운로드</title>
+    <title>QRChat v9.41.0 다운로드</title>
     <style>
         body {
             font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -131,15 +131,15 @@
 <body>
     <div class="container">
         <h1>🎉 QRChat</h1>
-        <div class="version">v9.40.0 - 동영상 재입장 버그 디버그 버전</div>
+        <div class="version">v9.41.0 - 동영상 재입장 버그 수정!</div>
         
         <div class="alert">
-            <div class="alert-title">🐛 동영상 재입장 버그 디버그 버전!</div>
+            <div class="alert-title">✅ 동영상 재입장 버그 수정 완료!</div>
             <div class="alert-text">
-                ⚠️ <strong>디버그 버전</strong> - 동영상 메시지 타입 파싱 로그 추가<br>
-                🔍 <strong>문제 분석</strong> - 채팅방 재입장 시 동영상 썸네일/재생 안 되는 문제 진단<br>
-                📊 <strong>디버그 로그</strong> - Firestore 데이터와 메시지 타입 파싱 과정 출력<br>
-                🧪 <strong>테스트 요청</strong> - 앱 설치 후 동영상 업로드 → 나가기 → 재입장 → 로그 확인
+                ✅ <strong>위젯 Key 추가</strong> - 메시지와 동영상 위젯에 고유 Key 추가로 재렌더링 보장<br>
+                🔍 <strong>강화된 디버그</strong> - 동영상 메시지 렌더링 과정 상세 로깅<br>
+                🐛 <strong>문제 해결</strong> - 채팅방 나갔다 들어와도 동영상 썸네일 정상 표시<br>
+                ⚡ <strong>재생 가능</strong> - 동영상 클릭 시 정상 재생
             </div>
         </div>
 
@@ -149,38 +149,38 @@
             <!-- ZIP 파일 (디버그) -->
             <div class="file-info">
                 <div>
-                    <div class="file-name">🗜️ QRChat-v9.40.0-VIDEO-DEBUG.zip <span class="new-badge">디버그</span></div>
+                    <div class="file-name">🗜️ QRChat-v9.41.0-VIDEO-FIX.zip <span class="new-badge">권장</span></div>
                     <div class="file-size">크기: 33 MB (압축됨)</div>
                 </div>
             </div>
-            <a href="QRChat-v9.40.0-VIDEO-DEBUG.zip" class="btn">⬇️ ZIP 파일 다운로드</a>
+            <a href="QRChat-v9.41.0-VIDEO-FIX.zip" class="btn">⬇️ ZIP 파일 다운로드 (권장)</a>
             
             <!-- APK 파일 -->
             <div class="file-info" style="margin-top: 20px;">
                 <div>
-                    <div class="file-name">📱 QRChat-v9.40.0-VIDEO-DEBUG.apk</div>
+                    <div class="file-name">📱 QRChat-v9.41.0-VIDEO-FIX.apk</div>
                     <div class="file-size">크기: 69 MB</div>
                 </div>
             </div>
-            <a href="QRChat-v9.40.0-VIDEO-DEBUG.apk" class="btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">⬇️ APK 직접 다운로드</a>
+            <a href="QRChat-v9.41.0-VIDEO-FIX.apk" class="btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">⬇️ APK 직접 다운로드</a>
         </div>
 
         <div class="features">
-            <h2>🐛 v9.40.0 디버그 변경사항</h2>
+            <h2>✅ v9.41.0 버그 수정</h2>
             
             <div class="feature-item">
-                <div class="feature-title">🔍 동영상 타입 파싱 디버그 로그 추가 <span class="new-badge">DEBUG</span></div>
-                메시지 스트림에서 동영상 타입 파싱 과정을 상세히 로깅
+                <div class="feature-title">🔑 위젯 Key 추가 <span class="new-badge">FIX</span></div>
+                ListView의 각 메시지와 동영상 위젯에 고유 Key 추가로 재렌더링 보장
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">📊 Firestore 데이터 검증 <span class="new-badge">DEBUG</span></div>
-                원본 Firestore 데이터와 파싱된 메시지 타입 비교
+                <div class="feature-title">🔍 강화된 디버그 로그 <span class="new-badge">DEBUG</span></div>
+                동영상 메시지 렌더링, 클릭, 타입 파싱 과정 상세 로깅
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">🧪 재입장 버그 진단 <span class="new-badge">DEBUG</span></div>
-                채팅방 나갔다 들어올 때 동영상 썸네일/재생 안 되는 문제 원인 파악
+                <div class="feature-title">✅ 재입장 시 동영상 정상 표시 <span class="new-badge">FIX</span></div>
+                채팅방을 나갔다 들어와도 동영상 썸네일과 재생 기능 정상 작동
             </div>
         </div>
 
@@ -204,12 +204,12 @@
         </div>
 
         <div class="footer">
-            <p><strong>버전:</strong> 9.39.0 (Build 9390)</p>
-            <p><strong>릴리즈 날짜:</strong> 2026-02-13 03:37 UTC</p>
+            <p><strong>버전:</strong> 9.41.0 (Build 9410)</p>
+            <p><strong>릴리즈 날짜:</strong> 2026-02-13 07:57 UTC</p>
             <p><strong>Flutter SDK:</strong> 3.41.0 | <strong>Dart:</strong> 3.11.0</p>
             <p style="margin-top: 20px;">
                 <a href="https://github.com/Stevewon/qrchat" style="color: #667eea;">GitHub Repository</a> |
-                <a href="https://github.com/Stevewon/qrchat/releases/tag/v9.39.0" style="color: #667eea;">GitHub Release</a> |
+                <a href="https://github.com/Stevewon/qrchat/releases/tag/v9.41.0" style="color: #667eea;">GitHub Release</a> |
                 <a href="https://console.firebase.google.com/project/qrchat-b7a67" style="color: #667eea;">Firebase Console</a> |
                 <a href="https://8080-iuiezsh1341nwe1ngsc0x-cbeee0f9.sandbox.novita.ai" style="color: #667eea;">스티커 관리자</a>
             </p>
