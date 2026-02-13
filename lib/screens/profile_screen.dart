@@ -353,6 +353,211 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  /// 설정 바텀시트 표시
+  void _showSettingsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              // 핸들
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              // 타이틀
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  children: [
+                    const Text(
+                      '설정',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const Divider(height: 1),
+              
+              // 메뉴 리스트
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  children: [
+                    const SizedBox(height: 8),
+                    
+                    // 알림음 설정
+                    ListTile(
+                      leading: Icon(
+                        _notificationSoundEnabled 
+                            ? Icons.notifications_active 
+                            : Icons.notifications_off,
+                        color: _notificationSoundEnabled ? Colors.teal : Colors.grey,
+                      ),
+                      title: const Text('알림음', style: TextStyle(fontSize: 16)),
+                      subtitle: Text(
+                        _notificationSoundEnabled ? '켜짐' : '꺼짐',
+                        style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                      ),
+                      trailing: Switch(
+                        value: _notificationSoundEnabled,
+                        onChanged: (value) async {
+                          setState(() {
+                            _notificationSoundEnabled = value;
+                          });
+                          await _notificationService.setSoundEnabled(value);
+                          
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(value ? '알림음이 켜졌습니다' : '알림음이 꺼졌습니다'),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                          
+                          if (value) {
+                            await _notificationService.playNotificationSound();
+                          }
+                        },
+                      ),
+                    ),
+                    
+                    const Divider(height: 1, indent: 56),
+                    
+                    // About
+                    ListTile(
+                      leading: const Icon(Icons.info_outline, color: Colors.black87),
+                      title: const Text('About', style: TextStyle(fontSize: 16)),
+                      subtitle: Text(
+                        _appVersion.isEmpty 
+                          ? 'Loading version...' 
+                          : 'Version $_appVersion',
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                      onTap: () {
+                        // About 상세 페이지로 이동 (추후 구현)
+                      },
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    const Divider(height: 1, thickness: 8, color: Color(0xFFF0F0F0)),
+                    const SizedBox(height: 16),
+                    
+                    // 관리자 스티커 관리 버튼
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context); // 바텀시트 닫기
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminStickerScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.dashboard_customize),
+                        label: const Text('스티커 관리자'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // Logout 버튼
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context); // 바텀시트 닫기
+                          _logout();
+                        },
+                        icon: const Icon(Icons.logout),
+                        label: const Text('로그아웃'),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.red, width: 1),
+                          foregroundColor: Colors.red,
+                          minimumSize: const Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // 회원탈퇴 버튼
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // 바텀시트 닫기
+                          _showDeleteAccountDialog();
+                        },
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          '회원탈퇴',
+                          style: TextStyle(
+                            color: Colors.black45,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   /// 회원탈퇴 실행
   Future<void> _deleteAccount() async {
     // 로딩 다이얼로그 표시
@@ -433,6 +638,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          // 우측 상단 톱니바퀴 (설정) 아이콘
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.black87),
+            onPressed: () {
+              _showSettingsBottomSheet();
+            },
+          ),
+        ],
+      ),
       body: CustomScrollView(
         slivers: [
           // 카카오톡 스타일 프로필 헤더
@@ -575,40 +793,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // 메뉴 리스트
           SliverList(
             delegate: SliverChildListDelegate([
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               
-              // Securet 연동 배지
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE3F2FD),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.security, size: 18, color: Color(0xFF1976D2)),
-                    SizedBox(width: 6),
-                    Text(
-                      'Securet 연동',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF1976D2),
-                        fontWeight: FontWeight.w500,
-                      ),
+              // Securet 연동 배지 (카드 스타일)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  ],
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF1976D2).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.security, size: 24, color: Colors.white),
+                      SizedBox(width: 12),
+                      Text(
+                        'Securet 보안 연동 중',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Spacer(),
+                      Icon(Icons.verified_user, size: 20, color: Colors.white70),
+                    ],
+                  ),
                 ),
               ),
               
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               const Divider(height: 1, thickness: 1),
               
               // My QR Code
               ListTile(
-                leading: const Icon(Icons.qr_code_2, color: Colors.black87),
-                title: const Text('My QR Code', style: TextStyle(fontSize: 16)),
+                leading: const Icon(Icons.qr_code_2, color: Colors.black87, size: 28),
+                title: const Text(
+                  'My QR Code',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                subtitle: const Text(
+                  '내 QR 코드 보기',
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                 onTap: () {
                   if (_currentUser != null) {
@@ -622,161 +861,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
               
-              const Divider(height: 1, indent: 56),
-              
-              // 친구 초대 (NEW!)
-              // 친구 초대 기능 - 임시 비활성화
-              // ListTile(
-              //   leading: const Icon(Icons.person_add, color: Colors.green),
-              //   title: const Text('친구 초대', style: TextStyle(fontSize: 16)),
-              //   subtitle: const Text(
-              //     'QRChat을 친구들에게 소개하세요',
-              //     style: TextStyle(fontSize: 13, color: Colors.grey),
-              //   ),
-              //   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-              //   onTap: () {
-              //     // Navigator.push(
-              //     //   context,
-              //     //   MaterialPageRoute(
-              //     //     builder: (context) => const InviteFriendsScreen(),
-              //     //   ),
-              //     // );
-              //   },
-              // ),
-              
-              const Divider(height: 1, indent: 56),
-              
-              // 알림음 설정
-              ListTile(
-                leading: Icon(
-                  _notificationSoundEnabled 
-                      ? Icons.notifications_active 
-                      : Icons.notifications_off,
-                  color: _notificationSoundEnabled ? Colors.teal : Colors.grey,
-                ),
-                title: const Text('알림음', style: TextStyle(fontSize: 16)),
-                subtitle: Text(
-                  _notificationSoundEnabled ? '켜짐' : '꺼짐',
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-                ),
-                trailing: Switch(
-                  value: _notificationSoundEnabled,
-                  onChanged: (value) async {
-                    setState(() {
-                      _notificationSoundEnabled = value;
-                    });
-                    await _notificationService.setSoundEnabled(value);
-                    
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(value ? '알림음이 켜졌습니다' : '알림음이 꺼졌습니다'),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                    
-                    if (value) {
-                      await _notificationService.playNotificationSound();
-                    }
-                  },
-                ),
-              ),
-              
-              const Divider(height: 1, indent: 56),
-              
-              // About
-              ListTile(
-                leading: const Icon(Icons.info_outline, color: Colors.black87),
-                title: const Text('About', style: TextStyle(fontSize: 16)),
-                subtitle: Text(
-                  _appVersion.isEmpty 
-                    ? 'Loading version...' 
-                    : 'Version $_appVersion - 🎨 Sticker/Emoji UI improved',
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
-                ),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                onTap: () {},
-              ),
-              
-              const SizedBox(height: 24),
-              const Divider(height: 1, thickness: 8, color: Color(0xFFF0F0F0)),
-              const SizedBox(height: 16),
-              
-              // 관리자 스티커 관리 버튼
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminStickerScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.dashboard_customize),
-                  label: const Text('스티커 관리자'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // Logout 버튼
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: OutlinedButton(
-                  onPressed: _logout,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.red, width: 1),
-                    minimumSize: const Size(double.infinity, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Logout',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // 회원탈퇴 버튼 (카카오톡 스타일)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextButton(
-                  onPressed: _showDeleteAccountDialog,
-                  style: TextButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    '회원탈퇴',
-                    style: TextStyle(
-                      color: Colors.black45,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ),
+              const Divider(height: 1, thickness: 1),
               
               const SizedBox(height: 32),
             ]),
