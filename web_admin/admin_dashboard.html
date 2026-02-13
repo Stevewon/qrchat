@@ -769,7 +769,10 @@
                 <div class="content-card">
                     <div class="card-header">
                         <h3 class="card-title">👥 사용자 목록</h3>
-                        <button class="btn btn-primary" onclick="loadUsers()">🔄 새로고침</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" onclick="loadUsers()">🔄 새로고침</button>
+                            <button class="btn" onclick="removeDuplicateNicknames()" style="background: #ef4444; color: white;">🗑️ 중복 닉네임 제거</button>
+                        </div>
                     </div>
 
                     <div id="usersLoading" class="loading">
@@ -1978,6 +1981,89 @@
             } catch (error) {
                 console.error('Error unbanning user:', error);
                 alert('차단 해제 실패: ' + error.message);
+            }
+        };
+
+        // 중복 닉네임 제거
+        window.removeDuplicateNicknames = async () => {
+            if (!confirm('⚠️ 경고!\n\n동일한 닉네임을 가진 사용자 중 가장 최근에 가입한 사용자만 남기고 나머지를 삭제합니다.\n\n이 작업은 되돌릴 수 없습니다!\n\n계속하시겠습니까?')) {
+                return;
+            }
+            
+            if (!confirm('정말로 중복 닉네임을 가진 계정들을 삭제하시겠습니까?\n\n마지막 확인입니다!')) {
+                return;
+            }
+            
+            try {
+                // 모든 사용자 가져오기
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                
+                // 닉네임별로 그룹화
+                const nicknameMap = {};
+                usersSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    const nickname = user.nickname;
+                    
+                    if (nickname) {
+                        if (!nicknameMap[nickname]) {
+                            nicknameMap[nickname] = [];
+                        }
+                        
+                        nicknameMap[nickname].push({
+                            id: doc.id,
+                            registeredAt: user.registeredAt?.toDate?.() || new Date(user.registeredAt),
+                            data: user
+                        });
+                    }
+                });
+                
+                // 중복된 닉네임 찾기
+                let totalDuplicates = 0;
+                let deletedCount = 0;
+                const duplicateNicknames = [];
+                
+                for (const nickname in nicknameMap) {
+                    const users = nicknameMap[nickname];
+                    
+                    if (users.length > 1) {
+                        totalDuplicates += users.length;
+                        
+                        // 가입일 기준으로 내림차순 정렬 (최신이 먼저)
+                        users.sort((a, b) => b.registeredAt - a.registeredAt);
+                        
+                        // 가장 최근 가입자는 유지하고 나머지 삭제
+                        const toDelete = users.slice(1);
+                        
+                        for (const user of toDelete) {
+                            await deleteDoc(doc(db, 'users', user.id));
+                            deletedCount++;
+                        }
+                        
+                        duplicateNicknames.push({
+                            nickname: nickname,
+                            total: users.length,
+                            deleted: toDelete.length
+                        });
+                    }
+                }
+                
+                if (deletedCount === 0) {
+                    alert('중복된 닉네임이 없습니다.');
+                } else {
+                    let message = `✅ 중복 닉네임 제거 완료!\n\n`;
+                    message += `📊 삭제된 계정: ${deletedCount}개\n`;
+                    message += `👤 영향받은 닉네임: ${duplicateNicknames.length}개\n\n`;
+                    
+                    duplicateNicknames.forEach(item => {
+                        message += `- "${item.nickname}": ${item.total}개 중 ${item.deleted}개 삭제\n`;
+                    });
+                    
+                    alert(message);
+                    loadUsers();
+                }
+            } catch (error) {
+                console.error('Error removing duplicate nicknames:', error);
+                alert('중복 닉네임 제거 실패: ' + error.message);
             }
         };
 

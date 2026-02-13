@@ -55,6 +55,20 @@ class SecuretAuthService {
     }
 
     try {
+      // Check if nickname already exists
+      final nicknameSnapshot = await _firestore
+          .collection('users')
+          .where('nickname', isEqualTo: nickname)
+          .limit(1)
+          .get();
+      
+      if (nicknameSnapshot.docs.isNotEmpty) {
+        if (kDebugMode) {
+          debugPrint('⚠️ 이미 사용 중인 닉네임입니다!');
+        }
+        throw Exception('사용불가 닉네임입니다\n\n이미 다른 사용자가 사용 중인 닉네임입니다.\n다른 닉네임을 선택해주세요.');
+      }
+
       // Check if this QR code is banned
       final bannedUsersSnapshot = await _firestore
           .collection('users')
