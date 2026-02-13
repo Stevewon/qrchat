@@ -90,8 +90,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     
     // ⭐ QKEY 자동 적립 타이머 시작
     _startQKeyTimer();
-      }
-    });
   }
   
   /// 채팅 초기화 (재진입 시에도 안전)
