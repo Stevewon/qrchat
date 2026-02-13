@@ -19,6 +19,7 @@ import '../services/firebase_friend_service.dart';
 import '../services/notification_service.dart';
 import '../services/app_badge_service.dart';
 import '../services/chat_state_service.dart';
+import '../services/qkey_service.dart';
 import '../widgets/invite_friends_dialog.dart';
 import 'debug_log_screen.dart';
 import 'video_player_screen.dart'; // 동영상 재생 화면
@@ -56,6 +57,10 @@ class _ChatScreenState extends State<ChatScreen> {
   StreamSubscription? _messagesSubscription;
   StreamSubscription<ChatRoom?>? _chatRoomSubscription;
   late ChatRoom _currentChatRoom; // 채팅방 정보 (업데이트 가능)
+  
+  // QKEY 적립 타이머
+  Timer? _qkeyTimer;
+  DateTime? _lastQKeyEarnTime;
   
   // 업로드 중인 임시 메시지 목록 (카카오톡 스타일)
   final List<Map<String, dynamic>> _uploadingMessages = [];
@@ -96,7 +101,11 @@ class _ChatScreenState extends State<ChatScreen> {
     Future.delayed(const Duration(milliseconds: 500), () {
       _markMessagesAsRead();
     });
+    
+    // ⭐ QKEY 자동 적립 타이머 시작
+    _startQKeyTimer();
   }
+  
   @override
   void dispose() {
     // ⭐ 채팅방 나가기 추적 (알림 재개용)
@@ -106,6 +115,10 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollController.dispose();
     _messagesSubscription?.cancel();
     _chatRoomSubscription?.cancel();
+    
+    // ⭐ QKEY 타이머 정지
+    _qkeyTimer?.cancel();
+    
     super.dispose();
   }
 
@@ -229,6 +242,69 @@ class _ChatScreenState extends State<ChatScreen> {
     if (kDebugMode) {
       debugPrint(log4);
       DebugLogger.log(log4);
+    }
+  }
+
+  /// QKEY 자동 적립 타이머 시작
+  void _startQKeyTimer() {
+    // 첫 번째 적립 시도 (즉시)
+    _tryEarnQKey();
+    
+    // 5분마다 반복 (300초)
+    _qkeyTimer = Timer.periodic(
+      const Duration(minutes: QKeyService.earnIntervalMinutes),
+      (timer) {
+        _tryEarnQKey();
+      },
+    );
+    
+    if (kDebugMode) {
+      debugPrint('⏰ QKEY 자동 적립 타이머 시작 (${QKeyService.earnIntervalMinutes}분 간격)');
+    }
+  }
+  
+  /// QKEY 적립 시도
+  Future<void> _tryEarnQKey() async {
+    try {
+      final success = await QKeyService.earnQKey(
+        widget.currentUserId,
+        description: '채팅 활동',
+      );
+      
+      if (success && mounted) {
+        _lastQKeyEarnTime = DateTime.now();
+        
+        // 적립 성공 시 작은 스낵바 표시
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: const [
+                Icon(Icons.monetization_on, color: Colors.white, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  '🎉 +10 QKEY 적립!',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFFFFB300),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+        
+        if (kDebugMode) {
+          debugPrint('✅ QKEY 적립 성공: +${QKeyService.earnAmountPerInterval} QKEY');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ QKEY 적립 실패: $e');
+      }
     }
   }
 

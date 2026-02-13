@@ -8,7 +8,9 @@ import 'dart:io';
 import '../services/securet_auth_service.dart';
 // import '../screens/invite_friends_screen.dart'; // 파일 없음 - 임시 비활성화
 import '../services/notification_service.dart';
+import '../services/qkey_service.dart';
 import '../models/securet_user.dart';
+import '../models/qkey_transaction.dart';
 import 'login_screen.dart';
 import 'my_qr_code_screen.dart';
 import 'admin_sticker_screen.dart';
@@ -27,6 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final NotificationService _notificationService = NotificationService();
   String _statusMessage = ''; // 상태 메시지
   String _appVersion = ''; // 앱 버전
+  int _qkeyBalance = 0; // QKEY 잔액
 
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserProfile();
     _loadNotificationSettings();
     _loadAppVersion();
+    _loadQKeyBalance();
   }
   
   /// 앱 버전 로드
@@ -47,6 +51,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (mounted) {
       setState(() {
         _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+      });
+    }
+  }
+  
+  /// QKEY 잔액 로드
+  Future<void> _loadQKeyBalance() async {
+    if (_currentUser == null) {
+      final user = await SecuretAuthService.getCurrentUser();
+      if (user == null) return;
+      _currentUser = user;
+    }
+    
+    final balance = await QKeyService.getUserBalance(_currentUser!.id);
+    if (mounted) {
+      setState(() {
+        _qkeyBalance = balance;
       });
     }
   }
@@ -219,6 +239,206 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }
             },
             child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// QKEY 출금 신청 다이얼로그
+  void _showWithdrawDialog() {
+    if (_qkeyBalance < QKeyService.withdrawMinAmount) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '최소 출금 가능 금액은 ${QKeyService.withdrawMinAmount} QKEY입니다.\n'
+            '(현재 잔액: $_qkeyBalance QKEY)'
+          ),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    final walletController = TextEditingController();
+    final amountController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: const [
+            Icon(Icons.account_balance_wallet, color: Color(0xFF1976D2)),
+            SizedBox(width: 8),
+            Text('QKEY 출금 신청'),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 현재 잔액
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE3F2FD),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '현재 잔액',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF1976D2),
+                      ),
+                    ),
+                    Text(
+                      '$_qkeyBalance QKEY',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1976D2),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // 출금 금액
+              TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: '출금 금액 (QKEY)',
+                  hintText: '${QKeyService.withdrawUnit}의 배수로 입력',
+                  border: const OutlineInputBorder(),
+                  suffixText: 'QKEY',
+                ),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // 지갑 주소
+              TextField(
+                controller: walletController,
+                decoration: const InputDecoration(
+                  labelText: '지갑 주소',
+                  hintText: '암호화폐 지갑 주소를 입력하세요',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 2,
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // 안내 사항
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 16, color: Colors.orange.shade700),
+                        const SizedBox(width: 4),
+                        Text(
+                          '출금 안내',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '• 최소 출금: ${QKeyService.withdrawMinAmount} QKEY\n'
+                      '• 출금 단위: ${QKeyService.withdrawUnit} QKEY\n'
+                      '• 관리자 승인 후 처리됩니다\n'
+                      '• 지갑 주소를 정확히 입력해주세요',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange.shade900,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final amountText = amountController.text.trim();
+              final walletAddress = walletController.text.trim();
+              
+              if (amountText.isEmpty || walletAddress.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('모든 항목을 입력해주세요')),
+                );
+                return;
+              }
+              
+              final amount = int.tryParse(amountText);
+              if (amount == null || amount <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('올바른 금액을 입력해주세요')),
+                );
+                return;
+              }
+              
+              Navigator.pop(context);
+              
+              // 로딩 표시
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+              
+              final result = await QKeyService.requestWithdraw(
+                userId: _currentUser!.id,
+                amount: amount,
+                walletAddress: walletAddress,
+              );
+              
+              if (mounted) {
+                Navigator.pop(context); // 로딩 닫기
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(result['message'] ?? ''),
+                    backgroundColor: result['success'] ? Colors.green : Colors.red,
+                  ),
+                );
+                
+                if (result['success']) {
+                  _loadQKeyBalance(); // 잔액 새로고침
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1976D2),
+            ),
+            child: const Text('출금 신청'),
           ),
         ],
       ),
@@ -830,6 +1050,110 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Spacer(),
                       Icon(Icons.verified_user, size: 20, color: Colors.white70),
                     ],
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // QKEY 포인트 카드
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: GestureDetector(
+                  onTap: _showWithdrawDialog,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFB300), Color(0xFFFFA000)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFFB300).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.monetization_on, size: 24, color: Colors.white),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'QKEY 포인트',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              '$_qkeyBalance',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Text(
+                              'QKEY',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white70,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(Icons.info_outline, size: 14, color: Colors.white),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    '채팅 5분마다 10 QKEY 적립',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: const [
+                                  Text(
+                                    '출금 신청',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
