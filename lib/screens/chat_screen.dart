@@ -145,6 +145,17 @@ class _ChatScreenState extends State<ChatScreen> {
             debugPrint(log1);
             DebugLogger.log(log1);
             
+            // 🐛 DEBUG: 동영상 메시지 개수 확인
+            final videoMessages = messages.where((m) => m.type == MessageType.video).toList();
+            if (videoMessages.isNotEmpty) {
+              debugPrint('🎬 [메시지 스트림] 동영상 메시지: ${videoMessages.length}개');
+              for (var msg in videoMessages) {
+                debugPrint('   - ID: ${msg.id}');
+                debugPrint('   - Type: ${msg.type}');
+                debugPrint('   - Content: ${msg.content.substring(0, msg.content.length > 50 ? 50 : msg.content.length)}...');
+              }
+            }
+            
             for (var msg in messages) {
               final log2 = '   - ${msg.content}: readBy=${msg.readBy.length}명 ${msg.readBy.join(", ")}';
               debugPrint(log2);
@@ -1875,7 +1886,16 @@ class _ChatScreenState extends State<ChatScreen> {
         if (index < _messages.length) {
           final message = _messages[index];
           final isMe = message.senderId == widget.currentUserId;
-          return _buildMessageBubble(message, isMe);
+          
+          // 🐛 DEBUG: 메시지 렌더링 로그 (동영상만)
+          if (message.type == MessageType.video && kDebugMode) {
+            debugPrint('🎬 [ListView] 동영상 메시지 렌더링 index=$index, id=${message.id}');
+          }
+          
+          return Container(
+            key: ValueKey(message.id), // 🔑 메시지 고유 Key 추가
+            child: _buildMessageBubble(message, isMe),
+          );
         } 
         // 업로드 중 임시 메시지 표시
         else {
@@ -2763,8 +2783,20 @@ class _ChatScreenState extends State<ChatScreen> {
 
   /// 동영상 메시지 위젯 (카카오톡 스타일 썸네일)
   Widget _buildVideoMessage(String videoUrl, bool isMe) {
+    // 🐛 DEBUG: 동영상 메시지 렌더링 로그
+    if (kDebugMode) {
+      debugPrint('🎬 [동영상 메시지] 렌더링 시작');
+      debugPrint('   URL: ${videoUrl.substring(0, videoUrl.length > 50 ? 50 : videoUrl.length)}...');
+      debugPrint('   isMe: $isMe');
+    }
+    
     return GestureDetector(
+      key: ValueKey(videoUrl), // 🔑 고유 Key 추가로 재렌더링 보장
       onTap: () {
+        if (kDebugMode) {
+          debugPrint('🎬 [동영상 클릭] 재생 화면으로 이동');
+        }
+        
         // 동영상 재생 화면으로 이동
         Navigator.push(
           context,
