@@ -465,6 +465,8 @@ class FirebaseChatService {
         if (kDebugMode) {
           debugPrint('🔍 [메시지 스트림] 메시지 ID: ${doc.id}');
           debugPrint('   발신자: ${message.senderNickname}');
+          debugPrint('   타입: ${data['type']} → ${message.type}');
+          debugPrint('   Content: ${message.content.substring(0, message.content.length > 50 ? 50 : message.content.length)}...');
           debugPrint('   Firestore senderProfilePhoto: ${data['senderProfilePhoto']}');
           debugPrint('   Message 객체 senderProfilePhoto: ${message.senderProfilePhoto}');
         }
