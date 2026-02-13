@@ -2,7 +2,7 @@ name: qrchat
 description: "QR Code Chat App with Group Chat Media Fix - v9.38.0"
 publish_to: 'none'
 
-version: 9.38.0+9380
+version: 9.39.0+9390
 
 environment:
   sdk: ^3.9.2
