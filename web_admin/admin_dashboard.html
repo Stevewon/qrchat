@@ -529,25 +529,25 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a class="nav-link active" onclick="showSection('dashboard')">
+                    <a class="nav-link active" onclick="showSection('dashboard', event)">
                         <span class="nav-icon">📊</span>
                         <span>대시보드</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="showSection('qkey')">
+                    <a class="nav-link" onclick="showSection('qkey', event)">
                         <span class="nav-icon">💰</span>
                         <span>QKEY 출금 관리</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="showSection('stickers')">
+                    <a class="nav-link" onclick="showSection('stickers', event)">
                         <span class="nav-icon">🎨</span>
                         <span>스티커 관리</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="showSection('users')">
+                    <a class="nav-link" onclick="showSection('users', event)">
                         <span class="nav-icon">👥</span>
                         <span>사용자 관리</span>
                     </a>
@@ -613,16 +613,16 @@
                     </div>
 
                     <div class="tabs">
-                        <button class="tab-btn active" onclick="filterWithdrawals('pending')">
+                        <button class="tab-btn active" onclick="filterWithdrawals('pending', event)">
                             대기중 (<span id="pendingCountTab">0</span>)
                         </button>
-                        <button class="tab-btn" onclick="filterWithdrawals('approved')">
+                        <button class="tab-btn" onclick="filterWithdrawals('approved', event)">
                             승인됨 (<span id="approvedCountTab">0</span>)
                         </button>
-                        <button class="tab-btn" onclick="filterWithdrawals('completed')">
+                        <button class="tab-btn" onclick="filterWithdrawals('completed', event)">
                             완료됨 (<span id="completedCountTab">0</span>)
                         </button>
-                        <button class="tab-btn" onclick="filterWithdrawals('rejected')">
+                        <button class="tab-btn" onclick="filterWithdrawals('rejected', event)">
                             거부됨 (<span id="rejectedCountTab">0</span>)
                         </button>
                     </div>
@@ -872,14 +872,16 @@
         }
 
         // 출금 필터링
-        window.filterWithdrawals = (status) => {
+        window.filterWithdrawals = (status, event) => {
             window.currentFilter = status;
             
             // 탭 활성화
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
             
             // 필터링
             const filtered = window.allWithdrawals.filter(w => w.withdrawStatus === status);
@@ -1121,12 +1123,14 @@
         };
 
         // 섹션 전환
-        window.showSection = (section) => {
+        window.showSection = (section, event) => {
             // 네비게이션 활성화
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            event.target.closest('.nav-link').classList.add('active');
+            if (event && event.target) {
+                event.target.closest('.nav-link').classList.add('active');
+            }
             
             // 섹션 표시/숨김
             document.getElementById('dashboardSection').style.display = 'none';
