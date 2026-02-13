@@ -87,19 +87,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Register
-    final success = await SecuretAuthService.registerWithSecuret(qrUrl, nickname, password);
+    try {
+      // Register
+      final success = await SecuretAuthService.registerWithSecuret(qrUrl, nickname, password);
 
-    if (mounted) {
-      if (success) {
-        // 가입 성공 시 바로 홈 화면으로 이동 (SnackBar 제거)
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
-      } else {
+      if (mounted) {
+        if (success) {
+          // 가입 성공 시 바로 홈 화면으로 이동 (SnackBar 제거)
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+            _errorMessage = '가입에 실패했습니다. 입력 정보를 확인해주세요.';
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = '가입에 실패했습니다. 입력 정보를 확인해주세요.';
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
         });
       }
     }

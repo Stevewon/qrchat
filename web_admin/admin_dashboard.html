@@ -1739,6 +1739,17 @@
             
             const profileImg = user.profilePhoto || 'https://via.placeholder.com/40';
             const qkeyBalance = user.qkeyBalance || 0;
+            const isBanned = user.banned === true;
+            
+            // 상태 표시
+            const statusHTML = isBanned 
+                ? '<span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; background: #ef444420; color: #ef4444;">🚫 차단됨</span>'
+                : '<span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; background: #10b98120; color: #10b981;">✅ 정상</span>';
+            
+            // 차단 버튼
+            const banButtonHTML = isBanned
+                ? `<button onclick="unbanUser('${userId}')" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🔓 차단해제</button>`
+                : `<button onclick="banUser('${userId}', '${(user.nickname || '알 수 없음').replace(/'/g, "\\'")}'" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🚫 차단</button>`;
             
             tr.innerHTML = `
                 <td><strong style="color: #667eea;">${index}</strong></td>
@@ -1749,11 +1760,10 @@
                 <td>${dateStr}</td>
                 <td><strong style="color: #667eea;">${qkeyBalance.toLocaleString()} QKEY</strong></td>
                 <td>
-                    <span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; background: #10b98120; color: #10b981;">
-                        정상
-                    </span>
+                    ${statusHTML}
                 </td>
                 <td>
+                    ${banButtonHTML}
                     <button onclick="viewUserDetail('${userId}')" style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">
                         👁️ 상세
                     </button>
@@ -1931,6 +1941,87 @@
             } catch (error) {
                 console.error('Error adjusting QKEY:', error);
                 alert('QKEY 조정 실패: ' + error.message);
+            }
+        };
+
+        // 사용자 차단
+        window.banUser = async (userId, nickname) => {
+            if (!confirm(`⚠️ 사용자 차단\n\n사용자: ${nickname}\n\n이 사용자를 차단하시겠습니까?\n\n차단된 사용자는:\n• 로그인할 수 없습니다\n• 동일한 QR 주소로 재가입할 수 없습니다\n• 차단 해제 전까지 모든 서비스 이용이 불가합니다`)) {
+                return;
+            }
+            
+            try {
+                const userDoc = await getDoc(doc(db, 'users', userId));
+                if (!userDoc.exists()) {
+                    alert('사용자를 찾을 수 없습니다');
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                const qrCodeUrl = userData.qrCodeUrl || '';
+                
+                // 사용자 문서 업데이트
+                await updateDoc(doc(db, 'users', userId), {
+                    banned: true,
+                    bannedAt: Timestamp.now(),
+                    bannedBy: window.currentUser.email,
+                    bannedQrCode: qrCodeUrl  // QR 코드 저장하여 재가입 방지
+                });
+                
+                // 차단 로그 기록
+                await addDoc(collection(db, 'ban_logs'), {
+                    userId: userId,
+                    nickname: nickname,
+                    qrCodeUrl: qrCodeUrl,
+                    action: 'ban',
+                    timestamp: Timestamp.now(),
+                    adminEmail: window.currentUser.email
+                });
+                
+                alert(`✅ ${nickname} 사용자가 차단되었습니다`);
+                loadUsers();
+            } catch (error) {
+                console.error('Error banning user:', error);
+                alert('사용자 차단 실패: ' + error.message);
+            }
+        };
+
+        // 사용자 차단 해제
+        window.unbanUser = async (userId) => {
+            if (!confirm('이 사용자의 차단을 해제하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const userDoc = await getDoc(doc(db, 'users', userId));
+                if (!userDoc.exists()) {
+                    alert('사용자를 찾을 수 없습니다');
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                
+                // 사용자 문서 업데이트
+                await updateDoc(doc(db, 'users', userId), {
+                    banned: false,
+                    unbannedAt: Timestamp.now(),
+                    unbannedBy: window.currentUser.email
+                });
+                
+                // 차단 해제 로그 기록
+                await addDoc(collection(db, 'ban_logs'), {
+                    userId: userId,
+                    nickname: userData.nickname,
+                    action: 'unban',
+                    timestamp: Timestamp.now(),
+                    adminEmail: window.currentUser.email
+                });
+                
+                alert(`✅ ${userData.nickname} 사용자의 차단이 해제되었습니다`);
+                loadUsers();
+            } catch (error) {
+                console.error('Error unbanning user:', error);
+                alert('차단 해제 실패: ' + error.message);
             }
         };
 

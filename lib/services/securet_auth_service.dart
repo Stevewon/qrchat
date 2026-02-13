@@ -55,6 +55,20 @@ class SecuretAuthService {
     }
 
     try {
+      // Check if this QR code is banned
+      final bannedUsersSnapshot = await _firestore
+          .collection('users')
+          .where('bannedQrCode', isEqualTo: qrUrl)
+          .limit(1)
+          .get();
+      
+      if (bannedUsersSnapshot.docs.isNotEmpty) {
+        if (kDebugMode) {
+          debugPrint('🚫 차단된 QR 코드입니다!');
+        }
+        throw Exception('🚫 차단된 QR 코드입니다\n\n이 QR 코드로는 가입할 수 없습니다.\n차단된 계정의 QR 코드입니다.\n\n문의: 관리자에게 연락해주세요.');
+      }
+
       final uri = Uri.parse(qrUrl);
       final token = uri.queryParameters['token'] ?? '';
       final voip = uri.queryParameters['voip'] ?? '';
@@ -72,6 +86,7 @@ class SecuretAuthService {
         await _firestore.collection('users').doc(user.id).set({
           'id': user.id,
           'qrUrl': qrUrl,
+          'qrCodeUrl': qrUrl,  // For consistency with ban check
           'nickname': nickname,
           'password': password,  // 멀티 디바이스 로그인을 위해 저장
           'token': token,
@@ -79,6 +94,7 @@ class SecuretAuthService {
           'os': 'android',
           'registeredAt': FieldValue.serverTimestamp(),
           'profilePhoto': '',
+          'banned': false,  // Default to not banned
         }, SetOptions(merge: true));
         
         if (kDebugMode) {
@@ -96,7 +112,7 @@ class SecuretAuthService {
       if (kDebugMode) {
         debugPrint('❌ 회원가입 오류: $e');
       }
-      return false;
+      rethrow;  // Throw the exception so UI can show the error message
     }
   }
 
@@ -130,6 +146,7 @@ class SecuretAuthService {
       final doc = querySnapshot.docs.first;
       final userData = doc.data();
       final storedPassword = userData['password'] ?? '';
+      final isBanned = userData['banned'] == true;
       
       if (kDebugMode) {
         debugPrint('✅ 사용자 발견!');
@@ -137,6 +154,15 @@ class SecuretAuthService {
         debugPrint('   입력값: "$password"');
         debugPrint('   저장값: "$storedPassword"');
         debugPrint('   일치: ${storedPassword == password}');
+        debugPrint('   차단 상태: $isBanned');
+      }
+
+      // 차단 여부 확인
+      if (isBanned) {
+        if (kDebugMode) {
+          debugPrint('🚫 차단된 사용자입니다!');
+        }
+        throw Exception('🚫 차단된 계정입니다\n\n관리자에 의해 차단되었습니다.\n차단 해제 전까지 로그인할 수 없습니다.\n\n문의: 관리자에게 연락해주세요.');
       }
 
       // 비밀번호 확인
