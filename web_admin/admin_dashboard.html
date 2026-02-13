@@ -768,13 +768,8 @@
                 <!-- 사용자 목록 카드 -->
                 <div class="content-card">
                     <div class="card-header">
-                        <h3 class="card-title">👥 사용자 목록 <span id="userCountBadge" style="background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 14px; margin-left: 10px;">0명</span></h3>
-                        <div>
-                            <button class="btn btn-danger" onclick="removeDuplicateNicknames()" style="margin-right: 10px;">
-                                🗑️ 중복 닉네임 제거
-                            </button>
-                            <button class="btn btn-primary" onclick="loadUsers()">🔄 새로고침</button>
-                        </div>
+                        <h3 class="card-title">👥 사용자 목록</h3>
+                        <button class="btn btn-primary" onclick="loadUsers()">🔄 새로고침</button>
                     </div>
 
                     <div id="usersLoading" class="loading">
@@ -787,7 +782,6 @@
                             <table id="usersTable">
                                 <thead>
                                     <tr>
-                                        <th>번호</th>
                                         <th>프로필</th>
                                         <th>닉네임</th>
                                         <th>가입일</th>
@@ -1599,7 +1593,6 @@
             const content = document.getElementById('usersContent');
             const tbody = document.getElementById('usersBody');
             const empty = document.getElementById('usersEmpty');
-            const countBadge = document.getElementById('userCountBadge');
             
             loading.style.display = 'flex';
             content.style.display = 'none';
@@ -1607,11 +1600,6 @@
             try {
                 const sortBy = document.getElementById('userSortBy').value;
                 const sortOrder = document.getElementById('userSortOrder').value;
-                
-                // 전체 사용자 수 조회
-                const allUsersSnapshot = await getDocs(collection(db, 'users'));
-                const totalCount = allUsersSnapshot.size;
-                countBadge.textContent = `${totalCount}명`;
                 
                 const q = query(
                     collection(db, 'users'),
@@ -1628,10 +1616,9 @@
                     empty.style.display = 'none';
                     tbody.innerHTML = '';
                     
-                    let index = 1;
                     snapshot.forEach(doc => {
                         const user = doc.data();
-                        const tr = createUserRow(index++, doc.id, user);
+                        const tr = createUserRow(doc.id, user);
                         tbody.appendChild(tr);
                     });
                 }
@@ -1658,7 +1645,6 @@
             const content = document.getElementById('usersContent');
             const tbody = document.getElementById('usersBody');
             const empty = document.getElementById('usersEmpty');
-            const countBadge = document.getElementById('userCountBadge');
             
             loading.style.display = 'flex';
             content.style.display = 'none';
@@ -1675,34 +1661,6 @@
                     const userId = doc.id.toLowerCase();
                     
                     if (nickname.includes(searchQuery) || userId.includes(searchQuery)) {
-                        results.push({ id: doc.id, data: user });
-                    }
-                });
-                
-                countBadge.textContent = `${results.length}명 (검색 결과)`;
-                
-                if (results.length === 0) {
-                    empty.style.display = 'block';
-                    tbody.innerHTML = '';
-                } else {
-                    empty.style.display = 'none';
-                    tbody.innerHTML = '';
-                    
-                    let index = 1;
-                    results.forEach(result => {
-                        const tr = createUserRow(index++, result.id, result.data);
-                        tbody.appendChild(tr);
-                    });
-                }
-                
-                loading.style.display = 'none';
-                content.style.display = 'block';
-            } catch (error) {
-                console.error('Error searching users:', error);
-                alert('사용자 검색 실패: ' + error.message);
-                loading.style.display = 'none';
-            }
-        };
                         results.push({ id: doc.id, data: user });
                     }
                 });
@@ -1730,8 +1688,7 @@
         };
 
         // 사용자 행 생성
-        // 사용자 행 생성
-        function createUserRow(index, userId, user) {
+        function createUserRow(userId, user) {
             const tr = document.createElement('tr');
             
             const registeredDate = user.registeredAt?.toDate?.() || new Date(user.registeredAt);
@@ -1749,10 +1706,9 @@
             // 차단 버튼
             const banButtonHTML = isBanned
                 ? `<button onclick="unbanUser('${userId}')" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🔓 차단해제</button>`
-                : `<button onclick="banUser('${userId}', '${(user.nickname || '알 수 없음').replace(/'/g, "\\'")}'" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🚫 차단</button>`;
+                : `<button onclick="banUser('${userId}', '${(user.nickname || '알 수 없음').replace(/'/g, "\\'")}')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🚫 차단</button>`;
             
             tr.innerHTML = `
-                <td><strong style="color: #667eea;">${index}</strong></td>
                 <td>
                     <img src="${profileImg}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                 </td>
@@ -1958,14 +1914,14 @@
                 }
                 
                 const userData = userDoc.data();
-                const qrCodeUrl = userData.qrCodeUrl || '';
+                const qrCodeUrl = userData.qrCodeUrl || userData.qrUrl || '';
                 
                 // 사용자 문서 업데이트
                 await updateDoc(doc(db, 'users', userId), {
                     banned: true,
                     bannedAt: Timestamp.now(),
                     bannedBy: window.currentUser.email,
-                    bannedQrCode: qrCodeUrl  // QR 코드 저장하여 재가입 방지
+                    bannedQrCode: qrCodeUrl
                 });
                 
                 // 차단 로그 기록
@@ -2022,87 +1978,6 @@
             } catch (error) {
                 console.error('Error unbanning user:', error);
                 alert('차단 해제 실패: ' + error.message);
-            }
-        };
-
-        // 중복 닉네임 제거
-        window.removeDuplicateNicknames = async () => {
-            if (!confirm('⚠️ 경고!\n\n동일한 닉네임을 가진 사용자 중 가장 최근에 가입한 사용자만 남기고 나머지를 삭제합니다.\n\n이 작업은 되돌릴 수 없습니다!\n\n계속하시겠습니까?')) {
-                return;
-            }
-            
-            if (!confirm('정말로 중복 닉네임을 가진 계정들을 삭제하시겠습니까?\n\n마지막 확인입니다!')) {
-                return;
-            }
-            
-            try {
-                // 모든 사용자 가져오기
-                const usersSnapshot = await getDocs(collection(db, 'users'));
-                
-                // 닉네임별로 그룹화
-                const nicknameMap = {};
-                usersSnapshot.forEach(doc => {
-                    const user = doc.data();
-                    const nickname = user.nickname;
-                    
-                    if (nickname) {
-                        if (!nicknameMap[nickname]) {
-                            nicknameMap[nickname] = [];
-                        }
-                        
-                        nicknameMap[nickname].push({
-                            id: doc.id,
-                            registeredAt: user.registeredAt?.toDate?.() || new Date(user.registeredAt),
-                            data: user
-                        });
-                    }
-                });
-                
-                // 중복된 닉네임 찾기
-                let totalDuplicates = 0;
-                let deletedCount = 0;
-                const duplicateNicknames = [];
-                
-                for (const nickname in nicknameMap) {
-                    const users = nicknameMap[nickname];
-                    
-                    if (users.length > 1) {
-                        duplicateNicknames.push({
-                            nickname: nickname,
-                            count: users.length
-                        });
-                        totalDuplicates += users.length - 1;
-                        
-                        // 가입일 기준 정렬 (최신순)
-                        users.sort((a, b) => b.registeredAt - a.registeredAt);
-                        
-                        // 첫 번째(가장 최근) 제외하고 나머지 삭제
-                        for (let i = 1; i < users.length; i++) {
-                            await deleteDoc(doc(db, 'users', users[i].id));
-                            deletedCount++;
-                            console.log(`삭제: ${nickname} (${users[i].id}) - ${users[i].registeredAt.toLocaleDateString()}`);
-                        }
-                    }
-                }
-                
-                if (deletedCount === 0) {
-                    alert('중복된 닉네임이 없습니다!');
-                } else {
-                    let message = `✅ 중복 닉네임 제거 완료!\n\n`;
-                    message += `📊 삭제된 계정: ${deletedCount}개\n`;
-                    message += `👤 영향받은 닉네임: ${duplicateNicknames.length}개\n\n`;
-                    message += `상세 내역:\n`;
-                    duplicateNicknames.forEach(item => {
-                        message += `- "${item.nickname}": ${item.count}개 중 ${item.count - 1}개 삭제\n`;
-                    });
-                    
-                    alert(message);
-                    loadUsers();
-                }
-                
-            } catch (error) {
-                console.error('Error removing duplicates:', error);
-                alert('중복 제거 실패: ' + error.message);
             }
         };
 
