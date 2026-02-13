@@ -1005,8 +1005,7 @@
                 const withdrawalsRef = collection(db, 'qkey_transactions');
                 const q = query(
                     withdrawalsRef, 
-                    where('type', '==', 'withdraw'),
-                    orderBy('timestamp', 'desc')
+                    where('type', '==', 'withdraw')
                 );
                 
                 const snapshot = await getDocs(q);
@@ -1017,6 +1016,13 @@
                         id: doc.id,
                         ...doc.data()
                     });
+                });
+                
+                // 클라이언트 사이드 정렬 (최신 순)
+                window.allWithdrawals.sort((a, b) => {
+                    const aTime = a.timestamp?.toMillis?.() || 0;
+                    const bTime = b.timestamp?.toMillis?.() || 0;
+                    return bTime - aTime;
                 });
                 
                 // 탭 카운트 업데이트
@@ -1503,8 +1509,7 @@
             
             try {
                 // sticker_packs 컬렉션에서 로드
-                const q = query(collection(db, 'sticker_packs'), orderBy('created_at', 'desc'));
-                const snapshot = await getDocs(q);
+                const snapshot = await getDocs(collection(db, 'sticker_packs'));
                 
                 if (snapshot.empty) {
                     empty.style.display = 'block';
@@ -1513,9 +1518,25 @@
                     empty.style.display = 'none';
                     grid.innerHTML = '';
                     
-                    // 각 스티커팩의 개별 스티커들을 카드로 표시
+                    // 팩들을 배열로 변환하고 생성일 기준 정렬
+                    const packs = [];
                     snapshot.forEach(doc => {
-                        const pack = doc.data();
+                        packs.push({
+                            id: doc.id,
+                            data: doc.data()
+                        });
+                    });
+                    
+                    // 클라이언트 사이드 정렬 (최신 순)
+                    packs.sort((a, b) => {
+                        const aTime = a.data.created_at?.toMillis?.() || 0;
+                        const bTime = b.data.created_at?.toMillis?.() || 0;
+                        return bTime - aTime;
+                    });
+                    
+                    // 각 스티커팩의 개별 스티커들을 카드로 표시
+                    packs.forEach(packItem => {
+                        const pack = packItem.data;
                         const stickers = pack.stickers || [];
                         
                         // 스티커팩 헤더
@@ -1527,7 +1548,7 @@
                                     <h3 style="margin: 0 0 5px 0; font-size: 18px;">${pack.pack_name || '이름 없음'}</h3>
                                     <p style="margin: 0; font-size: 13px; opacity: 0.9;">ID: ${pack.pack_id || 'N/A'} | 스티커 ${pack.sticker_count || 0}개</p>
                                 </div>
-                                <button onclick="deleteStickerPack('${doc.id}')" style="padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: 1px solid white; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                                <button onclick="deleteStickerPack('${packItem.id}')" style="padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: 1px solid white; border-radius: 6px; cursor: pointer; font-size: 13px;">
                                     🗑️ 팩 삭제
                                 </button>
                             </div>
@@ -1536,7 +1557,7 @@
                         
                         // 각 스티커 카드
                         stickers.forEach((sticker, index) => {
-                            const card = createStickerPackItemCard(doc.id, pack.pack_id, sticker, index);
+                            const card = createStickerPackItemCard(packItem.id, pack.pack_id, sticker, index);
                             grid.appendChild(card);
                         });
                     });
@@ -1761,16 +1782,27 @@
                 const transactionsQuery = query(
                     collection(db, 'qkey_transactions'),
                     where('userId', '==', userId),
-                    orderBy('timestamp', 'desc'),
-                    limit(10)
+                    limit(100)
                 );
                 const transactionsSnap = await getDocs(transactionsQuery);
                 
+                const transactions = [];
+                transactionsSnap.forEach(doc => {
+                    transactions.push(doc.data());
+                });
+                
+                // 클라이언트 사이드 정렬 (최신 순) 후 10개만 선택
+                transactions.sort((a, b) => {
+                    const aTime = a.timestamp?.toMillis?.() || 0;
+                    const bTime = b.timestamp?.toMillis?.() || 0;
+                    return bTime - aTime;
+                });
+                const recentTransactions = transactions.slice(0, 10);
+                
                 let transactionsHtml = '<p style="color: #6b7280;">거래 내역이 없습니다</p>';
-                if (!transactionsSnap.empty) {
+                if (recentTransactions.length > 0) {
                     transactionsHtml = '<div style="max-height: 200px; overflow-y: auto;">';
-                    transactionsSnap.forEach(doc => {
-                        const tx = doc.data();
+                    recentTransactions.forEach(tx => {
                         const date = tx.timestamp?.toDate?.().toLocaleDateString('ko-KR') || '';
                         const amountColor = tx.amount > 0 ? '#10b981' : '#ef4444';
                         const amountSign = tx.amount > 0 ? '+' : '';
