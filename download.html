@@ -131,56 +131,56 @@
 <body>
     <div class="container">
         <h1>🎉 QRChat</h1>
-        <div class="version">v9.39.0 - 프로필 탭으로 바로 Securet 연결!</div>
+        <div class="version">v9.40.0 - 동영상 재입장 버그 디버그 버전</div>
         
         <div class="alert">
-            <div class="alert-title">🔒 Securet 보안 통화 UX 개선!</div>
+            <div class="alert-title">🐛 동영상 재입장 버그 디버그 버전!</div>
             <div class="alert-text">
-                ✅ <strong>프로필 사진 탭으로 바로 Securet 연결</strong> - 팝업 없이 즉시 보안 통화 시작!<br>
-                ✅ <strong>간편한 보안 통화</strong> - 1대1 채팅방에서 상대방 프로필 터치만으로 연결<br>
-                ✅ <strong>빠른 접근</strong> - 불필요한 단계 제거, 1초 안에 Securet 실행<br>
-                ✅ <strong>직관적인 UX</strong> - 카카오톡 스타일의 간편한 사용자 경험
+                ⚠️ <strong>디버그 버전</strong> - 동영상 메시지 타입 파싱 로그 추가<br>
+                🔍 <strong>문제 분석</strong> - 채팅방 재입장 시 동영상 썸네일/재생 안 되는 문제 진단<br>
+                📊 <strong>디버그 로그</strong> - Firestore 데이터와 메시지 타입 파싱 과정 출력<br>
+                🧪 <strong>테스트 요청</strong> - 앱 설치 후 동영상 업로드 → 나가기 → 재입장 → 로그 확인
             </div>
         </div>
 
         <div class="download-box">
             <h2>📱 다운로드 옵션</h2>
             
-            <!-- ZIP 파일 (권장) -->
+            <!-- ZIP 파일 (디버그) -->
             <div class="file-info">
                 <div>
-                    <div class="file-name">🗜️ QRChat-v9.39.0-SECURET-DIRECT.zip <span class="new-badge">권장</span></div>
+                    <div class="file-name">🗜️ QRChat-v9.40.0-VIDEO-DEBUG.zip <span class="new-badge">디버그</span></div>
                     <div class="file-size">크기: 33 MB (압축됨)</div>
                 </div>
             </div>
-            <a href="QRChat-v9.39.0-SECURET-DIRECT.zip" class="btn">⬇️ ZIP 파일 다운로드 (권장)</a>
+            <a href="QRChat-v9.40.0-VIDEO-DEBUG.zip" class="btn">⬇️ ZIP 파일 다운로드</a>
             
             <!-- APK 파일 -->
             <div class="file-info" style="margin-top: 20px;">
                 <div>
-                    <div class="file-name">📱 QRChat-v9.39.0-SECURET-DIRECT.apk</div>
+                    <div class="file-name">📱 QRChat-v9.40.0-VIDEO-DEBUG.apk</div>
                     <div class="file-size">크기: 69 MB</div>
                 </div>
             </div>
-            <a href="QRChat-v9.39.0-SECURET-DIRECT.apk" class="btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">⬇️ APK 직접 다운로드</a>
+            <a href="QRChat-v9.40.0-VIDEO-DEBUG.apk" class="btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">⬇️ APK 직접 다운로드</a>
         </div>
 
         <div class="features">
-            <h2>🆕 v9.39.0 새로운 기능</h2>
+            <h2>🐛 v9.40.0 디버그 변경사항</h2>
             
             <div class="feature-item">
-                <div class="feature-title">🔒 프로필 탭으로 바로 Securet 연결 <span class="new-badge">NEW</span></div>
-                1대1 채팅방 상단 프로필 사진을 탭하면 팝업 없이 즉시 Securet 보안 통화 시작!
+                <div class="feature-title">🔍 동영상 타입 파싱 디버그 로그 추가 <span class="new-badge">DEBUG</span></div>
+                메시지 스트림에서 동영상 타입 파싱 과정을 상세히 로깅
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">⚡ 빠른 보안 통화 접근 <span class="new-badge">UX</span></div>
-                하단 팝업 제거로 1초 안에 Securet 실행 가능
+                <div class="feature-title">📊 Firestore 데이터 검증 <span class="new-badge">DEBUG</span></div>
+                원본 Firestore 데이터와 파싱된 메시지 타입 비교
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">✅ 카카오톡 스타일 UX <span class="new-badge">UX</span></div>
-                직관적인 프로필 탭 한 번으로 보안 통화 연결
+                <div class="feature-title">🧪 재입장 버그 진단 <span class="new-badge">DEBUG</span></div>
+                채팅방 나갔다 들어올 때 동영상 썸네일/재생 안 되는 문제 원인 파악
             </div>
         </div>
 
