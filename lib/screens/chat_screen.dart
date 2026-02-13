@@ -888,6 +888,70 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   /// Securet 옵션 표시 (비밀대화, 보안통화)
+  /// Securet 통화 바로 시작 (프로필 사진 탭 시 - 팝업 없이)
+  void _startSecuretCallDirectly() async {
+    // 상대방 정보 가져오기
+    final otherUserId = _currentChatRoom.participantIds.firstWhere(
+      (id) => id != widget.currentUserId,
+      orElse: () => '',
+    );
+    
+    if (otherUserId.isEmpty) {
+      _showSnackBar('상대방 정보를 찾을 수 없습니다', isError: true);
+      return;
+    }
+    
+    // Firestore에서 상대방의 Securet 정보 가져오기
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(otherUserId)
+          .get();
+      
+      if (!userDoc.exists) {
+        if (!mounted) return;
+        _showSnackBar('사용자 정보를 찾을 수 없습니다', isError: true);
+        return;
+      }
+      
+      final otherUserQrUrl = userDoc.data()?['qrUrl'] as String?;
+      final otherUserNickname = userDoc.data()?['nickname'] as String? ?? '알 수 없음';
+      
+      // QR URL 검증
+      if (otherUserQrUrl == null || otherUserQrUrl.isEmpty) {
+        if (!mounted) return;
+        _showSnackBar(
+          '${otherUserNickname}님이 아직 Securet을 등록하지 않았습니다',
+          isError: true,
+        );
+        return;
+      }
+      
+      // URL 형식 검증
+      if (!otherUserQrUrl.startsWith('http://') && !otherUserQrUrl.startsWith('https://')) {
+        if (!mounted) return;
+        _showSnackBar('잘못된 Securet URL 형식입니다', isError: true);
+        return;
+      }
+      
+      if (kDebugMode) {
+        debugPrint('🔒 [Securet 직접 시작] ${otherUserNickname}님과 보안 통화 시작');
+        debugPrint('🔒 [Securet URL] $otherUserQrUrl');
+      }
+      
+      // 바로 Securet URL로 이동
+      if (!mounted) return;
+      await _launchSecuretUrl(otherUserQrUrl, otherUserNickname);
+      
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ [Securet 직접 시작] 오류: $e');
+      }
+      if (!mounted) return;
+      _showSnackBar('보안 통화를 시작할 수 없습니다', isError: true);
+    }
+  }
+
   void _showSecuretOptions() async {
     // 상대방 정보 가져오기
     final otherUserId = _currentChatRoom.participantIds.firstWhere(
@@ -969,75 +1033,8 @@ class _ChatScreenState extends State<ChatScreen> {
     
     if (!mounted) return;
     
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 핸들
-              Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 20),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              
-              // 제목
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    const Icon(Icons.security, color: Colors.green, size: 28),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Securet 보안 연결',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 8),
-              
-              // 설명
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  otherUserNickname != null
-                      ? '$otherUserNickname님과 보안 통신을 시작합니다'
-                      : '상대방과 보안 통신을 시작합니다',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // 비밀대화 버튼
-              _buildSecuretOptionTile(
-                icon: Icons.lock,
-                title: '비밀대화',
-                subtitle: '종단간 암호화 메시지',
-                color: Colors.blue,
-                onTap: () {
-                  Navigator.pop(context);
-                  _launchSecuretChat(otherUserQrUrl);
-                },
-              ),
+    // ⭐ 팝업 없이 바로 Securet 비밀대화로 이동
+    _launchSecuretChat(otherUserQrUrl);
               
               const Divider(height: 1),
               
@@ -1655,7 +1652,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 // 프로필 사진 (1:1은 상대방 사진, 그룹은 그룹 아이콘) - 클릭 가능
                 GestureDetector(
                   onTap: _currentChatRoom.type == ChatRoomType.oneToOne
-                      ? _showSecuretOptions
+                      ? _startSecuretCallDirectly  // 바로 Securet 통화 시작 (팝업 없이)
                       : _showGroupSecuretOptions, // 그룹 채팅에서 사용자 선택
                   child: CircleAvatar(
                     radius: 20,
