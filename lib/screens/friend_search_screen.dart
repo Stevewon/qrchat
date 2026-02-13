@@ -131,7 +131,10 @@ class _FriendSearchScreenState extends State<FriendSearchScreen> {
         user.nickname,
       );
 
-      // 친구 요청 성공 (스낵바 제거)
+      // 친구 요청 성공 - 녹색 스낵바 표시
+      if (mounted) {
+        _showSnackBar('친구추가를 요청하였습니다', isSuccess: true);
+      }
     } catch (e) {
       if (mounted) {
         _showSnackBar('친구 요청 실패: $e');
@@ -156,15 +159,14 @@ class _FriendSearchScreenState extends State<FriendSearchScreen> {
     );
   }
 
-  /// 에러 스낵바 표시 (성공 메시지는 제거)
+  /// 스낵바 표시 (성공 시 녹색, 실패 시 빨간색)
   void _showSnackBar(String message, {bool isSuccess = false}) {
     if (!mounted) return;
-    if (isSuccess) return; // 성공 메시지는 표시하지 않음
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: isSuccess ? Colors.green : Colors.red, // 성공 시 녹색, 실패 시 빨간색
         duration: const Duration(seconds: 2),
       ),
     );
