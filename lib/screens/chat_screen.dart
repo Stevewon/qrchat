@@ -412,6 +412,9 @@ class _ChatScreenState extends State<ChatScreen> {
   /// 갤러리에서 사진/동영상 선택
   Future<void> _pickImageFromGallery() async {
     try {
+      // ⭐ mounted 체크 추가
+      if (!mounted) return;
+      
       final ImagePicker picker = ImagePicker();
       
       // 먼저 사진 또는 동영상 선택 다이얼로그 표시
@@ -522,6 +525,9 @@ class _ChatScreenState extends State<ChatScreen> {
   /// 카메라로 사진 촬영
   Future<void> _pickImageFromCamera() async {
     try {
+      // ⭐ mounted 체크 추가
+      if (!mounted) return;
+      
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
         source: ImageSource.camera,
@@ -544,6 +550,9 @@ class _ChatScreenState extends State<ChatScreen> {
   /// 카메라로 동영상 촬영
   Future<void> _pickVideoFromCamera() async {
     try {
+      // ⭐ mounted 체크 추가
+      if (!mounted) return;
+      
       final ImagePicker picker = ImagePicker();
       final XFile? video = await picker.pickVideo(
         source: ImageSource.camera,
@@ -564,6 +573,9 @@ class _ChatScreenState extends State<ChatScreen> {
   /// 갤러리에서 동영상 선택
   Future<void> _pickVideoFromGallery() async {
     try {
+      // ⭐ mounted 체크 추가
+      if (!mounted) return;
+      
       final ImagePicker picker = ImagePicker();
       final XFile? video = await picker.pickVideo(
         source: ImageSource.gallery,
@@ -584,6 +596,9 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _uploadAndSendVideo(XFile video) async {
     // 임시 메시지 ID 생성
     final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
+    
+    // ⭐ mounted 체크
+    if (!mounted) return;
     
     // 임시 업로드 메시지 추가 (카카오톡 스타일)
     setState(() {
@@ -642,9 +657,11 @@ class _ChatScreenState extends State<ChatScreen> {
       );
 
       // 임시 메시지 제거 (업로드 완료)
-      setState(() {
-        _uploadingMessages.removeWhere((msg) => msg['id'] == tempId);
-      });
+      if (mounted) {
+        setState(() {
+          _uploadingMessages.removeWhere((msg) => msg['id'] == tempId);
+        });
+      }
 
       if (!success) {
         _showSnackBar('동영상 전송 실패', isError: true);
@@ -652,9 +669,11 @@ class _ChatScreenState extends State<ChatScreen> {
       // 성공 시 실제 메시지가 채팅창에 표시됨
     } catch (e) {
       // 임시 메시지 제거 (에러 발생)
-      setState(() {
-        _uploadingMessages.removeWhere((msg) => msg['id'] == tempId);
-      });
+      if (mounted) {
+        setState(() {
+          _uploadingMessages.removeWhere((msg) => msg['id'] == tempId);
+        });
+      }
       
       if (kDebugMode) {
         debugPrint('❌ 동영상 업로드 실패: $e');
@@ -667,6 +686,9 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _uploadAndSendImage(XFile image) async {
     // 임시 메시지 ID 생성
     final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
+    
+    // ⭐ mounted 체크
+    if (!mounted) return;
     
     // 임시 업로드 메시지 추가 (카카오톡 스타일)
     setState(() {
@@ -725,9 +747,11 @@ class _ChatScreenState extends State<ChatScreen> {
       );
 
       // 임시 메시지 제거 (업로드 완료)
-      setState(() {
-        _uploadingMessages.removeWhere((msg) => msg['id'] == tempId);
-      });
+      if (mounted) {
+        setState(() {
+          _uploadingMessages.removeWhere((msg) => msg['id'] == tempId);
+        });
+      }
 
       if (!success) {
         _showSnackBar('이미지 전송 실패', isError: true);
@@ -735,9 +759,11 @@ class _ChatScreenState extends State<ChatScreen> {
       // 성공 시 실제 메시지가 채팅창에 표시됨
     } catch (e) {
       // 임시 메시지 제거 (에러 발생)
-      setState(() {
-        _uploadingMessages.removeWhere((msg) => msg['id'] == tempId);
-      });
+      if (mounted) {
+        setState(() {
+          _uploadingMessages.removeWhere((msg) => msg['id'] == tempId);
+        });
+      }
       
       if (kDebugMode) {
         debugPrint('❌ 이미지 업로드 실패: $e');
