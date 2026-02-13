@@ -14,6 +14,7 @@ import '../models/qkey_transaction.dart';
 import 'login_screen.dart';
 import 'my_qr_code_screen.dart';
 import 'admin_sticker_screen.dart';
+import 'admin_qkey_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -689,6 +690,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 16),
                     const Divider(height: 1, thickness: 8, color: Color(0xFFF0F0F0)),
                     const SizedBox(height: 16),
+                    
+                    // 관리자 QKEY 관리 버튼
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context); // 바텀시트 닫기
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminQKeyScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.monetization_on),
+                        label: const Text('QKEY 출금 관리'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFB300),
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 12),
                     
                     // 관리자 스티커 관리 버튼
                     Padding(
