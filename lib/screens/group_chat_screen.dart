@@ -26,6 +26,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // 🐱 스티커 전송용
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'video_player_screen.dart'; // 🎬 동영상 재생 화면
 
 /// 그룹 채팅 화면 (1:1 채팅 구조 기반)
 class GroupChatScreen extends StatefulWidget {
@@ -1154,7 +1155,16 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       itemBuilder: (context, index) {
         final message = _messages[index];
         final isMe = message.senderId == widget.currentUserId;
-        return _buildMessageBubble(message, isMe);
+        
+        // 🐛 DEBUG: 그룹방 동영상 메시지 렌더링 로그
+        if (message.type == MessageType.video && kDebugMode) {
+          debugPrint('🎬 [그룹 ListView] 동영상 메시지 렌더링 index=$index, id=${message.id}');
+        }
+        
+        return Container(
+          key: ValueKey(message.id), // 🔑 메시지 고유 Key 추가
+          child: _buildMessageBubble(message, isMe),
+        );
       },
     );
   }
@@ -1254,33 +1264,126 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       child: _buildImageMessage(message.content),  // 🎨 스티커 구분 로직 적용
                     )
                   else if (message.type == MessageType.video)
-                    // 동영상 메시지 (길게 누르면 복사) - 테두리 없음
+                    // 동영상 메시지 - 카카오톡 스타일 (클릭 가능)
                     GestureDetector(
+                      key: ValueKey(message.content), // 🔑 동영상 URL 기반 고유 Key
+                      onTap: () {
+                        // 🐛 DEBUG: 동영상 클릭 로그
+                        if (kDebugMode) {
+                          debugPrint('🎬 [그룹방 동영상 클릭] 재생 화면으로 이동');
+                          debugPrint('   URL: ${message.content.substring(0, message.content.length > 50 ? 50 : message.content.length)}...');
+                        }
+                        
+                        // 동영상 재생 화면으로 이동
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoPlayerScreen(
+                              videoUrl: message.content,
+                              title: '동영상',
+                            ),
+                          ),
+                        );
+                      },
                       onLongPress: () => _showCopyMenu(context, message),
-                      child: Container(
-                      width: 200,
-                      height: 200,
-                      color: Colors.black,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Icon(Icons.play_circle_outline, size: 64, color: Colors.white),
+                          // 동영상 썸네일 박스
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              width: 240,
+                              height: 180,
+                              color: Colors.black87,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  // 배경 그라데이션
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Colors.grey[800]!,
+                                          Colors.grey[900]!,
+                                        ],
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.videocam,
+                                        size: 48,
+                                        color: Colors.white.withValues(alpha: 0.3),
+                                      ),
+                                    ),
+                                  ),
+                                  // 그라데이션 오버레이
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.black.withValues(alpha: 0.1),
+                                          Colors.black.withValues(alpha: 0.3),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // 재생 버튼
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                          ),
+                          // 하단 "동영상" 라벨
                           Positioned(
                             bottom: 8,
-                            left: 8,
+                            right: 8,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              color: Colors.black54,
-                              child: const Text(
-                                '동영상',
-                                style: TextStyle(color: Colors.white, fontSize: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.7),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.videocam,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    '동영상',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  )
+                    )
                   else if (message.type == MessageType.file)
                     // 파일 메시지 (길게 누르면 복사)
                     GestureDetector(
