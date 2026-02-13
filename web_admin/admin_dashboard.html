@@ -1601,16 +1601,10 @@
             content.style.display = 'none';
             
             try {
-                const sortBy = document.getElementById('userSortBy').value;
-                const sortOrder = document.getElementById('userSortOrder').value;
-                
-                const q = query(
-                    collection(db, 'users'),
-                    orderBy(sortBy, sortOrder),
-                    limit(100)
+                // 인덱스 불필요하도록 단순 쿼리 사용
+                const snapshot = await getDocs(
+                    query(collection(db, 'users'), limit(100))
                 );
-                
-                const snapshot = await getDocs(q);
                 
                 if (snapshot.empty) {
                     empty.style.display = 'block';
@@ -1619,10 +1613,25 @@
                     empty.style.display = 'none';
                     tbody.innerHTML = '';
                     
+                    // 클라이언트 사이드에서 정렬
+                    const users = [];
                     snapshot.forEach(doc => {
-                        const user = doc.data();
-                        const tr = createUserRow(doc.id, user);
-                        tbody.appendChild(tr);
+                        users.push({
+                            id: doc.id,
+                            data: doc.data()
+                        });
+                    });
+                    
+                    // 가입일 기준 내림차순 정렬 (최신 순)
+                    users.sort((a, b) => {
+                        const aDate = a.data.registeredAt?.toDate?.() || new Date(a.data.registeredAt || 0);
+                        const bDate = b.data.registeredAt?.toDate?.() || new Date(b.data.registeredAt || 0);
+                        return bDate - aDate;
+                    });
+                    
+                    users.forEach(user => {
+                        const row = createUserRow(user.id, user.data);
+                        tbody.appendChild(row);
                     });
                 }
                 
