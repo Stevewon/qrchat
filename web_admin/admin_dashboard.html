@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRChat 관리자 대시보드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon.blue { background: #dbeafe; }
+        .stat-icon.green { background: #dcfce7; }
+        .stat-icon.yellow { background: #fef3c7; }
+        .stat-icon.red { background: #fee2e2; }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .content-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9fafb;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-approved { background: #dbeafe; color: #1e40af; }
+        .badge-completed { background: #dcfce7; color: #166534; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            word-break: break-all;
+        }
+
+        #loginPage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #5568d3;
+        }
+
+        #dashboardPage {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 로그인 페이지 -->
+    <div id="loginPage">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🎯 QRChat 관리자</h1>
+                <p>Google 계정으로 로그인하세요</p>
+            </div>
+            <button class="login-btn" onclick="loginWithGoogle()">
+                🔐 Google로 로그인
+            </button>
+        </div>
+    </div>
+
+    <!-- 대시보드 페이지 -->
+    <div id="dashboardPage">
+        <!-- 사이드바 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎯 QRChat</h1>
+                <p>관리자 대시보드</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="showSection('dashboard')">
+                        <span class="nav-icon">📊</span>
+                        <span>대시보드</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showSection('qkey')">
+                        <span class="nav-icon">💰</span>
+                        <span>QKEY 출금 관리</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showSection('stickers')">
+                        <span class="nav-icon">🎨</span>
+                        <span>스티커 관리</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showSection('users')">
+                        <span class="nav-icon">👥</span>
+                        <span>사용자 관리</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <!-- 상단바 -->
+            <div class="top-bar">
+                <h2 class="page-title" id="pageTitle">대시보드</h2>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <span id="userName">관리자</span>
+                    <button class="logout-btn" onclick="logout()">로그아웃</button>
+                </div>
+            </div>
+
+            <!-- 대시보드 섹션 -->
+            <div id="dashboardSection">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">💰</div>
+                        <div class="stat-label">대기중 출금</div>
+                        <div class="stat-value" id="pendingCount">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">✅</div>
+                        <div class="stat-label">오늘 승인</div>
+                        <div class="stat-value" id="approvedToday">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">📊</div>
+                        <div class="stat-label">총 출금액</div>
+                        <div class="stat-value" id="totalWithdrawn">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">👥</div>
+                        <div class="stat-label">전체 사용자</div>
+                        <div class="stat-value" id="totalUsers">-</div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 최근 활동</h3>
+                    </div>
+                    <p style="color: #6b7280; text-align: center; padding: 40px;">
+                        최근 출금 신청 및 승인 내역이 여기에 표시됩니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- QKEY 출금 관리 섹션 -->
+            <div id="qkeySection" style="display: none;">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">💰 QKEY 출금 신청 관리</h3>
+                        <button class="btn btn-primary" onclick="loadQKeyWithdrawals()">
+                            🔄 새로고침
+                        </button>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="filterWithdrawals('pending')">
+                            대기중 (<span id="pendingCountTab">0</span>)
+                        </button>
+                        <button class="tab-btn" onclick="filterWithdrawals('approved')">
+                            승인됨 (<span id="approvedCountTab">0</span>)
+                        </button>
+                        <button class="tab-btn" onclick="filterWithdrawals('completed')">
+                            완료됨 (<span id="completedCountTab">0</span>)
+                        </button>
+                        <button class="tab-btn" onclick="filterWithdrawals('rejected')">
+                            거부됨 (<span id="rejectedCountTab">0</span>)
+                        </button>
+                    </div>
+
+                    <div id="withdrawalsLoading" class="loading">
+                        <div class="spinner"></div>
+                        <p>출금 신청 목록을 불러오는 중...</p>
+                    </div>
+
+                    <div id="withdrawalsContent" style="display: none;">
+                        <div class="table-container">
+                            <table id="withdrawalsTable">
+                                <thead>
+                                    <tr>
+                                        <th>신청 시간</th>
+                                        <th>사용자 ID</th>
+                                        <th>금액</th>
+                                        <th>지갑 주소</th>
+                                        <th>상태</th>
+                                        <th>작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="withdrawalsBody">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="withdrawalsEmpty" class="empty-state" style="display: none;">
+                            <div class="empty-icon">📭</div>
+                            <p>출금 신청 내역이 없습니다</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 스티커 관리 섹션 -->
+            <div id="stickersSection" style="display: none;">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">🎨 스티커 관리</h3>
+                    </div>
+                    <p style="color: #6b7280; text-align: center; padding: 40px;">
+                        스티커 업로드 및 관리 기능은 <a href="index.html" style="color: #667eea; font-weight: 600;">여기</a>에서 이용하실 수 있습니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 사용자 관리 섹션 -->
+            <div id="usersSection" style="display: none;">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">👥 사용자 관리</h3>
+                    </div>
+                    <p style="color: #6b7280; text-align: center; padding: 40px;">
+                        사용자 관리 기능은 개발 중입니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 출금 상세/처리 모달 -->
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">출금 신청 상세</div>
+            <div class="modal-body" id="modalBody">
+                <!-- 동적으로 채워짐 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, Timestamp, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase 설정 (실제 프로젝트 설정으로 교체 필요)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHwYDu1ZDP2xRHgSWUbp2yz2VvSIZXI7A",
+            authDomain: "qrchat-68c0d.firebaseapp.com",
+            projectId: "qrchat-68c0d",
+            storageBucket: "qrchat-68c0d.firebasestorage.app",
+            messagingSenderId: "488740672531",
+            appId: "1:488740672531:web:8f80d3cb27c3e0dd0bdf2c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 전역 변수
+        window.currentUser = null;
+        window.allWithdrawals = [];
+        window.currentFilter = 'pending';
+
+        // 로그인
+        window.loginWithGoogle = async () => {
+            try {
+                const provider = new GoogleAuthProvider();
+                const result = await signInWithPopup(auth, provider);
+                console.log('로그인 성공:', result.user.email);
+            } catch (error) {
+                console.error('로그인 실패:', error);
+                alert('로그인에 실패했습니다: ' + error.message);
+            }
+        };
+
+        // 로그아웃
+        window.logout = async () => {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                try {
+                    await signOut(auth);
+                    console.log('로그아웃 성공');
+                } catch (error) {
+                    console.error('로그아웃 실패:', error);
+                    alert('로그아웃에 실패했습니다');
+                }
+            }
+        };
+
+        // 인증 상태 감지
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.currentUser = user;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboardPage').style.display = 'block';
+                document.getElementById('userName').textContent = user.displayName || user.email;
+                document.getElementById('userAvatar').textContent = (user.displayName || user.email)[0].toUpperCase();
+                
+                // 데이터 로드
+                loadDashboardData();
+                loadQKeyWithdrawals();
+            } else {
+                window.currentUser = null;
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('dashboardPage').style.display = 'none';
+            }
+        });
+
+        // 대시보드 데이터 로드
+        async function loadDashboardData() {
+            try {
+                // QKEY 출금 통계
+                const withdrawalsRef = collection(db, 'qkey_transactions');
+                const q = query(withdrawalsRef, where('type', '==', 'withdraw'));
+                const snapshot = await getDocs(q);
+                
+                let pendingCount = 0;
+                let approvedToday = 0;
+                let totalWithdrawn = 0;
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.withdrawStatus === 'pending') {
+                        pendingCount++;
+                    }
+                    if (data.withdrawStatus === 'approved' && data.processedAt) {
+                        const processedDate = data.processedAt.toDate();
+                        if (processedDate >= today) {
+                            approvedToday++;
+                        }
+                    }
+                    if (data.withdrawStatus === 'completed') {
+                        totalWithdrawn += Math.abs(data.amount);
+                    }
+                });
+                
+                document.getElementById('pendingCount').textContent = pendingCount;
+                document.getElementById('approvedToday').textContent = approvedToday;
+                document.getElementById('totalWithdrawn').textContent = totalWithdrawn.toLocaleString() + ' QKEY';
+                
+                // 사용자 수
+                const usersRef = collection(db, 'users');
+                const usersSnapshot = await getDocs(usersRef);
+                document.getElementById('totalUsers').textContent = usersSnapshot.size;
+                
+            } catch (error) {
+                console.error('대시보드 데이터 로드 실패:', error);
+            }
+        }
+
+        // QKEY 출금 목록 로드
+        window.loadQKeyWithdrawals = async () => {
+            try {
+                document.getElementById('withdrawalsLoading').style.display = 'block';
+                document.getElementById('withdrawalsContent').style.display = 'none';
+                
+                const withdrawalsRef = collection(db, 'qkey_transactions');
+                const q = query(
+                    withdrawalsRef, 
+                    where('type', '==', 'withdraw'),
+                    orderBy('timestamp', 'desc')
+                );
+                
+                const snapshot = await getDocs(q);
+                window.allWithdrawals = [];
+                
+                snapshot.forEach(doc => {
+                    window.allWithdrawals.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // 탭 카운트 업데이트
+                updateTabCounts();
+                
+                // 필터 적용
+                filterWithdrawals(window.currentFilter);
+                
+                document.getElementById('withdrawalsLoading').style.display = 'none';
+                document.getElementById('withdrawalsContent').style.display = 'block';
+                
+            } catch (error) {
+                console.error('출금 목록 로드 실패:', error);
+                alert('출금 목록을 불러오는데 실패했습니다: ' + error.message);
+                document.getElementById('withdrawalsLoading').style.display = 'none';
+            }
+        };
+
+        // 탭 카운트 업데이트
+        function updateTabCounts() {
+            const counts = {
+                pending: 0,
+                approved: 0,
+                completed: 0,
+                rejected: 0
+            };
+            
+            window.allWithdrawals.forEach(w => {
+                if (w.withdrawStatus in counts) {
+                    counts[w.withdrawStatus]++;
+                }
+            });
+            
+            document.getElementById('pendingCountTab').textContent = counts.pending;
+            document.getElementById('approvedCountTab').textContent = counts.approved;
+            document.getElementById('completedCountTab').textContent = counts.completed;
+            document.getElementById('rejectedCountTab').textContent = counts.rejected;
+        }
+
+        // 출금 필터링
+        window.filterWithdrawals = (status) => {
+            window.currentFilter = status;
+            
+            // 탭 활성화
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 필터링
+            const filtered = window.allWithdrawals.filter(w => w.withdrawStatus === status);
+            
+            if (filtered.length === 0) {
+                document.getElementById('withdrawalsEmpty').style.display = 'block';
+                document.querySelector('.table-container').style.display = 'none';
+            } else {
+                document.getElementById('withdrawalsEmpty').style.display = 'none';
+                document.querySelector('.table-container').style.display = 'block';
+                
+                // 테이블 렌더링
+                renderWithdrawalsTable(filtered);
+            }
+        };
+
+        // 출금 테이블 렌더링
+        function renderWithdrawalsTable(withdrawals) {
+            const tbody = document.getElementById('withdrawalsBody');
+            tbody.innerHTML = '';
+            
+            withdrawals.forEach(w => {
+                const tr = document.createElement('tr');
+                
+                const timestamp = w.timestamp?.toDate?.() || new Date(w.timestamp);
+                const dateStr = timestamp.toLocaleDateString('ko-KR') + ' ' + 
+                               timestamp.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+                
+                const statusBadge = getStatusBadge(w.withdrawStatus);
+                const actions = getActionButtons(w);
+                
+                tr.innerHTML = `
+                    <td>${dateStr}</td>
+                    <td><code>${w.userId.substring(0, 8)}...</code></td>
+                    <td><strong>${Math.abs(w.amount).toLocaleString()} QKEY</strong></td>
+                    <td><code style="font-size: 11px;">${w.walletAddress?.substring(0, 12)}...</code></td>
+                    <td>${statusBadge}</td>
+                    <td>${actions}</td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 상태 뱃지
+        function getStatusBadge(status) {
+            const badges = {
+                pending: '<span class="badge badge-pending">대기중</span>',
+                approved: '<span class="badge badge-approved">승인됨</span>',
+                completed: '<span class="badge badge-completed">완료</span>',
+                rejected: '<span class="badge badge-rejected">거부됨</span>'
+            };
+            return badges[status] || status;
+        }
+
+        // 작업 버튼
+        function getActionButtons(withdrawal) {
+            const buttons = [];
+            
+            buttons.push(`<button class="btn btn-primary" onclick="showWithdrawalDetail('${withdrawal.id}')">상세</button>`);
+            
+            if (withdrawal.withdrawStatus === 'pending') {
+                buttons.push(`<button class="btn btn-success" onclick="approveWithdrawal('${withdrawal.id}')">승인</button>`);
+                buttons.push(`<button class="btn btn-danger" onclick="rejectWithdrawal('${withdrawal.id}')">거부</button>`);
+            } else if (withdrawal.withdrawStatus === 'approved') {
+                buttons.push(`<button class="btn btn-success" onclick="completeWithdrawal('${withdrawal.id}')">완료 처리</button>`);
+            }
+            
+            return `<div class="action-buttons">${buttons.join('')}</div>`;
+        }
+
+        // 출금 상세 보기
+        window.showWithdrawalDetail = (id) => {
+            const withdrawal = window.allWithdrawals.find(w => w.id === id);
+            if (!withdrawal) return;
+            
+            const timestamp = withdrawal.timestamp?.toDate?.() || new Date(withdrawal.timestamp);
+            const processedAt = withdrawal.processedAt?.toDate?.();
+            
+            const html = `
+                <div class="info-row">
+                    <span class="info-label">거래 ID</span>
+                    <span class="info-value"><code>${withdrawal.id}</code></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">사용자 ID</span>
+                    <span class="info-value"><code>${withdrawal.userId}</code></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">출금 금액</span>
+                    <span class="info-value">${Math.abs(withdrawal.amount).toLocaleString()} QKEY</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">거래 후 잔액</span>
+                    <span class="info-value">${withdrawal.balanceAfter.toLocaleString()} QKEY</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">신청 시간</span>
+                    <span class="info-value">${timestamp.toLocaleString('ko-KR')}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">상태</span>
+                    <span class="info-value">${getStatusBadge(withdrawal.withdrawStatus)}</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">지갑 주소</label>
+                    <div class="wallet-address">${withdrawal.walletAddress || 'N/A'}</div>
+                </div>
+                ${withdrawal.description ? `
+                <div class="form-group">
+                    <label class="form-label">설명</label>
+                    <p>${withdrawal.description}</p>
+                </div>
+                ` : ''}
+                ${withdrawal.adminNote ? `
+                <div class="form-group">
+                    <label class="form-label">관리자 메모</label>
+                    <p>${withdrawal.adminNote}</p>
+                </div>
+                ` : ''}
+                ${processedAt ? `
+                <div class="info-row">
+                    <span class="info-label">처리 시간</span>
+                    <span class="info-value">${processedAt.toLocaleString('ko-KR')}</span>
+                </div>
+                ` : ''}
+                ${withdrawal.adminId ? `
+                <div class="info-row">
+                    <span class="info-label">처리 관리자</span>
+                    <span class="info-value"><code>${withdrawal.adminId}</code></span>
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('modalTitle').textContent = '출금 신청 상세';
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('withdrawModal').classList.add('show');
+        };
+
+        // 출금 승인
+        window.approveWithdrawal = async (id) => {
+            const note = prompt('승인 메모를 입력하세요 (선택사항):');
+            if (note === null) return; // 취소
+            
+            if (!confirm('이 출금 신청을 승인하시겠습니까?')) return;
+            
+            try {
+                const docRef = doc(db, 'qkey_transactions', id);
+                await updateDoc(docRef, {
+                    withdrawStatus: 'approved',
+                    adminNote: note || '',
+                    adminId: window.currentUser.uid,
+                    processedAt: Timestamp.now()
+                });
+                
+                alert('✅ 출금이 승인되었습니다!');
+                loadQKeyWithdrawals();
+                loadDashboardData();
+            } catch (error) {
+                console.error('승인 실패:', error);
+                alert('승인에 실패했습니다: ' + error.message);
+            }
+        };
+
+        // 출금 거부
+        window.rejectWithdrawal = async (id) => {
+            const note = prompt('거부 사유를 입력하세요:');
+            if (!note) {
+                alert('거부 사유를 입력해주세요');
+                return;
+            }
+            
+            if (!confirm('이 출금 신청을 거부하시겠습니까?\n잔액이 복구됩니다.')) return;
+            
+            try {
+                const withdrawal = window.allWithdrawals.find(w => w.id === id);
+                if (!withdrawal) throw new Error('출금 신청을 찾을 수 없습니다');
+                
+                // 출금 상태 업데이트
+                const docRef = doc(db, 'qkey_transactions', id);
+                await updateDoc(docRef, {
+                    withdrawStatus: 'rejected',
+                    adminNote: note,
+                    adminId: window.currentUser.uid,
+                    processedAt: Timestamp.now()
+                });
+                
+                // 사용자 잔액 복구
+                const userRef = doc(db, 'users', withdrawal.userId);
+                const refundAmount = Math.abs(withdrawal.amount);
+                await updateDoc(userRef, {
+                    qkeyBalance: withdrawal.balanceAfter + refundAmount
+                });
+                
+                alert('❌ 출금이 거부되었고 잔액이 복구되었습니다!');
+                loadQKeyWithdrawals();
+                loadDashboardData();
+            } catch (error) {
+                console.error('거부 실패:', error);
+                alert('거부에 실패했습니다: ' + error.message);
+            }
+        };
+
+        // 출금 완료 처리
+        window.completeWithdrawal = async (id) => {
+            const note = prompt('완료 메모를 입력하세요 (선택사항):');
+            if (note === null) return; // 취소
+            
+            if (!confirm('출금을 완료 처리하시겠습니까?\n실제로 암호화폐를 전송했는지 확인하세요!')) return;
+            
+            try {
+                const docRef = doc(db, 'qkey_transactions', id);
+                const updateData = {
+                    withdrawStatus: 'completed',
+                    processedAt: Timestamp.now()
+                };
+                
+                if (note) {
+                    updateData.adminNote = note;
+                }
+                if (!window.allWithdrawals.find(w => w.id === id).adminId) {
+                    updateData.adminId = window.currentUser.uid;
+                }
+                
+                await updateDoc(docRef, updateData);
+                
+                alert('✅ 출금이 완료 처리되었습니다!');
+                loadQKeyWithdrawals();
+                loadDashboardData();
+            } catch (error) {
+                console.error('완료 처리 실패:', error);
+                alert('완료 처리에 실패했습니다: ' + error.message);
+            }
+        };
+
+        // 모달 닫기
+        window.closeModal = () => {
+            document.getElementById('withdrawModal').classList.remove('show');
+        };
+
+        // 섹션 전환
+        window.showSection = (section) => {
+            // 네비게이션 활성화
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('.nav-link').classList.add('active');
+            
+            // 섹션 표시/숨김
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('qkeySection').style.display = 'none';
+            document.getElementById('stickersSection').style.display = 'none';
+            document.getElementById('usersSection').style.display = 'none';
+            
+            const titles = {
+                dashboard: '📊 대시보드',
+                qkey: '💰 QKEY 출금 관리',
+                stickers: '🎨 스티커 관리',
+                users: '👥 사용자 관리'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[section];
+            document.getElementById(section + 'Section').style.display = 'block';
+            
+            // QKEY 섹션 진입 시 데이터 로드
+            if (section === 'qkey') {
+                loadQKeyWithdrawals();
+            }
+        };
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = (event) => {
+            const modal = document.getElementById('withdrawModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>
