@@ -131,15 +131,15 @@
 <body>
     <div class="container">
         <h1>🎉 QRChat</h1>
-        <div class="version">v9.37.0 - 동영상 썸네일 표시 완성!</div>
+        <div class="version">v9.38.0 - 그룹방 미디어 기능 수정!</div>
         
         <div class="alert">
-            <div class="alert-title">🎬 동영상 썸네일 표시 추가!</div>
+            <div class="alert-title">🔧 그룹방 재입장 버그 수정!</div>
             <div class="alert-text">
-                ✅ <strong>동영상 썸네일</strong> - 이제 채팅방에서 동영상이 명확하게 보입니다!<br>
-                ✅ <strong>240x180 크기</strong> - 카카오톡과 유사한 썸네일 박스<br>
-                ✅ <strong>재생 버튼</strong> - 중앙에 큰 재생 버튼 표시<br>
-                ✅ <strong>풀스크린 재생</strong> - 탭하면 전체 화면에서 재생!
+                ✅ <strong>그룹방 재입장 문제 해결</strong> - 나갔다 들어와도 모든 기능 정상 작동!<br>
+                ✅ <strong>앨범 기능 복구</strong> - 사진/동영상 선택 정상 작동<br>
+                ✅ <strong>카메라 기능 복구</strong> - 사진 촬영 정상 작동<br>
+                ✅ <strong>동영상 업로드 복구</strong> - 동영상 촬영 & 업로드 정상 작동
             </div>
         </div>
 
@@ -149,43 +149,38 @@
             <!-- ZIP 파일 (권장) -->
             <div class="file-info">
                 <div>
-                    <div class="file-name">🗜️ QRChat-v9.37.0-VIDEO-THUMBNAIL.zip <span class="new-badge">권장</span></div>
+                    <div class="file-name">🗜️ QRChat-v9.38.0-GROUP-MEDIA-FIX.zip <span class="new-badge">권장</span></div>
                     <div class="file-size">크기: 33 MB (압축됨)</div>
                 </div>
             </div>
-            <a href="QRChat-v9.37.0-VIDEO-THUMBNAIL.zip" class="btn">⬇️ ZIP 파일 다운로드 (권장)</a>
+            <a href="QRChat-v9.38.0-GROUP-MEDIA-FIX.zip" class="btn">⬇️ ZIP 파일 다운로드 (권장)</a>
             
             <!-- APK 파일 -->
             <div class="file-info" style="margin-top: 20px;">
                 <div>
-                    <div class="file-name">📱 QRChat-v9.37.0-VIDEO-THUMBNAIL.apk</div>
+                    <div class="file-name">📱 QRChat-v9.38.0-GROUP-MEDIA-FIX.apk</div>
                     <div class="file-size">크기: 69 MB</div>
                 </div>
             </div>
-            <a href="QRChat-v9.37.0-VIDEO-THUMBNAIL.apk" class="btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">⬇️ APK 직접 다운로드</a>
+            <a href="QRChat-v9.38.0-GROUP-MEDIA-FIX.apk" class="btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">⬇️ APK 직접 다운로드</a>
         </div>
 
         <div class="features">
-            <h2>🆕 v9.37.0 새로운 기능</h2>
+            <h2>🆕 v9.38.0 버그 수정</h2>
             
             <div class="feature-item">
-                <div class="feature-title">🎬 동영상 썸네일 표시 <span class="new-badge">NEW</span></div>
-                채팅방에서 동영상 메시지를 240x180 크기의 썸네일 박스로 표시!
+                <div class="feature-title">🔧 그룹방 재입장 시 기능 작동 안 하던 문제 해결 <span class="new-badge">FIX</span></div>
+                그룹방에서 나갔다가 다시 들어와도 모든 미디어 기능 정상 작동!
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">▶️ 재생 버튼 오버레이 <span class="new-badge">NEW</span></div>
-                중앙에 큰 재생 버튼 (64x64) 표시로 명확한 시각적 피드백
+                <div class="feature-title">✅ mounted 상태 체크 추가 <span class="new-badge">FIX</span></div>
+                모든 미디어 선택/업로드 함수에 안전성 체크 추가 (6개 함수)
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">🎨 카카오톡 스타일 디자인 <span class="new-badge">NEW</span></div>
-                검은 배경 + 비디오 아이콘 + 그라데이션 오버레이
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-title">🏷️ 동영상 라벨 표시 <span class="new-badge">NEW</span></div>
-                하단에 "동영상" 라벨과 아이콘 표시
+                <div class="feature-title">🎬 앨범/카메라/동영상 기능 안정화 <span class="new-badge">FIX</span></div>
+                context 유효성 검사 추가로 안정적인 미디어 처리
             </div>
         </div>
 
@@ -193,69 +188,28 @@
             <h2>✅ 이전 버전 기능</h2>
             
             <div class="feature-item">
-                <div class="feature-title">✅ 풀스크린 동영상 재생</div>
-                화면 전체를 가득 채우는 몰입형 재생 (v9.36.0)
+                <div class="feature-title">✅ 동영상 썸네일 표시</div>
+                240x180 크기 썸네일 박스 + 재생 버튼 (v9.37.0)
             </div>
             
             <div class="feature-item">
-                <div class="feature-title">✅ 상단 뒤로가기 + 하단 컨트롤</div>
-                진행바, 시간, 재생/일시정지, 저장, 공유 기능 (v9.36.0)
+                <div class="feature-title">✅ 풀스크린 동영상 재생</div>
+                화면 전체를 가득 채우는 몰입형 재생 + 저장/공유 기능 (v9.36.0)
             </div>
             
             <div class="feature-item">
                 <div class="feature-title">✅ 동영상 업로드 & 재생</div>
                 채팅방에서 동영상 업로드 및 전용 재생 화면 (v9.35.0)
             </div>
-            
-            <div class="feature-item">
-                <div class="feature-title">✅ 친구 목록 & 채팅방</div>
-                Firebase 권한 문제 해결 (v9.34.0)
-            </div>
-        </div>
-
-        <div class="features">
-            <h2>📱 동영상 썸네일 미리보기</h2>
-            <div style="background: #2c3e50; color: white; padding: 20px; border-radius: 10px; font-family: monospace; line-height: 1.8;">
-                채팅방에서의 동영상 표시:<br><br>
-                ┌─────────────────────┐<br>
-                │                     │<br>
-                │   📹 비디오 아이콘  │<br>
-                │                     │<br>
-                │       ⭕ 재생       │ ← 중앙 재생 버튼<br>
-                │                     │<br>
-                │                     │<br>
-                │  📹 동영상      ────┤ ← 하단 라벨<br>
-                └─────────────────────┘<br>
-                     (240 x 180)
-            </div>
-        </div>
-
-        <div class="features">
-            <h2>📱 재생 화면 UI</h2>
-            <div style="background: #2c3e50; color: white; padding: 20px; border-radius: 10px; font-family: monospace; line-height: 1.8;">
-                ┌─────────────────────────────────┐<br>
-                │  ← 뒤로가기    동영상           │ ← 상단<br>
-                ├─────────────────────────────────┤<br>
-                │                                 │<br>
-                │         동영상 재생             │<br>
-                │        (풀스크린)                │<br>
-                │                                 │<br>
-                ├─────────────────────────────────┤<br>
-                │  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ ← 진행바<br>
-                │  00:15 / 02:30        ⏸         │ ← 컨트롤<br>
-                ├─────────────────────────────────┤<br>
-                │   💾 저장    📤 공유    🗑️ 삭제  │ ← 액션<br>
-                └─────────────────────────────────┘
-            </div>
         </div>
 
         <div class="footer">
-            <p><strong>버전:</strong> 9.37.0 (Build 9370)</p>
-            <p><strong>릴리즈 날짜:</strong> 2026-02-12 22:14 UTC</p>
+            <p><strong>버전:</strong> 9.38.0 (Build 9380)</p>
+            <p><strong>릴리즈 날짜:</strong> 2026-02-13 03:19 UTC</p>
             <p><strong>Flutter SDK:</strong> 3.41.0 | <strong>Dart:</strong> 3.11.0</p>
             <p style="margin-top: 20px;">
                 <a href="https://github.com/Stevewon/qrchat" style="color: #667eea;">GitHub Repository</a> |
-                <a href="https://github.com/Stevewon/qrchat/releases/tag/v9.37.0" style="color: #667eea;">GitHub Release</a> |
+                <a href="https://github.com/Stevewon/qrchat/releases/tag/v9.38.0" style="color: #667eea;">GitHub Release</a> |
                 <a href="https://console.firebase.google.com/project/qrchat-b7a67" style="color: #667eea;">Firebase Console</a> |
                 <a href="https://8080-iuiezsh1341nwe1ngsc0x-cbeee0f9.sandbox.novita.ai" style="color: #667eea;">스티커 관리자</a>
             </p>
