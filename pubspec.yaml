@@ -1,8 +1,8 @@
 name: qrchat
-description: "QR Code Chat App - QKEY Earn Rate 2 v1.0.10"
+description: "QR Code Chat App - Sticker Pack Management v1.0.11"
 publish_to: 'none'
 
-version: 1.0.10+110
+version: 1.0.11+111
 
 environment:
   sdk: ^3.9.2
