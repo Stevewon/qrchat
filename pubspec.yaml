@@ -1,8 +1,8 @@
 name: qrchat
-description: "QR Code Chat App with Group Chat Media Fix - v9.38.0"
+description: "QR Code Chat App with Video Thumbnail Feature - v1.0.4"
 publish_to: 'none'
 
-version: 9.47.0+9470
+version: 1.0.4+104
 
 environment:
   sdk: ^3.9.2
