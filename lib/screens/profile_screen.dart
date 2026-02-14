@@ -863,6 +863,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
+          // My QR Code 아이콘
+          IconButton(
+            icon: const Icon(Icons.qr_code_2, color: Colors.black87),
+            tooltip: 'My QR Code',
+            onPressed: () {
+              if (_currentUser != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyQRCodeScreen(user: _currentUser!),
+                  ),
+                );
+              }
+            },
+          ),
           // 우측 상단 톱니바퀴 (설정) 아이콘
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black87),
@@ -1197,32 +1212,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               
               const SizedBox(height: 24),
-              const Divider(height: 1, thickness: 1),
-              
-              // My QR Code
-              ListTile(
-                leading: const Icon(Icons.qr_code_2, color: Colors.black87, size: 28),
-                title: const Text(
-                  'My QR Code',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                subtitle: const Text(
-                  '내 QR 코드 보기',
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
-                ),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                onTap: () {
-                  if (_currentUser != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MyQRCodeScreen(user: _currentUser!),
-                      ),
-                    );
-                  }
-                },
-              ),
-              
               const Divider(height: 1, thickness: 1),
               
               const SizedBox(height: 32),

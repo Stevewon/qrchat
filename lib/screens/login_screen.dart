@@ -99,21 +99,34 @@ class _LoginScreenState extends State<LoginScreen> {
     final qrUrl = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('닉네임 찾기'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('가입 시 사용한 QR 주소를 입력하세요'),
+            const Text(
+              '가입 시 사용한 QR 주소를 입력하세요',
+              style: TextStyle(fontSize: 14, color: Colors.black87),
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: qrUrlController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'QR 주소',
-                hintText: 'https://...',
-                border: OutlineInputBorder(),
+                hintText: 'https://securet.kr/...',
+                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
-              maxLines: 3,
+              keyboardType: TextInputType.url,
+              autocorrect: false,
             ),
           ],
         ),
@@ -124,6 +137,10 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, qrUrlController.text.trim()),
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
             child: const Text('찾기'),
           ),
         ],
@@ -211,21 +228,34 @@ class _LoginScreenState extends State<LoginScreen> {
     final qrUrl = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('비밀번호 찾기'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('가입 시 사용한 QR 주소를 입력하세요'),
+            const Text(
+              '가입 시 사용한 QR 주소를 입력하세요',
+              style: TextStyle(fontSize: 14, color: Colors.black87),
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: qrUrlController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'QR 주소',
-                hintText: 'https://...',
-                border: OutlineInputBorder(),
+                hintText: 'https://securet.kr/...',
+                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
-              maxLines: 3,
+              keyboardType: TextInputType.url,
+              autocorrect: false,
             ),
           ],
         ),
@@ -236,6 +266,10 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, qrUrlController.text.trim()),
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
             child: const Text('찾기'),
           ),
         ],
