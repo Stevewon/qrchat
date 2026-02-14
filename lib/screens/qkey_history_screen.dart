@@ -5,7 +5,7 @@ import '../models/qkey_transaction.dart';
 import '../services/qkey_service.dart';
 import '../services/securet_auth_service.dart';
 
-/// 사용자 QKEY 거래 내역 화면
+/// 사용자 QKEY 채굴 내역 화면
 class QKeyHistoryScreen extends StatefulWidget {
   const QKeyHistoryScreen({super.key});
 
@@ -84,7 +84,7 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text(
-          'QKEY 거래 내역',
+          'QKEY 채굴 내역',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0xFFFFB300),
@@ -112,7 +112,7 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
           // 잔액 카드
           _buildBalanceCard(),
           
-          // 거래 내역 리스트
+          // 채굴 내역 리스트
           Expanded(
             child: _currentUserId == null
                 ? const Center(child: CircularProgressIndicator())
@@ -253,7 +253,7 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
     IconData icon;
     
     if (_filterType == null) {
-      message = '거래 내역이 없습니다';
+      message = '채굴 내역이 없습니다';
       icon = Icons.inbox;
     } else {
       switch (_filterType!) {

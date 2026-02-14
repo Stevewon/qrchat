@@ -1215,7 +1215,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               },
                               icon: const Icon(Icons.history, size: 18),
                               label: const Text(
-                                '거래 내역',
+                                '채굴 내역',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
