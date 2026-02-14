@@ -37,3 +37,4 @@ package-lock.json
 .firebaserc.local
 firebase-debug.log*
 firestore-debug.log*
+firebase-service-account.json
