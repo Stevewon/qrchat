@@ -14,7 +14,7 @@ import '../models/qkey_transaction.dart';
 import 'login_screen.dart';
 import 'my_qr_code_screen.dart';
 import 'admin_qkey_screen.dart';
-import 'sticker_pack_management_screen.dart';
+// import 'sticker_pack_management_screen.dart'; // 웹 어드민에서만 관리
 import 'qkey_history_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -690,26 +690,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     
                     const Divider(height: 1, indent: 56),
                     
-                    // 🎨 스티커팩 관리 (ListTile 형태로 추가)
-                    ListTile(
-                      leading: const Icon(Icons.collections, color: Colors.purple),
-                      title: const Text('스티커팩 관리', style: TextStyle(fontSize: 16)),
-                      subtitle: const Text(
-                        '스티커 추가, 삭제 및 팩 관리',
-                        style: TextStyle(fontSize: 13, color: Colors.grey),
-                      ),
-                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                      onTap: () {
-                        Navigator.pop(context); // 바텀시트 닫기
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const StickerPackManagementScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    
                     const SizedBox(height: 16),
                     const Divider(height: 1, thickness: 8, color: Color(0xFFF0F0F0)),
                     const SizedBox(height: 16),
@@ -731,34 +711,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: const Text('QKEY 출금 관리'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFFB300),
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 12),
-                    
-                    // 스티커팩 관리 버튼 (관리자용)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pop(context); // 바텀시트 닫기
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const StickerPackManagementScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.collections),
-                        label: const Text('스티커팩 관리'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
                           foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(
