@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'chat_list_screen.dart';
 import 'friends_list_screen.dart';
 import 'qr_scanner_screen.dart';
 import 'profile_screen.dart';
 import '../services/securet_auth_service.dart';
 import '../services/firebase_notification_service.dart';
+import '../services/qkey_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,11 +19,114 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  bool _hasShownLoginBonus = false; // 로그인 보너스 팝업 표시 여부
 
   @override
   void initState() {
     super.initState();
     _startNotificationListener();
+    _checkLoginBonus(); // 로그인 보너스 확인
+  }
+  
+  /// 🎁 로그인 보너스 확인 및 팝업 표시
+  Future<void> _checkLoginBonus() async {
+    if (_hasShownLoginBonus) return;
+    
+    // 화면이 완전히 로드된 후 실행
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    if (!mounted) return;
+    
+    try {
+      final user = await SecuretAuthService.getCurrentUser();
+      if (user == null) return;
+      
+      // Firestore에서 마지막 로그인 보너스 시간 확인
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      
+      // 이미 보너스를 받았는지 SharedPreferences로 확인 (중복 팝업 방지)
+      final prefs = await SharedPreferences.getInstance();
+      final lastPopupDate = prefs.getString('last_login_bonus_popup');
+      
+      if (lastPopupDate != null) {
+        final lastDate = DateTime.parse(lastPopupDate);
+        final lastDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
+        
+        // 오늘 이미 팝업을 표시했으면 skip
+        if (lastDay.isAtSameMomentAs(today)) {
+          return;
+        }
+      }
+      
+      // 보너스를 받았는지 확인 (QKeyService에서 받았음)
+      // 실제로 오늘 로그인 보너스를 받았는지 체크
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.id)
+          .get();
+      
+      if (!userDoc.exists) return;
+      
+      final userData = userDoc.data()!;
+      final lastLoginBonusDate = (userData['lastLoginBonusDate'] as Timestamp?)?.toDate();
+      
+      if (lastLoginBonusDate != null) {
+        final lastBonusDay = DateTime(lastLoginBonusDate.year, lastLoginBonusDate.month, lastLoginBonusDate.day);
+        
+        // 오늘 로그인 보너스를 받았으면 팝업 표시
+        if (lastBonusDay.isAtSameMomentAs(today)) {
+          final todayCount = (userData['todayLoginBonusCount'] as int?) ?? 0;
+          
+          // 팝업 표시
+          _hasShownLoginBonus = true;
+          await prefs.setString('last_login_bonus_popup', now.toIso8601String());
+          
+          if (mounted) {
+            _showLoginBonusSnackBar(todayCount);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ 로그인 보너스 확인 실패: $e');
+    }
+  }
+  
+  /// 🎉 로그인 보너스 스낵바 표시 + 알림음
+  Future<void> _showLoginBonusSnackBar(int count) async {
+    // 🔊 알림음 재생
+    try {
+      final player = AudioPlayer();
+      await player.setVolume(0.6); // 중간 볼륨
+      await player.play(AssetSource('sounds/coin_earn.mp3'));
+    } catch (e) {
+      debugPrint('⚠️ 로그인 보너스 알림음 재생 실패: $e');
+    }
+    
+    // 💬 스낵바 표시
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.card_giftcard, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                '🎁 로그인 보너스 +${QKeyService.loginBonusAmount} QKEY! ($count/${QKeyService.loginBonusMaxPerDay})',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          backgroundColor: const Color(0xFFFFB300),
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    }
   }
 
   /// ⭐ 실시간 알림 트리거 리스너 시작

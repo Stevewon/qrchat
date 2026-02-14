@@ -9,6 +9,7 @@ import 'package:gal/gal.dart'; // 이미지/동영상 저장
 import 'package:video_thumbnail/video_thumbnail.dart'; // 동영상 썸네일
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:audioplayers/audioplayers.dart'; // 🔊 알림음
 import '../models/chat_room.dart';
 import '../models/chat_message.dart';
 import '../models/friend.dart'; // ⭐ Friend 모델
@@ -298,7 +299,18 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         );
         
         if (success && mounted) {
-          // 채굴 성공 시 작은 스낵바 표시
+          // 🔊 채굴 성공 알림음 재생
+          try {
+            final player = AudioPlayer();
+            await player.setVolume(0.6); // 중간 볼륨
+            await player.play(AssetSource('sounds/coin_earn.mp3'));
+          } catch (e) {
+            if (kDebugMode) {
+              debugPrint('⚠️ 채굴 알림음 재생 실패: $e');
+            }
+          }
+          
+          // 💬 채굴 성공 스낵바 표시
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(

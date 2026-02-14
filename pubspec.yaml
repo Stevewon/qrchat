@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Login Bonus & Chat Mining Update v1.0.20"
+description: "QRChat - Mining Sound Effect Update v1.0.21"
 publish_to: 'none'
 
-version: 1.0.20+120
+version: 1.0.21+121
 
 environment:
   sdk: ^3.9.2
@@ -94,6 +94,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/sounds/notification.mp3
+    - assets/sounds/coin_earn.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
