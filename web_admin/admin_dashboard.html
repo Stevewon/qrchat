@@ -280,30 +280,30 @@
         }
 
         .btn-primary {
-            background: #4a5568;
+            background: #6b7280;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #2d3748;
+            background: #4b5563;
         }
 
         .btn-success {
-            background: #718096;
+            background: #6b7280;
             color: white;
         }
 
         .btn-success:hover {
-            background: #4a5568;
+            background: #4b5563;
         }
 
         .btn-danger {
-            background: #1a202c;
+            background: #4b5563;
             color: white;
         }
 
         .btn-danger:hover {
-            background: #000000;
+            background: #374151;
         }
 
         .btn-secondary {
@@ -1745,10 +1745,10 @@
                 ? '<span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; background: #ef444420; color: #ef4444;">🚫 차단됨</span>'
                 : '<span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; background: #10b98120; color: #10b981;">✅ 정상</span>';
             
-            // 차단 버튼
+            // 차단 버튼 (단색 스타일)
             const banButtonHTML = isBanned
-                ? `<button onclick="unbanUser('${userId}')" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🔓 차단해제</button>`
-                : `<button onclick="banUser('${userId}', '${(user.nickname || '알 수 없음').replace(/'/g, "\\'")}')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🚫 차단</button>`;
+                ? `<button onclick="unbanUser('${userId}')" style="padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🔓 차단해제</button>`
+                : `<button onclick="banUser('${userId}', '${(user.nickname || '알 수 없음').replace(/'/g, "\\'")}')" style="padding: 6px 12px; background: #4b5563; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">🚫 차단</button>`;
             
             tr.innerHTML = `
                 <td>
@@ -1762,10 +1762,10 @@
                 </td>
                 <td>
                     ${banButtonHTML}
-                    <button onclick="viewUserDetail('${userId}')" style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">
+                    <button onclick="viewUserDetail('${userId}')" style="padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 5px;">
                         👁️ 상세
                     </button>
-                    <button onclick="adjustQkey('${userId}')" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                    <button onclick="adjustQkey('${userId}')" style="padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
                         💰 QKEY
                     </button>
                 </td>
