@@ -1,8 +1,8 @@
 name: qrchat
-description: "QR Code Chat App - Sticker Pack Management UI Improved v1.0.13"
+description: "QR Code Chat App - QKEY Historical Fix + Sticker Management v1.0.14"
 publish_to: 'none'
 
-version: 1.0.13+113
+version: 1.0.14+114
 
 environment:
   sdk: ^3.9.2
