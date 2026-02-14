@@ -2528,26 +2528,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     
     // 🔥 고정 크기 사용 (재진입 시에도 일관성 유지)
     const double stickerSize = 75.0;  // 스티커 고정 크기 (75px)
-    const double imageMaxSize = 250.0;  // 일반 이미지 최대 크기 (250px)
-    
-    final width = isSticker ? stickerSize : imageMaxSize;
-    final height = isSticker ? stickerSize : imageMaxSize;
+    const double imageMaxWidth = 250.0;  // 일반 이미지 최대 너비 (250px)
     
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: width,
-        maxHeight: height,
+        maxWidth: isSticker ? stickerSize : imageMaxWidth,
+        maxHeight: isSticker ? stickerSize : double.infinity,  // 스티커는 고정, 이미지는 제한 없음
       ),
       child: Image.network(
         imageUrl,
-        width: width,  // 명시적 크기 지정
-        height: height,
-        fit: isSticker ? BoxFit.contain : BoxFit.cover,  // 스티커: contain, 이미지: cover
+        fit: BoxFit.contain,  // 항상 contain 사용하여 이미지 잘림 방지
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
           return Container(
-            width: width,
-            height: height,
+            width: isSticker ? stickerSize : imageMaxWidth,
+            constraints: BoxConstraints(
+              maxHeight: isSticker ? stickerSize : 400,
+            ),
             color: isSticker ? Colors.transparent : Colors.grey[200],
             child: Center(
               child: CircularProgressIndicator(
@@ -2562,8 +2559,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         },
         errorBuilder: (context, error, stackTrace) {
           return Container(
-            width: width,
-            height: height,
+            width: isSticker ? stickerSize : imageMaxWidth,
+            constraints: BoxConstraints(
+              maxHeight: isSticker ? stickerSize : 400,
+            ),
             color: isSticker ? Colors.transparent : Colors.grey[200],
             child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,

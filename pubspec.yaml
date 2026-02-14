@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - QKEY Mining History & Admin Sticker Management v1.0.17"
+description: "QRChat - Image Fit Fix v1.0.18"
 publish_to: 'none'
 
-version: 1.0.17+117
+version: 1.0.18+118
 
 environment:
   sdk: ^3.9.2

@@ -2800,18 +2800,18 @@ class _ChatScreenState extends State<ChatScreen> {
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: maxWidth,
-              maxHeight: maxHeight,
+              maxHeight: isSticker ? stickerSize : double.infinity,  // 스티커는 고정, 이미지는 제한 없음
             ),
             child: Image.network(
               imageUrl,
-              width: maxWidth,  // 명시적 크기 지정
-              height: maxHeight,
-              fit: isSticker ? BoxFit.contain : BoxFit.cover,
+              fit: BoxFit.contain,  // 항상 contain 사용하여 이미지 잘림 방지
               loadingBuilder: (context, child, loadingProgress) {
                 if (loadingProgress == null) return child;
                 return Container(
                   width: maxWidth,
-                  height: maxHeight,
+                  constraints: BoxConstraints(
+                    maxHeight: isSticker ? stickerSize : 400,
+                  ),
                   color: isSticker ? Colors.transparent : Colors.grey[200],
                   child: Center(
                     child: CircularProgressIndicator(
@@ -2827,7 +2827,9 @@ class _ChatScreenState extends State<ChatScreen> {
               errorBuilder: (context, error, stackTrace) {
                 return Container(
                   width: maxWidth,
-                  height: maxHeight,
+                  constraints: BoxConstraints(
+                    maxHeight: isSticker ? stickerSize : 400,
+                  ),
                   color: isSticker ? Colors.transparent : Colors.grey[200],
                   child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
