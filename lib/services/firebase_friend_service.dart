@@ -584,8 +584,31 @@ class FirebaseFriendService {
         ));
       }
 
-      // 최신순 정렬 (메모리에서)
-      friends.sort((a, b) => b.addedAt.compareTo(a.addedAt));
+      // 가나다순 정렬 (한글 → 영어 알파벳 순)
+      friends.sort((a, b) {
+        final aName = a.friendNickname.toLowerCase();
+        final bName = b.friendNickname.toLowerCase();
+        
+        // 한글 여부 확인 (가-힣 범위)
+        final aIsKorean = RegExp(r'[가-힣]').hasMatch(aName[0]);
+        final bIsKorean = RegExp(r'[가-힣]').hasMatch(bName[0]);
+        
+        // 1. 한글끼리 비교
+        if (aIsKorean && bIsKorean) {
+          return aName.compareTo(bName);
+        }
+        
+        // 2. 한글이 먼저, 영어가 나중
+        if (aIsKorean && !bIsKorean) {
+          return -1; // a가 앞으로
+        }
+        if (!aIsKorean && bIsKorean) {
+          return 1; // b가 앞으로
+        }
+        
+        // 3. 영어끼리 비교
+        return aName.compareTo(bName);
+      });
 
       if (kDebugMode) {
         debugPrint('✅ 친구 ${friends.length}명 조회 완료');

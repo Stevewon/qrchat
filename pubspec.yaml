@@ -1,8 +1,8 @@
 name: qrchat
-description: "QR Code Chat App with Video Thumbnail Feature - v1.0.4"
+description: "QR Code Chat App with Friend List Sorting - v1.0.5"
 publish_to: 'none'
 
-version: 1.0.4+104
+version: 1.0.5+105
 
 environment:
   sdk: ^3.9.2
