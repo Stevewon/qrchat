@@ -2526,59 +2526,56 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     // Firebase Storage의 stickers 폴더 = 스티커로 간주
     final isSticker = imageUrl.contains('/stickers/');
     
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // 🔥 반응형 크기 계산 (화면 크기 기반)
-        final screenWidth = MediaQuery.of(context).size.width;
-        final stickerSize = 100.0;  // 스티커 고정 크기
-        final imageMaxWidth = screenWidth * 0.6;  // 일반 이미지는 화면의 60%
-        
-        final width = isSticker ? stickerSize : imageMaxWidth;
-        final height = isSticker ? stickerSize : imageMaxWidth;  // 정사각형 유지
-        
-        return ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: width,
-            maxHeight: height,
-          ),
-          child: Image.network(
-            imageUrl,
-            fit: isSticker ? BoxFit.contain : BoxFit.cover,  // 스티커: contain, 이미지: cover
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                width: width,
-                height: height,
-                color: isSticker ? Colors.transparent : Colors.grey[200],
-                child: Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                    strokeWidth: 2,
-                  ),
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: width,
-                height: height,
-                color: isSticker ? Colors.transparent : Colors.grey[200],
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error, color: Colors.red, size: 48),
-                    SizedBox(height: 8),
-                    Text('이미지 로드 실패', style: TextStyle(fontSize: 12)),
-                  ],
-                ),
-              );
-            },
-          ),
-        );
-      },
+    // 🔥 고정 크기 사용 (재진입 시에도 일관성 유지)
+    const double stickerSize = 75.0;  // 스티커 고정 크기 (75px)
+    const double imageMaxSize = 250.0;  // 일반 이미지 최대 크기 (250px)
+    
+    final width = isSticker ? stickerSize : imageMaxSize;
+    final height = isSticker ? stickerSize : imageMaxSize;
+    
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: width,
+        maxHeight: height,
+      ),
+      child: Image.network(
+        imageUrl,
+        width: width,  // 명시적 크기 지정
+        height: height,
+        fit: isSticker ? BoxFit.contain : BoxFit.cover,  // 스티커: contain, 이미지: cover
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: width,
+            height: height,
+            color: isSticker ? Colors.transparent : Colors.grey[200],
+            child: Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: width,
+            height: height,
+            color: isSticker ? Colors.transparent : Colors.grey[200],
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error, color: Colors.red, size: 48),
+                SizedBox(height: 8),
+                Text('이미지 로드 실패', style: TextStyle(fontSize: 12)),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
   

@@ -2744,15 +2744,12 @@ class _ChatScreenState extends State<ChatScreen> {
                            imageUrl.contains('em-content.zobj.net') || 
                            imageUrl.contains('media.giphy.com');
     
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // 반응형 크기 계산
-        final screenWidth = MediaQuery.of(context).size.width;
-        final stickerSize = 100.0;
-        final imageMaxWidth = screenWidth * 0.6;
-        
-        final maxWidth = isSticker ? stickerSize : imageMaxWidth;
-        final maxHeight = isSticker ? stickerSize : imageMaxWidth;
+    // 🔥 고정 크기 사용 (재진입 시에도 일관성 유지)
+    const double stickerSize = 75.0;  // 스티커 고정 크기 (75px)
+    const double imageMaxSize = 250.0;  // 일반 이미지 최대 크기 (250px)
+    
+    final maxWidth = isSticker ? stickerSize : imageMaxSize;
+    final maxHeight = isSticker ? stickerSize : imageMaxSize;
         
         return GestureDetector(
           onTap: isSticker ? null : () {
@@ -2807,6 +2804,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             child: Image.network(
               imageUrl,
+              width: maxWidth,  // 명시적 크기 지정
+              height: maxHeight,
               fit: isSticker ? BoxFit.contain : BoxFit.cover,
               loadingBuilder: (context, child, loadingProgress) {
                 if (loadingProgress == null) return child;
@@ -2843,8 +2842,6 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
         );
-      },
-    );
   }
 
   /// 파일 메시지 위젯

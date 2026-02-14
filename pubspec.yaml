@@ -1,8 +1,8 @@
 name: qrchat
-description: "QR Code Chat App - Sticker Pack Management v1.0.11"
+description: "QR Code Chat App - Fixed Image Size Consistency v1.0.12"
 publish_to: 'none'
 
-version: 1.0.11+111
+version: 1.0.12+112
 
 environment:
   sdk: ^3.9.2
