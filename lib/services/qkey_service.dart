@@ -10,7 +10,7 @@ class QKeyService {
   static const String _transactionsCollection = 'qkey_transactions';
   
   // QKEY 적립 설정
-  static const int earnAmountPerInterval = 10;      // 5분당 적립량
+  static const int earnAmountPerInterval = 2;       // 5분당 적립량 (10 → 2로 감소)
   static const int earnIntervalMinutes = 5;         // 적립 간격 (분)
   static const int withdrawMinAmount = 1000;        // 최소 출금 가능 금액
   static const int withdrawUnit = 1000;             // 출금 단위
