@@ -1190,7 +1190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Icon(Icons.info_outline, size: 14, color: Colors.white),
                             SizedBox(width: 6),
                             Text(
-                              '채팅 5분마다 10 QKEY 적립',
+                              '채팅 5분마다 2 QKEY 적립',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.white,
