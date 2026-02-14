@@ -42,6 +42,7 @@ dependencies:
   # Image
   image_picker: 1.1.2
   video_player: 2.9.2  # 동영상 재생을 위한 패키지
+  video_thumbnail: ^0.5.3  # 동영상 썸네일 생성
   cached_network_image: 3.4.1
   gal: 2.3.0  # 이미지/동영상 저장 기능 (최신, 안정적)
   

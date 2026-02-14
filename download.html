@@ -3,221 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRChat v9.47.0 다운로드</title>
+    <title>QRChat APK 다운로드</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
+        
         .container {
             background: white;
             border-radius: 20px;
-            padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        h1 {
-            color: #667eea;
+            max-width: 500px;
+            width: 100%;
+            padding: 40px 30px;
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5em;
         }
-        .version {
-            text-align: center;
-            color: #666;
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
-        .alert {
-            background: #d4edda;
-            border: 2px solid #28a745;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        .alert-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #155724;
-            margin-bottom: 10px;
-        }
-        .alert-text {
-            color: #155724;
-            line-height: 1.6;
-        }
-        .download-box {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
-            margin: 20px 0;
-            border: 2px solid #e9ecef;
-        }
-        .download-box h2 {
-            color: #495057;
-            margin-top: 0;
-            font-size: 1.5em;
-        }
-        .file-info {
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin: 15px 0;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: white;
         }
-        .file-name {
-            font-weight: bold;
-            color: #333;
+        
+        h1 {
+            font-size: 28px;
+            color: #1a202c;
+            margin-bottom: 10px;
         }
-        .file-size {
-            color: #666;
-            font-size: 0.9em;
+        
+        .version {
+            color: #718096;
+            font-size: 16px;
+            margin-bottom: 30px;
         }
-        .btn {
+        
+        .download-btn {
             display: inline-block;
-            padding: 15px 40px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.1em;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-align: center;
-            margin: 10px 0;
-            display: block;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
         }
-        .btn:hover {
+        
+        .download-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
-        .features {
-            margin-top: 30px;
+        
+        .download-btn:active {
+            transform: translateY(0);
         }
-        .feature-item {
-            padding: 15px;
-            margin: 10px 0;
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            border-radius: 5px;
-        }
-        .feature-title {
-            font-weight: bold;
-            color: #1976d2;
-            margin-bottom: 5px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 2px solid #e9ecef;
-            color: #666;
-        }
-        .new-badge {
+        
+        .icon {
             display: inline-block;
-            background: #ff4444;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            margin-left: 5px;
+            margin-right: 8px;
+        }
+        
+        .info-box {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .info-box h3 {
+            color: #2d3748;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #718096;
+        }
+        
+        .info-value {
+            color: #2d3748;
+            font-weight: 600;
+        }
+        
+        .notice {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #7d6608;
+        }
+        
+        .notice strong {
+            color: #5d4a03;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .download-btn {
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎉 QRChat</h1>
-        <div class="version">v9.47.0 - QKEY 관리자 화면 추가!</div>
+        <div class="logo">📱</div>
+        <h1>QRChat</h1>
+        <div class="version">v1.0.3 (2026.02.14)</div>
         
-        <div class="alert">
-            <div class="alert-title">✅ QKEY 관리자 화면 추가 완료!</div>
-            <div class="alert-text">
-                ✅ <strong>위젯 Key 추가</strong> - 메시지와 동영상 위젯에 고유 Key 추가로 재렌더링 보장<br>
-                🔍 <strong>강화된 디버그</strong> - 동영상 메시지 렌더링 과정 상세 로깅<br>
-                🐛 <strong>문제 해결</strong> - 채팅방 나갔다 들어와도 동영상 썸네일 정상 표시<br>
-                ⚡ <strong>재생 가능</strong> - 동영상 클릭 시 정상 재생
+        <a href="qrchat_v1.0.3.apk" class="download-btn" download>
+            <span class="icon">⬇️</span>
+            APK 다운로드
+        </a>
+        
+        <div class="info-box">
+            <h3>📋 파일 정보</h3>
+            <div class="info-item">
+                <span class="info-label">파일명</span>
+                <span class="info-value">qrchat_v1.0.3.apk</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">파일 크기</span>
+                <span class="info-value">27.79 MB</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">지원 기기</span>
+                <span class="info-value">대부분의 Android 기기</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">최소 Android</span>
+                <span class="info-value">Android 5.0 (API 21)</span>
             </div>
         </div>
-
-        <div class="download-box">
-            <h2>📱 다운로드 옵션</h2>
-            
-            <!-- ZIP 파일 (디버그) -->
-            <div class="file-info">
-                <div>
-                    <div class="file-name">🗜️ QRChat-v9.47.0-QKEY-HISTORY.zip <span class="new-badge">권장</span></div>
-                    <div class="file-size">크기: 33 MB (압축됨)</div>
-                </div>
-            </div>
-            <a href="QRChat-v9.47.0-QKEY-HISTORY.zip" class="btn">⬇️ ZIP 파일 다운로드 (권장)</a>
-            
-            <!-- APK 파일 -->
-            <div class="file-info" style="margin-top: 20px;">
-                <div>
-                    <div class="file-name">📱 QRChat-v9.47.0-QKEY-HISTORY.apk</div>
-                    <div class="file-size">크기: 69 MB</div>
-                </div>
-            </div>
-            <a href="QRChat-v9.47.0-QKEY-HISTORY.apk" class="btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">⬇️ APK 직접 다운로드</a>
+        
+        <div class="notice">
+            <strong>📌 설치 안내</strong><br>
+            1. 다운로드 후 파일을 실행하세요<br>
+            2. "출처를 알 수 없는 앱" 설치 허용<br>
+            3. 설치 완료 후 앱 실행
         </div>
-
-        <div class="features">
-            <h2>✅ v9.47.0 그룹방 버그 수정</h2>
-            
-            <div class="feature-item">
-                <div class="feature-title">🔑 그룹방 위젯 Key 추가 <span class="new-badge">FIX</span></div>
-                그룹 채팅 ListView와 동영상 위젯에 ValueKey 추가로 재렌더링 보장
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-title">🎬 그룹방 동영상 재생 수정 <span class="new-badge">FIX</span></div>
-                그룹방에서 동영상 클릭 시 VideoPlayerScreen으로 이동하여 정상 재생
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-title">🎨 카카오톡 스타일 썸네일 <span class="new-badge">FIX</span></div>
-                그룹방 동영상 썸네일을 1:1방과 동일한 240x180 크기의 카카오톡 스타일로 개선
-            </div>
-        </div>
-
-        <div class="features">
-            <h2>✅ 이전 버전 기능</h2>
-            
-            <div class="feature-item">
-                <div class="feature-title">✅ 그룹방 미디어 기능 수정</div>
-                그룹방 재입장 시 앨범/카메라/동영상 기능 정상 작동 (v9.38.0)
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-title">✅ 동영상 썸네일 표시</div>
-                240x180 크기 썸네일 박스 + 재생 버튼 (v9.37.0)
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-title">✅ 풀스크린 동영상 재생</div>
-                화면 전체를 가득 채우는 몰입형 재생 + 저장/공유 기능 (v9.36.0)
-            </div>
-        </div>
-
-        <div class="footer">
-            <p><strong>버전:</strong> 9.41.0 (Build 9470)</p>
-            <p><strong>릴리즈 날짜:</strong> 2026-02-13 11:38 UTC</p>
-            <p><strong>Flutter SDK:</strong> 3.41.0 | <strong>Dart:</strong> 3.11.0</p>
-            <p style="margin-top: 20px;">
-                <a href="https://github.com/Stevewon/qrchat" style="color: #667eea;">GitHub Repository</a> |
-                <a href="https://github.com/Stevewon/qrchat/releases/tag/v9.47.0" style="color: #667eea;">GitHub Release</a> |
-                <a href="https://console.firebase.google.com/project/qrchat-b7a67" style="color: #667eea;">Firebase Console</a> |
-                <a href="https://8080-iuiezsh1341nwe1ngsc0x-cbeee0f9.sandbox.novita.ai" style="color: #667eea;">스티커 관리자</a>
-            </p>
-            <p style="margin-top: 20px; font-size: 0.9em; color: #999;">
-                개발자: GenSpark AI Developer<br>
-                빌드 환경: Flutter 3.41.0 | Dart 3.11.0<br>
-                상태: ✅ 프로덕션 준비 완료
-            </p>
+        
+        <div class="notice" style="margin-top: 15px; background: #e8f5e9; border-left-color: #4caf50; color: #1b5e20;">
+            <strong>✨ v1.0.3 주요 기능</strong><br>
+            • QR 주소로 닉네임/비밀번호 찾기<br>
+            • 닉네임 중복 체크<br>
+            • 사용자 차단 기능<br>
+            • QR 코드 재가입 방지
         </div>
     </div>
 </body>

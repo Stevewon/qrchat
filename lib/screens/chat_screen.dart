@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gal/gal.dart'; // 이미지/동영상 저장
+import 'package:video_thumbnail/video_thumbnail.dart'; // 동영상 썸네일
 import 'dart:async';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -2857,6 +2858,37 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  /// 동영상 썸네일 생성 (캐싱)
+  Future<String?> _generateVideoThumbnail(String videoUrl) async {
+    try {
+      final uint8list = await VideoThumbnail.thumbnailData(
+        video: videoUrl,
+        imageFormat: ImageFormat.JPEG,
+        maxWidth: 240,
+        quality: 75,
+      );
+
+      if (uint8list != null) {
+        // 임시 파일로 저장
+        final tempDir = await getTemporaryDirectory();
+        final fileName = videoUrl.hashCode.toString();
+        final file = File('${tempDir.path}/thumb_$fileName.jpg');
+        await file.writeAsBytes(uint8list);
+        
+        if (kDebugMode) {
+          debugPrint('✅ 썸네일 생성 성공: ${file.path}');
+        }
+        
+        return file.path;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ 썸네일 생성 실패: $e');
+      }
+    }
+    return null;
+  }
+
   /// 동영상 메시지 위젯 (카카오톡 스타일 썸네일)
   Widget _buildVideoMessage(String videoUrl, bool isMe) {
     // 🐛 DEBUG: 동영상 메시지 렌더링 로그
@@ -2887,50 +2919,74 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // 동영상 썸네일 (첫 프레임)
+          // 동영상 썸네일 (실제 비디오 프레임)
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Container(
               width: 240,
               height: 180,
               color: Colors.black87,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // 배경 (동영상 URL 표시 - 실제 썸네일 대신)
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.grey[800]!,
-                          Colors.grey[900]!,
-                        ],
-                      ),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.videocam,
-                        size: 48,
-                        color: Colors.white.withValues(alpha: 0.3),
-                      ),
-                    ),
-                  ),
-                  // 그라데이션 오버레이
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.1),
-                          Colors.black.withValues(alpha: 0.3),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+              child: FutureBuilder<String?>(
+                future: _generateVideoThumbnail(videoUrl),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData && snapshot.data != null) {
+                    // 썸네일 생성 성공
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        // 실제 썸네일 이미지
+                        Image.file(
+                          File(snapshot.data!),
+                          fit: BoxFit.cover,
+                        ),
+                        // 그라데이션 오버레이
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withValues(alpha: 0.1),
+                                Colors.black.withValues(alpha: 0.3),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    // 썸네일 생성 중 또는 실패 시 기본 아이콘 표시
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.grey[800]!,
+                                Colors.grey[900]!,
+                              ],
+                            ),
+                          ),
+                          child: Center(
+                            child: snapshot.connectionState == ConnectionState.waiting
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  )
+                                : Icon(
+                                    Icons.videocam,
+                                    size: 48,
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
             ),
           ),

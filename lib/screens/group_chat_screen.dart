@@ -5,6 +5,7 @@ import 'package:flutter/services.dart'; // Clipboard
 import 'dart:async';
 import 'dart:io';
 import 'package:gal/gal.dart'; // 이미지/동영상 저장
+import 'package:video_thumbnail/video_thumbnail.dart'; // 동영상 썸네일
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../models/chat_room.dart';
