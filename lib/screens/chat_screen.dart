@@ -66,6 +66,9 @@ class _ChatScreenState extends State<ChatScreen> {
   // 업로드 중인 임시 메시지 목록 (카카오톡 스타일)
   final List<Map<String, dynamic>> _uploadingMessages = [];
   
+  // 동영상 썸네일 캐시 (URL → 파일 경로)
+  final Map<String, String?> _thumbnailCache = {};
+  
   // 자주 사용하는 이모지 목록
   final List<String> _frequentEmojis = [
     '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
@@ -2858,7 +2861,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  /// 동영상 썸네일 생성 (캐싱) - 타임아웃 및 상세 로그 추가
+  /// 동영상 썸네일 생성 (캐싱) - HTTP URL을 로컬 파일로 변환 후 생성
   Future<String?> _generateVideoThumbnail(String videoUrl) async {
     // 캐시 확인
     if (_thumbnailCache.containsKey(videoUrl)) {
@@ -2874,13 +2877,41 @@ class _ChatScreenState extends State<ChatScreen> {
         debugPrint('   URL: ${videoUrl.substring(0, videoUrl.length > 100 ? 100 : videoUrl.length)}...');
       }
       
-      // 타임아웃 설정 (10초)
+      // 1️⃣ Firebase Storage URL을 로컬 파일로 다운로드
+      final tempDir = await getTemporaryDirectory();
+      final videoFileName = 'video_${videoUrl.hashCode}.mp4';
+      final videoFile = File('${tempDir.path}/$videoFileName');
+      
+      // 이미 다운로드된 파일이 있으면 재사용
+      if (!await videoFile.exists()) {
+        if (kDebugMode) {
+          debugPrint('📥 동영상 다운로드 중...');
+        }
+        
+        final response = await http.get(Uri.parse(videoUrl)).timeout(
+          const Duration(seconds: 15),
+          onTimeout: () {
+            throw TimeoutException('동영상 다운로드 타임아웃 (15초)');
+          },
+        );
+        
+        if (response.statusCode == 200) {
+          await videoFile.writeAsBytes(response.bodyBytes);
+          if (kDebugMode) {
+            debugPrint('✅ 동영상 다운로드 완료: ${response.bodyBytes.length} bytes');
+          }
+        } else {
+          throw Exception('동영상 다운로드 실패: HTTP ${response.statusCode}');
+        }
+      }
+      
+      // 2️⃣ 로컬 파일에서 썸네일 생성
       final uint8list = await VideoThumbnail.thumbnailData(
-        video: videoUrl,
+        video: videoFile.path, // 로컬 파일 경로 사용!
         imageFormat: ImageFormat.JPEG,
         maxWidth: 240,
         quality: 75,
-        timeMs: 1000, // 동영상 1초 시점의 썸네일 추출
+        timeMs: 1000,
       ).timeout(
         const Duration(seconds: 10),
         onTimeout: () {
@@ -2893,25 +2924,23 @@ class _ChatScreenState extends State<ChatScreen> {
 
       if (uint8list != null) {
         // 임시 파일로 저장
-        final tempDir = await getTemporaryDirectory();
-        final fileName = videoUrl.hashCode.toString();
-        final file = File('${tempDir.path}/thumb_$fileName.jpg');
-        await file.writeAsBytes(uint8list);
+        final thumbFileName = 'thumb_${videoUrl.hashCode}.jpg';
+        final thumbFile = File('${tempDir.path}/$thumbFileName');
+        await thumbFile.writeAsBytes(uint8list);
         
         if (kDebugMode) {
-          debugPrint('✅ 썸네일 생성 성공: ${file.path}');
+          debugPrint('✅ 썸네일 생성 성공: ${thumbFile.path}');
           debugPrint('   파일 크기: ${uint8list.length} bytes');
         }
         
         // 캐시에 저장
-        _thumbnailCache[videoUrl] = file.path;
+        _thumbnailCache[videoUrl] = thumbFile.path;
         
-        return file.path;
+        return thumbFile.path;
       } else {
         if (kDebugMode) {
           debugPrint('⚠️ 썸네일 데이터가 null입니다');
         }
-        // null도 캐시에 저장 (재시도 방지)
         _thumbnailCache[videoUrl] = null;
       }
     } catch (e, stackTrace) {
@@ -2919,7 +2948,6 @@ class _ChatScreenState extends State<ChatScreen> {
         debugPrint('❌ 썸네일 생성 실패: $e');
         debugPrint('   스택 트레이스: ${stackTrace.toString().split('\n').take(3).join('\n')}');
       }
-      // 에러도 캐시에 저장 (재시도 방지)
       _thumbnailCache[videoUrl] = null;
     }
     return null;

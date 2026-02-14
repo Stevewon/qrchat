@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart'; // TapGestureRecognizer
 import 'package:flutter/services.dart'; // Clipboard
 import 'dart:async';
 import 'dart:io';
+import 'dart:math'; // min 함수
 import 'package:gal/gal.dart'; // 이미지/동영상 저장
 import 'package:video_thumbnail/video_thumbnail.dart'; // 동영상 썸네일
 import 'package:http/http.dart' as http;
@@ -68,6 +69,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   
   // 업로드 중인 임시 메시지 목록 (카카오톡 스타일)
   final List<Map<String, dynamic>> _uploadingMessages = [];
+  
+  // 동영상 썸네일 캐시 (URL → 로컬 파일 경로)
+  final Map<String, String?> _thumbnailCache = {};
 
   @override
   void initState() {
@@ -1340,17 +1344,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       child: _buildImageMessage(message.content),  // 🎨 스티커 구분 로직 적용
                     )
                   else if (message.type == MessageType.video)
-                    // 동영상 메시지 - 카카오톡 스타일 (클릭 가능)
+                    // 동영상 메시지 - 실제 썸네일 표시
                     GestureDetector(
-                      key: ValueKey(message.content), // 🔑 동영상 URL 기반 고유 Key
+                      key: ValueKey(message.content),
                       onTap: () {
-                        // 🐛 DEBUG: 동영상 클릭 로그
                         if (kDebugMode) {
                           debugPrint('🎬 [그룹방 동영상 클릭] 재생 화면으로 이동');
-                          debugPrint('   URL: ${message.content.substring(0, message.content.length > 50 ? 50 : message.content.length)}...');
                         }
-                        
-                        // 동영상 재생 화면으로 이동
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -1365,50 +1365,65 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // 동영상 썸네일 박스
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               width: 240,
                               height: 180,
                               color: Colors.black87,
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  // 배경 그라데이션
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.grey[800]!,
-                                          Colors.grey[900]!,
-                                        ],
+                              child: FutureBuilder<String?>(
+                                future: _generateVideoThumbnail(message.content),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.done && 
+                                      snapshot.hasData && 
+                                      snapshot.data != null) {
+                                    // ✅ 썸네일 로드 성공
+                                    return Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        Image.file(
+                                          File(snapshot.data!),
+                                          fit: BoxFit.cover,
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                Colors.black.withValues(alpha: 0.1),
+                                                Colors.black.withValues(alpha: 0.3),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  } else {
+                                    // ⏳ 로딩 중 또는 실패 시 플레이스홀더
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [Colors.grey[800]!, Colors.grey[900]!],
+                                        ),
                                       ),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.videocam,
-                                        size: 48,
-                                        color: Colors.white.withValues(alpha: 0.3),
+                                      child: Center(
+                                        child: snapshot.connectionState == ConnectionState.waiting
+                                            ? const CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 2,
+                                              )
+                                            : Icon(
+                                                Icons.videocam,
+                                                size: 48,
+                                                color: Colors.white.withValues(alpha: 0.3),
+                                              ),
                                       ),
-                                    ),
-                                  ),
-                                  // 그라데이션 오버레이
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Colors.black.withValues(alpha: 0.1),
-                                          Colors.black.withValues(alpha: 0.3),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                    );
+                                  }
+                                },
                               ),
                             ),
                           ),
@@ -1439,11 +1454,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    Icons.videocam,
-                                    color: Colors.white,
-                                    size: 14,
-                                  ),
+                                  Icon(Icons.videocam, color: Colors.white, size: 14),
                                   SizedBox(width: 4),
                                   Text(
                                     '동영상',
@@ -2510,5 +2521,91 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         },
       ),
     );
+  }
+  
+  /// 동영상 썸네일 생성 (HTTP URL → 로컬 파일 변환 후 생성)
+  Future<String?> _generateVideoThumbnail(String videoUrl) async {
+    // 캐시 확인
+    if (_thumbnailCache.containsKey(videoUrl)) {
+      if (kDebugMode) {
+        debugPrint('💾 [그룹방 썸네일 캐시 사용] $videoUrl');
+      }
+      return _thumbnailCache[videoUrl];
+    }
+    
+    try {
+      if (kDebugMode) {
+        debugPrint('🎬 [그룹방 썸네일 생성 시작] ${videoUrl.substring(0, min(100, videoUrl.length))}...');
+      }
+      
+      // 1️⃣ 동영상을 로컬 파일로 다운로드
+      final tempDir = await getTemporaryDirectory();
+      final videoFileName = 'group_video_${videoUrl.hashCode}.mp4';
+      final videoFile = File('${tempDir.path}/$videoFileName');
+      
+      if (!await videoFile.exists()) {
+        if (kDebugMode) {
+          debugPrint('📥 동영상 다운로드 중...');
+        }
+        
+        final response = await http.get(Uri.parse(videoUrl)).timeout(
+          const Duration(seconds: 15),
+          onTimeout: () {
+            throw TimeoutException('동영상 다운로드 타임아웃 (15초)');
+          },
+        );
+        
+        if (response.statusCode == 200) {
+          await videoFile.writeAsBytes(response.bodyBytes);
+          if (kDebugMode) {
+            debugPrint('✅ 동영상 다운로드 완료: ${response.bodyBytes.length} bytes');
+          }
+        } else {
+          throw Exception('동영상 다운로드 실패: HTTP ${response.statusCode}');
+        }
+      }
+      
+      // 2️⃣ 로컬 파일에서 썸네일 생성
+      final uint8list = await VideoThumbnail.thumbnailData(
+        video: videoFile.path,
+        imageFormat: ImageFormat.JPEG,
+        maxWidth: 240,
+        quality: 75,
+        timeMs: 1000,
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          if (kDebugMode) {
+            debugPrint('⏱️ 썸네일 생성 타임아웃 (10초)');
+          }
+          return null;
+        },
+      );
+
+      if (uint8list != null) {
+        final thumbFileName = 'group_thumb_${videoUrl.hashCode}.jpg';
+        final thumbFile = File('${tempDir.path}/$thumbFileName');
+        await thumbFile.writeAsBytes(uint8list);
+        
+        if (kDebugMode) {
+          debugPrint('✅ 그룹방 썸네일 생성 성공: ${thumbFile.path}');
+        }
+        
+        _thumbnailCache[videoUrl] = thumbFile.path;
+        return thumbFile.path;
+      } else {
+        if (kDebugMode) {
+          debugPrint('⚠️ 썸네일 데이터가 null입니다');
+        }
+        _thumbnailCache[videoUrl] = null;
+      }
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('❌ 그룹방 썸네일 생성 실패: $e');
+        debugPrint('   스택: ${stackTrace.toString().split('\n').take(3).join('\n')}');
+      }
+      _thumbnailCache[videoUrl] = null;
+    }
+    return null;
   }
 }

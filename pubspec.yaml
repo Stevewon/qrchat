@@ -1,8 +1,8 @@
 name: qrchat
-description: "QR Code Chat App with Video Thumbnail Caching - v1.0.6"
+description: "QR Code Chat App - Video Thumbnail Fixed (HTTP Download) - v1.0.7"
 publish_to: 'none'
 
-version: 1.0.6+106
+version: 1.0.7+107
 
 environment:
   sdk: ^3.9.2
