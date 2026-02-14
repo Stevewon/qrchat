@@ -130,6 +130,60 @@ class SecuretAuthService {
     }
   }
 
+  // Find nickname by QR URL
+  static Future<String?> findNicknameByQrUrl(String qrUrl) async {
+    if (qrUrl.isEmpty) {
+      throw Exception('QR 주소를 입력해주세요');
+    }
+
+    try {
+      final querySnapshot = await _firestore
+          .collection('users')
+          .where('qrCodeUrl', isEqualTo: qrUrl)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return null;
+      }
+
+      final userData = querySnapshot.docs.first.data();
+      return userData['nickname'] ?? '';
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ 닉네임 찾기 오류: $e');
+      }
+      rethrow;
+    }
+  }
+
+  // Find password by QR URL
+  static Future<String?> findPasswordByQrUrl(String qrUrl) async {
+    if (qrUrl.isEmpty) {
+      throw Exception('QR 주소를 입력해주세요');
+    }
+
+    try {
+      final querySnapshot = await _firestore
+          .collection('users')
+          .where('qrCodeUrl', isEqualTo: qrUrl)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return null;
+      }
+
+      final userData = querySnapshot.docs.first.data();
+      return userData['password'] ?? '';
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ 비밀번호 찾기 오류: $e');
+      }
+      rethrow;
+    }
+  }
+
   // Login with nickname + password - SUPER SIMPLIFIED
   static Future<bool> login(String nickname, String password) async {
     if (nickname.isEmpty || password.isEmpty) {

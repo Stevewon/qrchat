@@ -93,6 +93,230 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _findNickname() async {
+    final qrUrlController = TextEditingController();
+    
+    final qrUrl = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('닉네임 찾기'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('가입 시 사용한 QR 주소를 입력하세요'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: qrUrlController,
+              decoration: const InputDecoration(
+                labelText: 'QR 주소',
+                hintText: 'https://...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, qrUrlController.text.trim()),
+            child: const Text('찾기'),
+          ),
+        ],
+      ),
+    );
+
+    if (qrUrl == null || qrUrl.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final nickname = await SecuretAuthService.findNicknameByQrUrl(qrUrl);
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (nickname != null && nickname.isNotEmpty) {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('✅ 닉네임을 찾았습니다'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('가입된 닉네임:'),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      nickname,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _nicknameController.text = nickname;
+                    });
+                  },
+                  child: const Text('입력하고 닫기'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('확인'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          setState(() {
+            _errorMessage = '❌ 해당 QR 주소로 가입된 계정을 찾을 수 없습니다';
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = '❌ 닉네임 찾기 오류\n\n$e';
+        });
+      }
+    }
+  }
+
+  Future<void> _findPassword() async {
+    final qrUrlController = TextEditingController();
+    
+    final qrUrl = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('비밀번호 찾기'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('가입 시 사용한 QR 주소를 입력하세요'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: qrUrlController,
+              decoration: const InputDecoration(
+                labelText: 'QR 주소',
+                hintText: 'https://...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, qrUrlController.text.trim()),
+            child: const Text('찾기'),
+          ),
+        ],
+      ),
+    );
+
+    if (qrUrl == null || qrUrl.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final password = await SecuretAuthService.findPasswordByQrUrl(qrUrl);
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (password != null && password.isNotEmpty) {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('✅ 비밀번호를 찾았습니다'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('가입된 비밀번호:'),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      password,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _passwordController.text = password;
+                    });
+                  },
+                  child: const Text('입력하고 닫기'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('확인'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          setState(() {
+            _errorMessage = '❌ 해당 QR 주소로 가입된 계정을 찾을 수 없습니다';
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = '❌ 비밀번호 찾기 오류\n\n$e';
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // 키보드 높이 감지
@@ -236,6 +460,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+
+              // Find Nickname/Password Links
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: _isLoading ? null : _findNickname,
+                    child: const Text('닉네임 찾기'),
+                  ),
+                  Text(
+                    '|',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _isLoading ? null : _findPassword,
+                    child: const Text('비밀번호 찾기'),
+                  ),
+                ],
+              ),
 
               // Register Link
               Row(
