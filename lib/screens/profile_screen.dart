@@ -13,7 +13,6 @@ import '../models/securet_user.dart';
 import '../models/qkey_transaction.dart';
 import 'login_screen.dart';
 import 'my_qr_code_screen.dart';
-import 'admin_sticker_screen.dart';
 import 'admin_qkey_screen.dart';
 import 'qkey_history_screen.dart';
 
@@ -709,34 +708,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: const Text('QKEY 출금 관리'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFFB300),
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 12),
-                    
-                    // 관리자 스티커 관리 버튼
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pop(context); // 바텀시트 닫기
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminStickerScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.dashboard_customize),
-                        label: const Text('스티커 관리자'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
                           foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(
