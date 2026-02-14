@@ -2858,14 +2858,37 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  /// 동영상 썸네일 생성 (캐싱)
+  /// 동영상 썸네일 생성 (캐싱) - 타임아웃 및 상세 로그 추가
   Future<String?> _generateVideoThumbnail(String videoUrl) async {
+    // 캐시 확인
+    if (_thumbnailCache.containsKey(videoUrl)) {
+      if (kDebugMode) {
+        debugPrint('💾 [썸네일 캐시 사용] $videoUrl');
+      }
+      return _thumbnailCache[videoUrl];
+    }
+    
     try {
+      if (kDebugMode) {
+        debugPrint('🎬 [썸네일 생성 시작]');
+        debugPrint('   URL: ${videoUrl.substring(0, videoUrl.length > 100 ? 100 : videoUrl.length)}...');
+      }
+      
+      // 타임아웃 설정 (10초)
       final uint8list = await VideoThumbnail.thumbnailData(
         video: videoUrl,
         imageFormat: ImageFormat.JPEG,
         maxWidth: 240,
         quality: 75,
+        timeMs: 1000, // 동영상 1초 시점의 썸네일 추출
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          if (kDebugMode) {
+            debugPrint('⏱️ 썸네일 생성 타임아웃 (10초)');
+          }
+          return null;
+        },
       );
 
       if (uint8list != null) {
@@ -2877,14 +2900,27 @@ class _ChatScreenState extends State<ChatScreen> {
         
         if (kDebugMode) {
           debugPrint('✅ 썸네일 생성 성공: ${file.path}');
+          debugPrint('   파일 크기: ${uint8list.length} bytes');
         }
         
+        // 캐시에 저장
+        _thumbnailCache[videoUrl] = file.path;
+        
         return file.path;
+      } else {
+        if (kDebugMode) {
+          debugPrint('⚠️ 썸네일 데이터가 null입니다');
+        }
+        // null도 캐시에 저장 (재시도 방지)
+        _thumbnailCache[videoUrl] = null;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (kDebugMode) {
         debugPrint('❌ 썸네일 생성 실패: $e');
+        debugPrint('   스택 트레이스: ${stackTrace.toString().split('\n').take(3).join('\n')}');
       }
+      // 에러도 캐시에 저장 (재시도 방지)
+      _thumbnailCache[videoUrl] = null;
     }
     return null;
   }
