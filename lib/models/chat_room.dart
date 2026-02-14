@@ -14,6 +14,7 @@ class ChatRoom {
   final int unreadCount;
   final bool isSecuret; // Securet 대화인지 일반 대화인지
   final String? groupName;  // 그룹 채팅방 이름 (옵션)
+  final String? createdBy;  // 채팅방을 만든 사람 (방장) ID
 
   ChatRoom({
     required this.id,
@@ -25,6 +26,7 @@ class ChatRoom {
     this.unreadCount = 0,
     this.isSecuret = false,
     this.groupName,
+    this.createdBy,
   }) : lastMessageTime = lastMessageTime ?? DateTime.now();
 
   Map<String, dynamic> toJson() {
@@ -38,6 +40,7 @@ class ChatRoom {
       'unreadCount': unreadCount,
       'isSecuret': isSecuret,
       'groupName': groupName,
+      'createdBy': createdBy,
     };
   }
 
@@ -56,6 +59,7 @@ class ChatRoom {
       unreadCount: json['unreadCount'] ?? 0,
       isSecuret: json['isSecuret'] ?? false,
       groupName: json['groupName'],
+      createdBy: json['createdBy'],
     );
   }
 
@@ -76,6 +80,7 @@ class ChatRoom {
       unreadCount: data['unreadCount'] ?? 0,
       isSecuret: data['isSecuret'] ?? false,
       groupName: data['groupName'],
+      createdBy: data['createdBy'],
     );
   }
 
@@ -115,6 +120,7 @@ class ChatRoom {
     int? unreadCount,
     bool? isSecuret,
     String? groupName,
+    String? createdBy,
   }) {
     return ChatRoom(
       id: id ?? this.id,
@@ -126,6 +132,7 @@ class ChatRoom {
       unreadCount: unreadCount ?? this.unreadCount,
       isSecuret: isSecuret ?? this.isSecuret,
       groupName: groupName ?? this.groupName,
+      createdBy: createdBy ?? this.createdBy,
     );
   }
 }

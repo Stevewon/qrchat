@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/securet_user.dart';
 import 'firebase_notification_service.dart';
 import 'app_badge_service.dart';
+import 'qkey_service.dart';
 
 /// Securet 인증 서비스
 /// 
@@ -263,6 +264,18 @@ class SecuretAuthService {
       if (kDebugMode) {
         debugPrint('✅✅✅ 로그인 성공! ✅✅✅');
         debugPrint('========== 로그인 완료 ==========\n');
+      }
+      
+      // 🎁 로그인 보너스 지급 (하루 5회까지)
+      try {
+        final bonusGiven = await QKeyService.giveLoginBonus(user.id);
+        if (bonusGiven && kDebugMode) {
+          debugPrint('🎁 로그인 보너스 지급 완료: +${QKeyService.loginBonusAmount} QKEY');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('⚠️ 로그인 보너스 지급 실패: $e');
+        }
       }
       
       return true;

@@ -15,6 +15,13 @@ class QKeyService {
   static const int withdrawMinAmount = 1000;        // 최소 출금 가능 금액
   static const int withdrawUnit = 1000;             // 출금 단위
   
+  // 첫 로그인 보너스 설정
+  static const int loginBonusAmount = 1;            // 로그인 당 지급량
+  static const int loginBonusMaxPerDay = 5;         // 하루 최대 로그인 보너스 횟수
+  
+  // 채팅방 채굴 설정
+  static const int chatMiningMaxPerDay = 3;         // 하루 최대 채팅 채굴 횟수
+  
   /// 사용자의 현재 QKEY 잔액 조회
   static Future<int> getUserBalance(String userId) async {
     try {
@@ -60,7 +67,243 @@ class QKeyService {
     }
   }
   
-  /// QKEY 적립 (채팅 활동)
+  /// 첫 로그인 보너스 지급
+  /// 하루 5회까지 지급 가능
+  static Future<bool> giveLoginBonus(String userId) async {
+    try {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      
+      // 사용자 문서 조회
+      final userDoc = await _firestore
+          .collection(_usersCollection)
+          .doc(userId)
+          .get();
+      
+      if (!userDoc.exists) {
+        if (kDebugMode) {
+          print('❌ 사용자를 찾을 수 없습니다');
+        }
+        return false;
+      }
+      
+      final userData = userDoc.data()!;
+      
+      // 오늘 로그인 보너스 받은 횟수 확인
+      final lastLoginBonusDate = (userData['lastLoginBonusDate'] as Timestamp?)?.toDate();
+      int todayLoginBonusCount = 0;
+      
+      if (lastLoginBonusDate != null) {
+        final lastLoginDay = DateTime(lastLoginBonusDate.year, lastLoginBonusDate.month, lastLoginBonusDate.day);
+        if (lastLoginDay.isAtSameMomentAs(today)) {
+          // 오늘 이미 받았음
+          todayLoginBonusCount = (userData['todayLoginBonusCount'] as int?) ?? 0;
+          
+          if (todayLoginBonusCount >= loginBonusMaxPerDay) {
+            if (kDebugMode) {
+              print('⏳ 오늘 로그인 보너스를 모두 받았습니다 ($todayLoginBonusCount/$loginBonusMaxPerDay)');
+            }
+            return false;
+          }
+        }
+      }
+      
+      // 현재 잔액 조회
+      final currentBalance = (userData['qkeyBalance'] as int?) ?? 0;
+      final newBalance = currentBalance + loginBonusAmount;
+      
+      // 트랜잭션으로 처리
+      final batch = _firestore.batch();
+      
+      // 1. 사용자 잔액 업데이트
+      final userRef = _firestore.collection(_usersCollection).doc(userId);
+      batch.update(userRef, {
+        'qkeyBalance': newBalance,
+        'qkey_balance': newBalance, // 동기화
+        'lastLoginBonusDate': Timestamp.fromDate(now),
+        'todayLoginBonusCount': todayLoginBonusCount + 1,
+        'totalQKeyEarned': FieldValue.increment(loginBonusAmount),
+      });
+      
+      // 2. 거래 내역 추가
+      final transactionRef = _firestore.collection(_transactionsCollection).doc();
+      final transaction = QKeyTransaction(
+        id: transactionRef.id,
+        userId: userId,
+        type: QKeyTransactionType.earn,
+        amount: loginBonusAmount,
+        balanceAfter: newBalance,
+        timestamp: now,
+        description: '로그인 보너스 (${todayLoginBonusCount + 1}/$loginBonusMaxPerDay)',
+      );
+      batch.set(transactionRef, transaction.toJson());
+      
+      await batch.commit();
+      
+      if (kDebugMode) {
+        print('✅ 로그인 보너스 지급 완료: +$loginBonusAmount QKEY (${todayLoginBonusCount + 1}/$loginBonusMaxPerDay) (잔액: $newBalance)');
+      }
+      
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ 로그인 보너스 지급 실패: $e');
+      }
+      return false;
+    }
+  }
+  
+  /// QKEY 채굴 (채팅방 활동 - 방장만)
+  /// chatRoomId: 채팅방 ID
+  /// creatorId: 방을 만든 사람 (방장) ID
+  /// userId: 현재 사용자 ID
+  /// messageTimestamp: 메시지 전송 시간
+  static Future<bool> earnQKeyFromChat({
+    required String chatRoomId,
+    required String creatorId,
+    required String userId,
+    required DateTime messageTimestamp,
+  }) async {
+    try {
+      // 방장이 아니면 지급하지 않음
+      if (userId != creatorId) {
+        if (kDebugMode) {
+          print('⏳ 방장이 아니므로 QKEY를 지급하지 않습니다');
+        }
+        return false;
+      }
+      
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      
+      // 사용자 문서 조회
+      final userDoc = await _firestore
+          .collection(_usersCollection)
+          .doc(userId)
+          .get();
+      
+      if (!userDoc.exists) {
+        if (kDebugMode) {
+          print('❌ 사용자를 찾을 수 없습니다');
+        }
+        return false;
+      }
+      
+      final userData = userDoc.data()!;
+      
+      // 채팅방별 마지막 채굴 시간 확인
+      final chatMiningData = userData['chatMiningData'] as Map<String, dynamic>? ?? {};
+      final roomMiningData = chatMiningData[chatRoomId] as Map<String, dynamic>? ?? {};
+      
+      // 마지막 메시지 시간과 마지막 채굴 시간 확인
+      final lastMessageTime = (roomMiningData['lastMessageTime'] as Timestamp?)?.toDate();
+      final lastMiningTime = (roomMiningData['lastMiningTime'] as Timestamp?)?.toDate();
+      
+      // 첫 메시지이거나 5분 이상 대화가 없었으면 타이머 시작
+      if (lastMessageTime == null || messageTimestamp.difference(lastMessageTime).inMinutes >= earnIntervalMinutes) {
+        // 타이머 시작: 메시지 시간 기록
+        final batch = _firestore.batch();
+        final userRef = _firestore.collection(_usersCollection).doc(userId);
+        
+        chatMiningData[chatRoomId] = {
+          'lastMessageTime': Timestamp.fromDate(messageTimestamp),
+          'lastMiningTime': lastMiningTime != null ? Timestamp.fromDate(lastMiningTime) : null,
+          'todayCount': roomMiningData['todayCount'] ?? 0,
+          'lastCountResetDate': roomMiningData['lastCountResetDate'],
+        };
+        
+        batch.update(userRef, {
+          'chatMiningData': chatMiningData,
+        });
+        
+        await batch.commit();
+        
+        if (kDebugMode) {
+          print('⏰ 채굴 타이머 시작: 5분 후 지급 예정');
+        }
+        return false;
+      }
+      
+      // 5분이 지났는지 확인
+      if (now.difference(lastMessageTime!).inMinutes < earnIntervalMinutes) {
+        if (kDebugMode) {
+          final remaining = earnIntervalMinutes - now.difference(lastMessageTime).inMinutes;
+          print('⏳ 아직 채굴 시간이 안됨: $remaining분 남음');
+        }
+        return false;
+      }
+      
+      // 오늘 채굴 횟수 확인
+      final lastCountResetDate = (roomMiningData['lastCountResetDate'] as Timestamp?)?.toDate();
+      int todayCount = 0;
+      
+      if (lastCountResetDate != null) {
+        final lastResetDay = DateTime(lastCountResetDate.year, lastCountResetDate.month, lastCountResetDate.day);
+        if (lastResetDay.isAtSameMomentAs(today)) {
+          todayCount = (roomMiningData['todayCount'] as int?) ?? 0;
+        }
+      }
+      
+      // 하루 3회 제한
+      if (todayCount >= chatMiningMaxPerDay) {
+        if (kDebugMode) {
+          print('⏳ 오늘 채굴 횟수를 모두 사용했습니다 ($todayCount/$chatMiningMaxPerDay)');
+        }
+        return false;
+      }
+      
+      // 현재 잔액 조회
+      final currentBalance = (userData['qkeyBalance'] as int?) ?? 0;
+      final newBalance = currentBalance + earnAmountPerInterval;
+      
+      // 트랜잭션으로 처리
+      final batch = _firestore.batch();
+      
+      // 1. 사용자 잔액 및 채굴 데이터 업데이트
+      final userRef = _firestore.collection(_usersCollection).doc(userId);
+      chatMiningData[chatRoomId] = {
+        'lastMessageTime': Timestamp.fromDate(messageTimestamp),
+        'lastMiningTime': Timestamp.fromDate(now),
+        'todayCount': todayCount + 1,
+        'lastCountResetDate': Timestamp.fromDate(now),
+      };
+      
+      batch.update(userRef, {
+        'qkeyBalance': newBalance,
+        'qkey_balance': newBalance, // 동기화
+        'chatMiningData': chatMiningData,
+        'totalQKeyEarned': FieldValue.increment(earnAmountPerInterval),
+      });
+      
+      // 2. 거래 내역 추가
+      final transactionRef = _firestore.collection(_transactionsCollection).doc();
+      final transaction = QKeyTransaction(
+        id: transactionRef.id,
+        userId: userId,
+        type: QKeyTransactionType.earn,
+        amount: earnAmountPerInterval,
+        balanceAfter: newBalance,
+        timestamp: now,
+        description: '채팅 채굴 (${todayCount + 1}/$chatMiningMaxPerDay)',
+      );
+      batch.set(transactionRef, transaction.toJson());
+      
+      await batch.commit();
+      
+      if (kDebugMode) {
+        print('✅ 채팅 채굴 완료: +$earnAmountPerInterval QKEY (${todayCount + 1}/$chatMiningMaxPerDay) (잔액: $newBalance)');
+      }
+      
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ 채팅 채굴 실패: $e');
+      }
+      return false;
+    }
+  }
+  
+  /// QKEY 적립 (채팅 활동) - 레거시 메서드 (하위 호환성 유지)
   static Future<bool> earnQKey(String userId, {String? description}) async {
     try {
       final now = DateTime.now();

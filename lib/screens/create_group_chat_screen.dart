@@ -146,6 +146,7 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
         participantIds,
         participantNicknames,
         groupName.trim(),
+        widget.currentUserId, // 방장은 채팅방을 만든 사람
       );
 
       if (mounted) {

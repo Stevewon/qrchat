@@ -63,9 +63,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   StreamSubscription<ChatRoom?>? _chatRoomSubscription;
   late ChatRoom _currentChatRoom;
   
-  // QKEY 적립 타이머
-  Timer? _qkeyTimer;
-  DateTime? _lastQKeyEarnTime;
+  // QKEY 적립 제거 (더 이상 타이머 사용 안 함)
   
   // 업로드 중인 임시 메시지 목록 (카카오톡 스타일)
   final List<Map<String, dynamic>> _uploadingMessages = [];
@@ -92,9 +90,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         _initializeChat();
       }
     });
-    
-    // ⭐ QKEY 자동 적립 타이머 시작
-    _startQKeyTimer();
   }
   
   /// 채팅 초기화 (재진입 시에도 안전)
@@ -143,73 +138,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     _messagesSubscription?.cancel();
     _chatRoomSubscription?.cancel();
     
-    // ⭐ QKEY 타이머 정지
-    _qkeyTimer?.cancel();
-    
     super.dispose();
-  }
-
-  /// QKEY 자동 적립 타이머 시작
-  void _startQKeyTimer() {
-    // 첫 번째 적립 시도 (즉시)
-    _tryEarnQKey();
-    
-    // 5분마다 반복
-    _qkeyTimer = Timer.periodic(
-      const Duration(minutes: QKeyService.earnIntervalMinutes),
-      (timer) {
-        _tryEarnQKey();
-      },
-    );
-    
-    if (kDebugMode) {
-      debugPrint('⏰ QKEY 자동 적립 타이머 시작 (${QKeyService.earnIntervalMinutes}분 간격)');
-    }
-  }
-  
-  /// QKEY 적립 시도
-  Future<void> _tryEarnQKey() async {
-    try {
-      final success = await QKeyService.earnQKey(
-        widget.currentUserId,
-        description: '그룹 채팅 활동',
-      );
-      
-      if (success && mounted) {
-        _lastQKeyEarnTime = DateTime.now();
-        
-        // 적립 성공 시 작은 스낵바 표시
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: const [
-                Icon(Icons.monetization_on, color: Colors.white, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  '🎉 +10 QKEY 적립!',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            backgroundColor: const Color(0xFFFFB300),
-            duration: const Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
-        
-        if (kDebugMode) {
-          debugPrint('✅ QKEY 적립 성공: +${QKeyService.earnAmountPerInterval} QKEY');
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ QKEY 적립 실패: $e');
-      }
-    }
   }
 
   /// 참여자 정보 로드 (1:1의 단순한 구조 유지)
@@ -343,6 +272,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     try {
       final currentUser = await SecuretAuthService.getCurrentUser();
       String? currentUserProfilePhoto = currentUser?.profilePhoto;
+      final now = DateTime.now();
 
       await _chatService.sendMessage(
         widget.chatRoom.id,
@@ -354,6 +284,52 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       );
 
       debugPrint('✅ [메시지 전송] 성공');
+      
+      // 🎁 QKEY 채굴 시도 (방장만, 대화 후 5분, 하루 3회)
+      try {
+        // 방장 ID: createdBy가 있으면 사용, 없으면 첫 번째 참여자를 방장으로 간주
+        final creatorId = widget.chatRoom.createdBy ?? widget.chatRoom.participantIds.first;
+        
+        final success = await QKeyService.earnQKeyFromChat(
+          chatRoomId: widget.chatRoom.id,
+          creatorId: creatorId,
+          userId: widget.currentUserId,
+          messageTimestamp: now,
+        );
+        
+        if (success && mounted) {
+          // 채굴 성공 시 작은 스낵바 표시
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: const [
+                  Icon(Icons.monetization_on, color: Colors.white, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    '🎉 +2 QKEY 채굴!',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              backgroundColor: const Color(0xFFFFB300),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          
+          if (kDebugMode) {
+            debugPrint('✅ QKEY 채굴 성공: +${QKeyService.earnAmountPerInterval} QKEY');
+          }
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('⚠️ QKEY 채굴 실패: $e');
+        }
+      }
     } catch (e) {
       debugPrint('❌ [메시지 전송] 실패: $e');
       

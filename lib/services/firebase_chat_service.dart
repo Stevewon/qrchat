@@ -68,6 +68,7 @@ class FirebaseChatService {
     List<String> participantIds,
     List<String> participantNicknames,
     String groupName,
+    String creatorId, // 추가: 방장 ID
   ) async {
     try {
       final roomId = 'group_${DateTime.now().millisecondsSinceEpoch}';
@@ -76,6 +77,7 @@ class FirebaseChatService {
         'participantIds': participantIds,
         'participantNicknames': participantNicknames,
         'groupName': groupName,
+        'createdBy': creatorId, // 추가: 방장 저장
         'lastMessage': '',
         'lastMessageTime': FieldValue.serverTimestamp(),
         'unreadCount': 0,
@@ -90,6 +92,7 @@ class FirebaseChatService {
         participantIds: participantIds,
         participantNicknames: participantNicknames,
         groupName: groupName,
+        createdBy: creatorId, // 추가: 방장 저장
         lastMessage: '',
         lastMessageTime: DateTime.now(),
         unreadCount: 0,

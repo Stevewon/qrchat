@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Removed Mobile Sticker Management v1.0.19"
+description: "QRChat - Login Bonus & Chat Mining Update v1.0.20"
 publish_to: 'none'
 
-version: 1.0.19+119
+version: 1.0.20+120
 
 environment:
   sdk: ^3.9.2
