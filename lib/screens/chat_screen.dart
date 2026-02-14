@@ -2261,7 +2261,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: TabBarView(
                   children: [
                     // 🐱 Firebase 스티커 탭
-                    _buildFirebaseStickerGrid(),
+                    Builder(
+                      builder: (BuildContext tabContext) => _buildFirebaseStickerGrid(tabContext),
+                    ),
                     
                     // 😊 일반 이모티콘 탭
                     _buildEmojiGrid(),
@@ -2321,8 +2323,8 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  /// 🐱 Firebase 스티커 그리드
-  Widget _buildFirebaseStickerGrid() {
+  /// 🐱 Firebase 스티커 그리드 (팩별 탭)
+  Widget _buildFirebaseStickerGrid(BuildContext stickerContext) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('sticker_packs')
@@ -2354,73 +2356,118 @@ class _ChatScreenState extends State<ChatScreen> {
         // Firebase에서 로딩한 스티커 팩들
         final stickerPacks = snapshot.data!.docs;
         
-        // 모든 스티커팩의 스티커를 하나의 리스트로 합침
-        final List<Map<String, dynamic>> allStickers = [];
-        for (var pack in stickerPacks) {
-          final data = pack.data() as Map<String, dynamic>;
-          final stickers = data['stickers'] as List<dynamic>? ?? [];
-          allStickers.addAll(stickers.cast<Map<String, dynamic>>());
-        }
-
-        if (allStickers.isEmpty) {
+        if (stickerPacks.isEmpty) {
           return _buildDefaultStickerGrid();
         }
 
-        return GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-          ),
-          itemCount: allStickers.length,
-          itemBuilder: (context, index) {
-            final sticker = allStickers[index];
-            final imageUrl = sticker['image_url'] as String;
-            final stickerName = sticker['sticker_name'] as String? ?? '스티커';
-            
-            return GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-                _sendSticker(imageUrl);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
+        // 카카오톡 스타일: 스티커팩별 탭으로 구분
+        return DefaultTabController(
+          length: stickerPacks.length,
+          child: Column(
+            children: [
+              // 스티커팩 탭 (상단)
+              TabBar(
+                isScrollable: true,
+                labelColor: Colors.black87,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Theme.of(stickerContext).primaryColor,
+                indicatorWeight: 3,
+                labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                unselectedLabelStyle: const TextStyle(fontSize: 13),
+                tabs: stickerPacks.map((pack) {
+                  final data = pack.data() as Map<String, dynamic>;
+                  final packName = data['pack_name'] as String? ?? '스티커팩';
+                  return Tab(text: packName);
+                }).toList(),
+              ),
+              
+              const Divider(height: 1, thickness: 1),
+              
+              // 스티커팩별 그리드 (하단)
+              Expanded(
+                child: TabBarView(
+                  children: stickerPacks.map((pack) {
+                    final data = pack.data() as Map<String, dynamic>;
+                    final stickers = data['stickers'] as List<dynamic>? ?? [];
+                    
+                    if (stickers.isEmpty) {
                       return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                              : null,
+                        child: Text(
+                          '스티커가 없습니다',
+                          style: TextStyle(color: Colors.grey[600]),
                         ),
                       );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.broken_image, color: Colors.grey[400]),
-                            Text(stickerName, style: TextStyle(fontSize: 8, color: Colors.grey[600])),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                    }
+                    
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: stickers.length,
+                      itemBuilder: (context, index) {
+                        final sticker = stickers[index] as Map<String, dynamic>;
+                        final imageUrl = sticker['image_url'] as String;
+                        final stickerName = sticker['sticker_name'] as String? ?? '스티커';
+                        
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pop(stickerContext);
+                            _sendSticker(imageUrl);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                          : null,
+                                      strokeWidth: 2,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.broken_image, color: Colors.grey[400], size: 24),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          stickerName,
+                                          style: TextStyle(fontSize: 8, color: Colors.grey[600]),
+                                          textAlign: TextAlign.center,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
                 ),
               ),
-            );
-          },
+            ],
+          ),
         );
       },
     );
@@ -2692,98 +2739,111 @@ class _ChatScreenState extends State<ChatScreen> {
   /// 이미지 메시지 위젯
   /// 이미지 메시지 위젯 (카카오톡 스타일 - 테두리 없음, 원본 비율 유지)
   Widget _buildImageMessage(String imageUrl, bool isMe) {
-    // 🐱 스티커 판별 (Emojipedia 또는 Giphy URL인 경우 스티커로 간주)
-    final bool isSticker = imageUrl.contains('em-content.zobj.net') || 
+    // 🐱 스티커 판별 (Firebase Storage의 stickers 폴더 또는 외부 스티커 URL)
+    final bool isSticker = imageUrl.contains('/stickers/') || 
+                           imageUrl.contains('em-content.zobj.net') || 
                            imageUrl.contains('media.giphy.com');
     
-    return GestureDetector(
-      onTap: isSticker ? null : () {  // 🔥 스티커는 확대 안 됨!
-        // 일반 이미지만 풀스크린 다이얼로그 표시
-        showDialog(
-          context: context,
-          builder: (context) => Dialog(
-            backgroundColor: Colors.black,
-            child: Stack(
-              children: [
-                Center(
-                  child: InteractiveViewer(
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(Icons.error, color: Colors.red, size: 48),
-                        );
-                      },
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 반응형 크기 계산
+        final screenWidth = MediaQuery.of(context).size.width;
+        final stickerSize = 100.0;
+        final imageMaxWidth = screenWidth * 0.6;
+        
+        final maxWidth = isSticker ? stickerSize : imageMaxWidth;
+        final maxHeight = isSticker ? stickerSize : imageMaxWidth;
+        
+        return GestureDetector(
+          onTap: isSticker ? null : () {
+            // 일반 이미지만 풀스크린 다이얼로그 표시
+            showDialog(
+              context: context,
+              builder: (dialogContext) => Dialog(
+                backgroundColor: Colors.black,
+                child: Stack(
+                  children: [
+                    Center(
+                      child: InteractiveViewer(
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(Icons.error, color: Colors.red, size: 48),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 20,
+                      right: 20,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                        onPressed: () => Navigator.pop(dialogContext),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: maxWidth,
+              maxHeight: maxHeight,
+            ),
+            child: Image.network(
+              imageUrl,
+              fit: isSticker ? BoxFit.contain : BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  width: maxWidth,
+                  height: maxHeight,
+                  color: isSticker ? Colors.transparent : Colors.grey[200],
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                      strokeWidth: 2,
                     ),
                   ),
-                ),
-                Positioned(
-                  top: 20,
-                  right: 20,
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                    onPressed: () => Navigator.pop(context),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: maxWidth,
+                  height: maxHeight,
+                  color: isSticker ? Colors.transparent : Colors.grey[200],
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error, color: Colors.red, size: 48),
+                      SizedBox(height: 8),
+                      Text('이미지 로드 실패', style: TextStyle(fontSize: 12)),
+                    ],
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         );
       },
-      // 🐱 스티커는 작게, 일반 이미지는 크게
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: isSticker ? 75 : MediaQuery.of(context).size.width * 0.6,  // 스티커: 75px (50% 감소), 일반: 60%
-          maxHeight: isSticker ? 75 : MediaQuery.of(context).size.height * 0.4,  // 스티커: 75px (50% 감소), 일반: 40%
-        ),
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.contain,  // 원본 비율 유지 (카카오톡 스타일)
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              width: isSticker ? 75 : 200,
-              height: isSticker ? 75 : 200,
-              color: isSticker ? Colors.transparent : Colors.grey[200],  // 🎨 스티커는 투명 배경
-              child: Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              width: isSticker ? 75 : 200,
-              height: isSticker ? 75 : 200,
-              color: isSticker ? Colors.transparent : Colors.grey[200],  // 🎨 스티커는 투명 배경
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error, color: Colors.red, size: 48),
-                  SizedBox(height: 8),
-                  Text('이미지 로드 실패', style: TextStyle(fontSize: 12)),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 

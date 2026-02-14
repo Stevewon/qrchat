@@ -1,47 +1,72 @@
-====================================
-QRChat v1.0.3 Android APK
-====================================
+QRChat v1.0.9 Android APK 설치 가이드
+=========================================
 
-📱 설치 방법:
+파일 정보:
+- 파일명: qrchat_v1.0.9.apk
+- 크기: 27.8 MB
+- 최소 Android 버전: 5.0 (API 21)
 
-1. "qrchat_v1.0.3.apk" 파일을 휴대폰으로 전송
-   (USB, 이메일, 클라우드 등)
+주요 변경사항 (v1.0.9):
+✅ 스티커팩 탭 구분 기능 (카카오톡 스타일)
+   - Firebase Firestore에서 여러 스티커팩을 가져와 탭으로 구분
+   - 각 스티커팩별로 독립적인 그리드 표시
+   - 스크롤 가능한 상단 탭 바로 팩 전환
+   - 투명 배경 애니메이션 스티커 지원
 
-2. 파일 실행
+✅ 그룹 채팅 스티커/이미지 크기 문제 수정
+   - 반응형 크기 계산 적용 (ConstrainedBox 사용)
+   - 스티커: 고정 75x75px
+   - 일반 이미지: 화면 너비 60%, 높이 40%
+   - 나갔다 들어와도 크기 일관성 유지
 
-3. "알 수 없는 출처" 또는 "이 출처 허용" 클릭
+기존 기능 유지:
+✓ 동영상 썸네일 생성 (HTTP 다운로드 + 로컬 캐싱)
+✓ 친구 목록 가나다 정렬
+✓ QR 주소로 닉네임/비밀번호 찾기
+✓ 회원가입 닉네임 중복 체크
+✓ 차단 사용자 로그인 방지
+✓ QR 코드 재가입 방지
+✓ My QR Code 아이콘 (프로필 화면 우상단)
+✓ 단일 라인 QR 주소 입력
 
+설치 방법:
+1. 휴대폰에서 이 ZIP 파일을 다운로드하여 압축 해제
+2. qrchat_v1.0.9.apk 파일 실행
+3. "출처를 알 수 없는 앱 설치" 권한 허용 (필요 시)
 4. 설치 진행
 
-5. 완료!
+⚠️ 중요 사항:
+- Firebase Storage 규칙이 read/write 허용으로 설정되어 있어야 합니다
+- 규칙 설정 위치: https://console.firebase.google.com/project/qrchat-b7a67/storage/rules
+- 규칙 예시:
+  ```
+  rules_version = '2';
+  service firebase.storage {
+    match /b/{bucket}/o {
+      match /{allPaths=**} {
+        allow read, write: if true;
+      }
+    }
+  }
+  ```
+- 규칙 변경 후 "게시" 버튼 클릭 필수
 
+🎨 스티커팩 관리:
+- Firestore 컬렉션: sticker_packs
+- 필드 구조:
+  - pack_name: 스티커팩 이름 (예: "기본 이모지", "동물 친구들")
+  - stickers: 배열 (image_url, sticker_name)
+  - created_at: 생성 시간 (최신순 정렬)
+- 업로드 방법: Firebase Console > Firestore Database에서 직접 추가
+- 앱을 재시작할 필요 없이 실시간으로 자동 반영됨
 
-📝 파일 정보:
-- 파일명: qrchat_v1.0.3.apk
-- 크기: 27.79 MB
-- 지원: 대부분의 Android 기기 (ARM64)
-- 최소: Android 5.0 이상
+관련 링크:
+- GitHub 저장소: https://github.com/Stevewon/qrchat
+- 관리자 대시보드: https://qrchat-b7a67.web.app/admin_dashboard.html
+- Firebase Console: https://console.firebase.google.com/project/qrchat-b7a67
 
-
-🆕 v1.0.3 새로운 기능:
-✅ QR 주소로 닉네임 찾기
-✅ QR 주소로 비밀번호 찾기
-✅ 회원가입 시 닉네임 중복 체크
-✅ 차단된 사용자 로그인 차단
-✅ QR 코드 재가입 방지
-❌ 모바일 스티커 관리 제거 (웹에서만)
-
-
-🔗 링크:
-- GitHub: https://github.com/Stevewon/qrchat
-- 웹 대시보드: https://qrchat-b7a67.web.app/admin_dashboard.html
-
-
-⚠️ 참고:
-- Google Play가 아닌 외부 설치이므로 보안 경고가 표시될 수 있습니다.
-- 신뢰할 수 있는 출처에서 다운로드한 파일만 설치하세요.
-
-====================================
-빌드: 2026-02-14
-버전: 1.0.3
-====================================
+빌드 정보:
+- 빌드 날짜: 2026-02-14
+- 버전: 1.0.9 (Build 109)
+- Flutter: 3.27.3
+- Dart: 3.6.1
