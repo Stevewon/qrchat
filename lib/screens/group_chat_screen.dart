@@ -80,6 +80,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     // ⭐ 그룹 채팅방 진입 추적 (알림 차단용)
     ChatStateService().enterChatRoom(widget.chatRoom.id);
     
+    // ⭐ Firestore에 현재 사용자 활성 상태 기록
+    _addActiveUser();
+    
     debugPrint('🟢 [그룹 채팅 v3] initState 시작');
     debugPrint('   채팅방 ID: ${widget.chatRoom.id}');
     debugPrint('   채팅방 이름: ${widget.chatRoom.groupName}');
@@ -134,12 +137,45 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     // ⭐ 그룹 채팅방 나가기 추적 (알림 재개용)
     ChatStateService().exitChatRoom();
     
+    // ⭐ Firestore에서 현재 사용자 활성 상태 제거
+    _removeActiveUser();
+    
     _messageController.dispose();
     _scrollController.dispose();
     _messagesSubscription?.cancel();
     _chatRoomSubscription?.cancel();
     
     super.dispose();
+  }
+
+  /// Firestore에 현재 사용자를 활성 사용자 목록에 추가
+  Future<void> _addActiveUser() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('chat_rooms')
+          .doc(widget.chatRoom.id)
+          .update({
+        'activeUserIds': FieldValue.arrayUnion([widget.currentUserId]),
+      });
+      debugPrint('✅ [활성 사용자] 추가 완료: ${widget.currentUserId}');
+    } catch (e) {
+      debugPrint('❌ [활성 사용자] 추가 실패: $e');
+    }
+  }
+
+  /// Firestore에서 현재 사용자를 활성 사용자 목록에서 제거
+  Future<void> _removeActiveUser() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('chat_rooms')
+          .doc(widget.chatRoom.id)
+          .update({
+        'activeUserIds': FieldValue.arrayRemove([widget.currentUserId]),
+      });
+      debugPrint('✅ [활성 사용자] 제거 완료: ${widget.currentUserId}');
+    } catch (e) {
+      debugPrint('❌ [활성 사용자] 제거 실패: $e');
+    }
   }
 
   /// 참여자 정보 로드 (1:1의 단순한 구조 유지)
@@ -1134,7 +1170,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               style: const TextStyle(fontSize: 16),
             ),
             Text(
-              '${_currentChatRoom.participantIds.length - 1}명',
+              '${_currentChatRoom.participantIds.length - _currentChatRoom.activeUserIds.length}명',
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
@@ -1242,7 +1278,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   /// 참여자 이름 표시 (일대일 채팅 스타일)
   String _buildParticipantNames() {
     if (_participantsMap.isEmpty) {
-      return '${_currentChatRoom.participantIds.length - 1}명이 참여 중인 그룹 채팅입니다';
+      return '${_currentChatRoom.participantIds.length - _currentChatRoom.activeUserIds.length}명이 참여 중인 그룹 채팅입니다';
     }
     
     // 자신을 제외한 참여자 목록

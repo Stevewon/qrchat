@@ -15,6 +15,7 @@ class ChatRoom {
   final bool isSecuret; // Securet 대화인지 일반 대화인지
   final String? groupName;  // 그룹 채팅방 이름 (옵션)
   final String? createdBy;  // 채팅방을 만든 사람 (방장) ID
+  final List<String> activeUserIds; // 현재 접속 중인 사용자 ID 리스트
 
   ChatRoom({
     required this.id,
@@ -27,6 +28,7 @@ class ChatRoom {
     this.isSecuret = false,
     this.groupName,
     this.createdBy,
+    this.activeUserIds = const [],
   }) : lastMessageTime = lastMessageTime ?? DateTime.now();
 
   Map<String, dynamic> toJson() {
@@ -41,6 +43,7 @@ class ChatRoom {
       'isSecuret': isSecuret,
       'groupName': groupName,
       'createdBy': createdBy,
+      'activeUserIds': activeUserIds,
     };
   }
 
@@ -60,6 +63,7 @@ class ChatRoom {
       isSecuret: json['isSecuret'] ?? false,
       groupName: json['groupName'],
       createdBy: json['createdBy'],
+      activeUserIds: List<String>.from(json['activeUserIds'] ?? []),
     );
   }
 
@@ -81,6 +85,7 @@ class ChatRoom {
       isSecuret: data['isSecuret'] ?? false,
       groupName: data['groupName'],
       createdBy: data['createdBy'],
+      activeUserIds: List<String>.from(data['activeUserIds'] ?? []),
     );
   }
 
@@ -121,6 +126,7 @@ class ChatRoom {
     bool? isSecuret,
     String? groupName,
     String? createdBy,
+    List<String>? activeUserIds,
   }) {
     return ChatRoom(
       id: id ?? this.id,
@@ -133,6 +139,7 @@ class ChatRoom {
       isSecuret: isSecuret ?? this.isSecuret,
       groupName: groupName ?? this.groupName,
       createdBy: createdBy ?? this.createdBy,
+      activeUserIds: activeUserIds ?? this.activeUserIds,
     );
   }
 }
