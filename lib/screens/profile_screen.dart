@@ -499,35 +499,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 return;
               }
               
+              // 먼저 다이얼로그 닫기
               Navigator.pop(context);
               
               // 로딩 표시
               showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (context) => const Center(
-                  child: CircularProgressIndicator(),
+                builder: (dialogContext) => WillPopScope(
+                  onWillPop: () async => false,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
               );
               
-              final result = await QKeyService.requestWithdraw(
-                userId: _currentUser!.id,
-                amount: amount,
-                walletAddress: walletAddress!, // 등록된 지갑 주소 사용
-              );
-              
-              if (mounted) {
-                Navigator.pop(context); // 로딩 닫기
-                
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(result['message'] ?? ''),
-                    backgroundColor: result['success'] ? Colors.green : Colors.red,
-                  ),
+              try {
+                final result = await QKeyService.requestWithdraw(
+                  userId: _currentUser!.id,
+                  amount: amount,
+                  walletAddress: walletAddress!, // 등록된 지갑 주소 사용
                 );
                 
-                if (result['success']) {
-                  _loadQKeyBalance(); // 잔액 새로고침
+                // 로딩 닫기 (무조건 실행)
+                if (mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
+                
+                // 결과 표시
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result['message'] ?? '출금 신청이 처리되었습니다'),
+                      backgroundColor: result['success'] ? Colors.green : Colors.red,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                  
+                  if (result['success']) {
+                    _loadQKeyBalance(); // 잔액 새로고침
+                  }
+                }
+              } catch (e) {
+                // 에러 처리
+                if (mounted) {
+                  Navigator.of(context, rootNavigator: true).pop(); // 로딩 닫기
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('출금 신청 중 오류가 발생했습니다: $e'),
+                      backgroundColor: Colors.red,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
                 }
               }
             },
