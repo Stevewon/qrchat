@@ -445,11 +445,18 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
         children: [
           Icon(
             icon,
-            size: 16,
+            size: 14,
             color: isSelected ? Colors.white : Colors.grey.shade700,
           ),
-          const SizedBox(width: 6),
-          Text('$label ($count)'),
+          const SizedBox(width: 4),
+          Text(
+            '$label ($count)',
+            style: TextStyle(
+              fontSize: 12,
+              color: isSelected ? Colors.white : Colors.grey.shade700,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ],
       ),
       onSelected: (selected) {
@@ -459,12 +466,8 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
       },
       selectedColor: const Color(0xFF1976D2),
       backgroundColor: Colors.grey.shade200,
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.grey.shade700,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 
@@ -508,20 +511,20 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
           // 필터 칩 영역
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
                   const SizedBox(width: 4),
                   _buildFilterChip('all', '전체', Icons.all_inclusive),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   _buildFilterChip('pending', '대기중', Icons.pending_outlined),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   _buildFilterChip('approved', '승인됨', Icons.check_circle_outline),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   _buildFilterChip('completed', '완료', Icons.check_circle),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   _buildFilterChip('rejected', '거부됨', Icons.cancel_outlined),
                   const SizedBox(width: 4),
                 ],
