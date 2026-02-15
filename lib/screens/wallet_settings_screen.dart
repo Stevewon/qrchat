@@ -53,11 +53,17 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
         final walletAddress = data?['walletAddress'] as String?;
 
         if (mounted) {
+          // 디버깅: 실제 저장된 주소 출력
+          print('🔍 DEBUG - walletAddress from Firestore: "$walletAddress"');
+          print('🔍 DEBUG - walletAddress length: ${walletAddress?.length}');
+          
           // 지갑 주소가 있고, 공백이 아니며, 이더리움 형식인지 확인
           final ethereumRegex = RegExp(r'^0x[a-fA-F0-9]{40}$');
           final hasValidWallet = walletAddress != null && 
                        walletAddress.trim().isNotEmpty && 
                        ethereumRegex.hasMatch(walletAddress.trim());
+          
+          print('🔍 DEBUG - hasValidWallet: $hasValidWallet');
           
           setState(() {
             _currentUser = user;
@@ -278,6 +284,71 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
     }
   }
 
+  /// 🚨 긴급: 잘못된 지갑 주소 삭제 (테스트용)
+  Future<void> _deleteWalletAddress() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('⚠️ 지갑 주소 삭제'),
+        content: const Text(
+          '저장된 지갑 주소를 삭제하시겠습니까?\n\n'
+          '삭제 후 새로운 주소를 등록할 수 있습니다.\n\n'
+          '이 기능은 테스트용입니다.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.id)
+          .update({
+        'walletAddress': FieldValue.delete(),
+        'walletRegisteredAt': FieldValue.delete(),
+      });
+
+      if (mounted) {
+        setState(() {
+          _walletAddress = null;
+          _hasWallet = false;
+          _isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ 지갑 주소가 삭제되었습니다'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('삭제 실패: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -302,6 +373,15 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          // 🚨 테스트용: 지갑 주소 삭제 버튼
+          if (_hasWallet)
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              onPressed: _deleteWalletAddress,
+              tooltip: '지갑 주소 삭제 (테스트용)',
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
