@@ -80,21 +80,36 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
   Future<void> _saveWalletAddress() async {
     final address = _walletController.text.trim();
     
+    // 1. 빈 값 체크
     if (address.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('지갑 주소를 입력해주세요')),
+        const SnackBar(
+          content: Text('❌ 지갑 주소를 입력해주세요'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
-    if (address.length < 20) {
+    // 2. 이더리움 주소 형식 검증 (0x로 시작하고 42자)
+    final ethereumAddressRegex = RegExp(r'^0x[a-fA-F0-9]{40}$');
+    if (!ethereumAddressRegex.hasMatch(address)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('올바른 지갑 주소를 입력해주세요')),
+        SnackBar(
+          content: const Text(
+            '❌ 올바른 이더리움 주소 형식이 아닙니다\n\n'
+            '✅ 올바른 형식:\n'
+            '0x로 시작하는 42자리 주소\n'
+            '예: 0xE0c166B147a742E4FbCf5e5BCf73aCA631f14f0e',
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
       );
       return;
     }
 
-    // 경고 다이얼로그 표시
+    // 3. 경고 다이얼로그 표시
     final confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -144,8 +159,40 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            // 입력한 주소 표시
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '입력한 주소:',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.blue.shade700,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  SelectableText(
+                    address,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'monospace',
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             const Text(
-              '입력한 주소가 정확한지 다시 한 번 확인해주세요.',
+              '위 주소가 정확한지 다시 한 번 확인해주세요.',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -430,13 +477,47 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   color: Colors.black87,
                 ),
               ),
+              const SizedBox(height: 8),
+              
+              // 형식 안내
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 18, color: Colors.blue.shade700),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '이더리움 주소 형식: 0x로 시작하는 42자리',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.blue.shade900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 12),
               
               TextField(
                 controller: _walletController,
                 maxLines: 3,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                  hintText: '암호화폐 지갑 주소를 입력하세요\n예: 0x1234567890abcdef...',
+                  hintText: '0xE0c166B147a742E4FbCf5e5BCf73aCA631f14f0e',
+                  hintStyle: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                    color: Colors.grey,
+                  ),
+                  helperText: '예시: 0x로 시작하는 40자리 영문+숫자',
+                  helperStyle: const TextStyle(fontSize: 11),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -444,7 +525,15 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Color(0xFF1976D2), width: 2),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
+                  ),
                   contentPadding: const EdgeInsets.all(16),
+                ),
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 13,
                 ),
               ),
               
@@ -504,6 +593,8 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                     Text(
                       '• 지갑 주소는 1회만 등록 가능합니다\n'
                       '• 등록 후에는 절대 변경할 수 없습니다\n'
+                      '• 이더리움 주소 형식만 지원합니다\n'
+                      '  (0x + 40자리 영문/숫자)\n'
                       '• 잘못된 주소 입력 시 출금이 불가능합니다\n'
                       '• 반드시 정확한 주소인지 확인 후 등록하세요\n'
                       '• 출금은 1,000 QKEY 단위로 가능합니다',
