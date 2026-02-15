@@ -53,17 +53,11 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
         final walletAddress = data?['walletAddress'] as String?;
 
         if (mounted) {
-          // 디버깅: 실제 저장된 주소 출력
-          print('🔍 DEBUG - walletAddress from Firestore: "$walletAddress"');
-          print('🔍 DEBUG - walletAddress length: ${walletAddress?.length}');
-          
           // 지갑 주소가 있고, 공백이 아니며, 이더리움 형식인지 확인
           final ethereumRegex = RegExp(r'^0x[a-fA-F0-9]{40}$');
           final hasValidWallet = walletAddress != null && 
                        walletAddress.trim().isNotEmpty && 
                        ethereumRegex.hasMatch(walletAddress.trim());
-          
-          print('🔍 DEBUG - hasValidWallet: $hasValidWallet');
           
           setState(() {
             _currentUser = user;
@@ -113,11 +107,13 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           content: const Text(
             '❌ 올바른 이더리움 주소 형식이 아닙니다\n\n'
             '✅ 올바른 형식:\n'
-            '0x로 시작하는 42자리 주소\n'
+            '• 0x로 시작해야 합니다\n'
+            '• 총 42자리여야 합니다\n'
+            '• 0-9, a-f, A-F만 포함해야 합니다\n\n'
             '예: 0xE0c166B147a742E4FbCf5e5BCf73aCA631f14f0e',
           ),
           backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
+          duration: const Duration(seconds: 5),
         ),
       );
       return;
@@ -135,84 +131,86 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
             Text('지갑 주소 등록'),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '⚠️ 중요 안내',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '⚠️ 중요 안내',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '• 지갑 주소는 1회만 입력 가능합니다\n'
-                    '• 입력 후에는 절대 변경할 수 없습니다\n'
-                    '• 잘못된 주소 입력 시 출금이 불가능합니다\n'
-                    '• 신중하게 확인 후 등록해주세요',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.red.shade900,
-                      height: 1.6,
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '• 지갑 주소는 1회만 입력 가능합니다\n'
+                      '• 입력 후에는 절대 변경할 수 없습니다\n'
+                      '• 잘못된 주소 입력 시 출금이 불가능합니다\n'
+                      '• 신중하게 확인 후 등록해주세요',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.red.shade900,
+                        height: 1.6,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            // 입력한 주소 표시
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '입력한 주소:',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue.shade700,
-                      fontWeight: FontWeight.bold,
+              const SizedBox(height: 16),
+              // 입력한 주소 표시
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '입력한 주소:',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  SelectableText(
-                    address,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'monospace',
-                      color: Colors.black87,
+                    const SizedBox(height: 6),
+                    SelectableText(
+                      address,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                        color: Colors.black87,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              '위 주소가 정확한지 다시 한 번 확인해주세요.',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+              const SizedBox(height: 16),
+              const Text(
+                '위 주소가 정확한지 다시 한 번 확인해주세요.',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -222,7 +220,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.blue,
             ),
             child: const Text('확인 및 등록'),
           ),
@@ -284,71 +282,6 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
     }
   }
 
-  /// 🚨 긴급: 잘못된 지갑 주소 삭제 (테스트용)
-  Future<void> _deleteWalletAddress() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('⚠️ 지갑 주소 삭제'),
-        content: const Text(
-          '저장된 지갑 주소를 삭제하시겠습니까?\n\n'
-          '삭제 후 새로운 주소를 등록할 수 있습니다.\n\n'
-          '이 기능은 테스트용입니다.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_currentUser!.id)
-          .update({
-        'walletAddress': FieldValue.delete(),
-        'walletRegisteredAt': FieldValue.delete(),
-      });
-
-      if (mounted) {
-        setState(() {
-          _walletAddress = null;
-          _hasWallet = false;
-          _isLoading = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ 지갑 주소가 삭제되었습니다'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('삭제 실패: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -373,15 +306,6 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          // 🚨 테스트용: 지갑 주소 삭제 버튼
-          if (_hasWallet)
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
-              onPressed: _deleteWalletAddress,
-              tooltip: '지갑 주소 삭제 (테스트용)',
-            ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
