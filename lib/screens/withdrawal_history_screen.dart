@@ -16,7 +16,6 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
   SecuretUser? _currentUser;
   bool _isLoading = true;
   List<Map<String, dynamic>> _withdrawals = [];
-  String _selectedFilter = 'all'; // all, pending, approved, completed, rejected
 
   @override
   void initState() {
@@ -24,7 +23,7 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
     _loadWithdrawalHistory();
   }
 
-  /// 출금 내역 로드
+  /// 출금 내역 로드 - 승인/완료된 내역만
   Future<void> _loadWithdrawalHistory() async {
     try {
       final user = await SecuretAuthService.getCurrentUser();
@@ -40,12 +39,19 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
           .orderBy('timestamp', descending: true)
           .get();
 
-      final withdrawals = snapshot.docs.map((doc) {
-        return {
-          'id': doc.id,
-          ...doc.data(),
-        };
-      }).toList();
+      // 승인됨(approved) 또는 완료(completed) 상태만 필터링
+      final withdrawals = snapshot.docs
+          .map((doc) {
+            return {
+              'id': doc.id,
+              ...doc.data(),
+            };
+          })
+          .where((w) {
+            final status = w['withdrawStatus'] as String?;
+            return status == 'approved' || status == 'completed';
+          })
+          .toList();
 
       if (mounted) {
         setState(() {
@@ -62,18 +68,6 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
         );
       }
     }
-  }
-
-  /// 필터링된 출금 내역
-  List<Map<String, dynamic>> get _filteredWithdrawals {
-    if (_selectedFilter == 'all') return _withdrawals;
-    return _withdrawals.where((w) => w['withdrawStatus'] == _selectedFilter).toList();
-  }
-
-  /// 상태별 카운트
-  int _getStatusCount(String status) {
-    if (status == 'all') return _withdrawals.length;
-    return _withdrawals.where((w) => w['withdrawStatus'] == status).length;
   }
 
   /// 상태 뱃지 위젯
@@ -433,38 +427,6 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
     );
   }
 
-  /// 필터 칩
-  Widget _buildFilterChip(String filter, String label, IconData icon) {
-    final isSelected = _selectedFilter == filter;
-    final count = _getStatusCount(filter);
-    
-    return ChoiceChip(
-      selected: isSelected,
-      label: Text(
-        '$label\n($count)',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 11,
-          height: 1.2,
-          color: isSelected ? Colors.white : Colors.grey.shade700,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-      onSelected: (selected) {
-        setState(() {
-          _selectedFilter = filter;
-        });
-      },
-      selectedColor: const Color(0xFF1976D2),
-      backgroundColor: Colors.grey.shade200,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      avatar: isSelected 
-          ? Icon(icon, size: 16, color: Colors.white)
-          : Icon(icon, size: 16, color: Colors.grey.shade700),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -502,29 +464,9 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
       ),
       body: Column(
         children: [
-          // 필터 칩 영역 - Grid 레이아웃으로 변경
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(12),
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              alignment: WrapAlignment.center,
-              children: [
-                _buildFilterChip('all', '전체', Icons.all_inclusive),
-                _buildFilterChip('pending', '대기중', Icons.pending_outlined),
-                _buildFilterChip('approved', '승인됨', Icons.check_circle_outline),
-                _buildFilterChip('completed', '완료', Icons.check_circle),
-                _buildFilterChip('rejected', '거부됨', Icons.cancel_outlined),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 8),
-          
           // 출금 목록
           Expanded(
-            child: _filteredWithdrawals.isEmpty
+            child: _withdrawals.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -536,7 +478,7 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '출금 내역이 없습니다',
+                          '지급된 출금 내역이 없습니다',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey.shade600,
@@ -544,7 +486,7 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'QKEY 출금 신청 시 여기에 표시됩니다',
+                          '관리자가 승인한 출금만 표시됩니다',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade500,
@@ -555,9 +497,9 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: _filteredWithdrawals.length,
+                    itemCount: _withdrawals.length,
                     itemBuilder: (context, index) {
-                      return _buildWithdrawalCard(_filteredWithdrawals[index]);
+                      return _buildWithdrawalCard(_withdrawals[index]);
                     },
                   ),
           ),
