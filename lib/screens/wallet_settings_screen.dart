@@ -307,14 +307,15 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // 안내 카드
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
@@ -335,33 +336,33 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                 children: const [
                   Row(
                     children: [
-                      Icon(Icons.account_balance_wallet, color: Colors.white, size: 24),
-                      SizedBox(width: 12),
+                      Icon(Icons.account_balance_wallet, color: Colors.white, size: 20),
+                      SizedBox(width: 10),
                       Text(
                         '암호화폐 지갑',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 12),
+                  SizedBox(height: 8),
                   Text(
                     'QKEY 출금을 위해 암호화폐 지갑 주소를 등록해주세요.\n'
                     '지갑 주소는 한 번만 등록 가능하며, 변경할 수 없습니다.',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       color: Colors.white,
-                      height: 1.5,
+                      height: 1.4,
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
             // 지갑 주소가 등록된 경우
             if (_hasWallet) ...[
@@ -574,11 +575,11 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                 ),
               ),
               
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               
               // 주의사항
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(12),
@@ -589,39 +590,41 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 20),
+                        Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 18),
                         const SizedBox(width: 8),
                         Text(
                           '주의사항',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: Colors.red.shade700,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     Text(
                       '• 지갑 주소는 1회만 등록 가능합니다\n'
                       '• 등록 후에는 절대 변경할 수 없습니다\n'
-                      '• 이더리움 주소 형식만 지원합니다\n'
-                      '  (0x + 40자리 영문/숫자)\n'
+                      '• 이더리움 주소 형식만 지원합니다 (0x + 40자리)\n'
                       '• 잘못된 주소 입력 시 출금이 불가능합니다\n'
-                      '• 반드시 정확한 주소인지 확인 후 등록하세요\n'
-                      '• 출금은 1,000 QKEY 단위로 가능합니다',
+                      '• 반드시 정확한 주소인지 확인 후 등록하세요',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         color: Colors.red.shade900,
-                        height: 1.6,
+                        height: 1.5,
                       ),
                     ),
                   ],
                 ),
               ),
+              
+              // 하단 여백 추가
+              const SizedBox(height: 40),
             ],
           ],
         ),
+      ),
       ),
     );
   }
