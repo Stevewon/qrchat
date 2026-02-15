@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -78,12 +79,19 @@ class _HomeScreenState extends State<HomeScreen> {
         if (lastBonusDay.isAtSameMomentAs(today)) {
           final todayCount = (userData['todayLoginBonusCount'] as int?) ?? 0;
           
-          // 팝업 표시
-          _hasShownLoginBonus = true;
-          await prefs.setString('last_login_bonus_popup', now.toIso8601String());
-          
-          if (mounted) {
-            _showLoginBonusSnackBar(todayCount);
+          // ⭐ 5회 미만일 때만 팝업 표시 (5/5 달성 시 숨김)
+          if (todayCount < QKeyService.loginBonusMaxPerDay) {
+            _hasShownLoginBonus = true;
+            await prefs.setString('last_login_bonus_popup', now.toIso8601String());
+            
+            if (mounted) {
+              _showLoginBonusSnackBar(todayCount);
+            }
+          } else {
+            // 5회 달성 시 로그
+            if (kDebugMode) {
+              debugPrint('🎁 오늘 로그인 보너스를 모두 받았습니다 ($todayCount/${QKeyService.loginBonusMaxPerDay})');
+            }
           }
         }
       }
