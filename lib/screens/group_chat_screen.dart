@@ -2201,6 +2201,20 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               },
             ),
             
+            // 삭제하기 버튼 (본인 메시지만)
+            if (message.senderId == widget.currentUserId)
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text(
+                  '삭제하기',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.red),
+                ),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _confirmDeleteMessage(message);
+                },
+              ),
+            
             // 취소 버튼
             ListTile(
               leading: const Icon(Icons.close, color: Colors.grey),
@@ -2216,6 +2230,73 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ),
       ),
     );
+  }
+
+  /// 메시지 삭제 확인 다이얼로그
+  Future<void> _confirmDeleteMessage(ChatMessage message) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('메시지 삭제'),
+        content: const Text('이 메시지를 삭제하시겠습니까?\n삭제된 메시지는 복구할 수 없습니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      await _deleteMessage(message);
+    }
+  }
+
+  /// 메시지 삭제
+  Future<void> _deleteMessage(ChatMessage message) async {
+    try {
+      // Firestore에서 메시지 삭제
+      await FirebaseFirestore.instance
+          .collection('chat_rooms')
+          .doc(widget.chatRoom.id)
+          .collection('messages')
+          .doc(message.id)
+          .delete();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('메시지가 삭제되었습니다'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+
+      if (kDebugMode) {
+        print('✅ 메시지 삭제 완료: ${message.id}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ 메시지 삭제 실패: $e');
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('메시지 삭제 실패: $e'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   /// 이미지/동영상을 갤러리에 저장
