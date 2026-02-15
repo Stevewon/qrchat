@@ -791,10 +791,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     
                     const Divider(height: 1, indent: 56),
                     
-                    // About
+                    // 앱 정보
                     ListTile(
                       leading: const Icon(Icons.info_outline, color: Colors.black87),
-                      title: const Text('About', style: TextStyle(fontSize: 16)),
+                      title: const Text('앱 정보', style: TextStyle(fontSize: 16)),
                       subtitle: Text(
                         _appVersion.isEmpty 
                           ? 'Loading version...' 
@@ -803,7 +803,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () {
-                        // About 상세 페이지로 이동 (추후 구현)
+                        // 앱 정보 상세 페이지로 이동 (추후 구현)
                       },
                     ),
                     
@@ -812,34 +812,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 16),
                     const Divider(height: 1, thickness: 8, color: Color(0xFFF0F0F0)),
                     const SizedBox(height: 16),
-                    
-                    // 관리자 QKEY 관리 버튼
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pop(context); // 바텀시트 닫기
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminQKeyScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.monetization_on),
-                        label: const Text('QKEY 출금 관리'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFB300),
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 12),
                     
                     // Logout 버튼
                     Padding(
