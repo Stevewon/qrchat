@@ -17,6 +17,7 @@ import 'admin_qkey_screen.dart';
 // import 'sticker_pack_management_screen.dart'; // 웹 어드민에서만 관리
 import 'qkey_history_screen.dart';
 import 'wallet_settings_screen.dart';
+import 'withdrawal_history_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -1270,52 +1271,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // 버튼들
-                      Row(
+                      // 버튼들 (3개로 확장)
+                      Column(
                         children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const QKeyHistoryScreen(),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const QKeyHistoryScreen(),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.history, size: 18),
+                                  label: const Text(
+                                    '채굴 내역',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                );
-                              },
-                              icon: const Icon(Icons.history, size: 18),
-                              label: const Text(
-                                '채굴 내역',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: const Color(0xFFFFB300),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFFFFB300),
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: _showWithdrawDialog,
-                              icon: const Icon(Icons.account_balance_wallet, size: 18),
-                              label: const Text(
-                                '출금 신청',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _showWithdrawDialog,
+                                  icon: const Icon(Icons.account_balance_wallet, size: 18),
+                                  label: const Text(
+                                    '출금 신청',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFFFFB300),
                                 elevation: 0,
                                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1327,12 +1330,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 8),
+                      // 출금 내역 버튼 (전체 너비)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const WithdrawalHistoryScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.receipt_long, size: 18),
+                          label: const Text(
+                            '출금 내역',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF1976D2),
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
+                ],
               ),
-              
-              const SizedBox(height: 24),
+            ),
+          ),
+          
+          const SizedBox(height: 24),
               const Divider(height: 1, thickness: 1),
               
               const SizedBox(height: 32),
