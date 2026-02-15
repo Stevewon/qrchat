@@ -1837,15 +1837,26 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       child: _buildTextMessageWithLinks(message.content, isMe),
                     ),
                   
-                  // 시간
+                  // 시간 및 읽지 않은 사용자 수 표시
                   Padding(
                     padding: const EdgeInsets.only(top: 4, left: 4, right: 4),
-                    child: Text(
-                      _formatTime(message.timestamp),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey[600],
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 읽지 않은 사용자 수 (내가 보낸 메시지만)
+                        if (isMe) ...[
+                          _buildUnreadCount(message),
+                          const SizedBox(width: 4),
+                        ],
+                        // 시간 표시
+                        Text(
+                          _formatTime(message.timestamp),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -2876,6 +2887,38 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           children: spans,
           style: const TextStyle(fontSize: 15),
         ),
+      ),
+    );
+  }
+
+  /// 읽지 않은 사용자 수 표시
+  Widget _buildUnreadCount(ChatMessage message) {
+    // 참여자 수 계산
+    final totalParticipants = widget.chatRoom.participantIds.length;
+    
+    // 읽지 않은 사용자 수 계산
+    final unreadCount = message.getUnreadCount(totalParticipants);
+    
+    if (kDebugMode) {
+      debugPrint('📊 [읽지 않은 수] 메시지: ${message.content}');
+      debugPrint('📊 [읽지 않은 수] 총 참여자: $totalParticipants');
+      debugPrint('📊 [읽지 않은 수] 읽은 사용자: ${message.readBy.length} (${message.readBy.join(", ")})');
+      debugPrint('📊 [읽지 않은 수] 발신자: ${message.senderId}');
+      debugPrint('📊 [읽지 않은 수] 읽지 않은 수: $unreadCount');
+    }
+    
+    // 읽지 않은 사용자가 없으면 빈 위젯 반환
+    if (unreadCount == 0) {
+      return const SizedBox.shrink();
+    }
+    
+    // 읽지 않은 사용자 수 표시
+    return Text(
+      '$unreadCount',
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.bold,
+        color: Colors.red,
       ),
     );
   }

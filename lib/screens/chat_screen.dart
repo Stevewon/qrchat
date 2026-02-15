@@ -2108,8 +2108,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // 읽음 알림 제거 (카카오톡 스타일 - 채팅방 안에서는 표시 안 함)
-                      // 시간만 표시
+                      // 읽지 않은 사용자 수 (내가 보낸 메시지만)
+                      if (isMe) ...[
+                        _buildUnreadCount(message),
+                        const SizedBox(width: 4),
+                      ],
+                      // 시간 표시
                       Text(
                         _formatTime(message.timestamp),
                         style: TextStyle(
