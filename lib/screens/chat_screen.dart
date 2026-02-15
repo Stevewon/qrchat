@@ -1274,7 +1274,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       onTap: () {
                         Navigator.pop(context);
-                        _launchSecuretCall(otherUserQrUrl!);
+                        _launchSecuretWithAction(otherUserQrUrl!, 'voice_call');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -1286,7 +1286,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       onTap: () {
                         Navigator.pop(context);
-                        _launchSecuretCall(otherUserQrUrl!);
+                        _launchSecuretWithAction(otherUserQrUrl!, 'video_call');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -1298,7 +1298,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       onTap: () {
                         Navigator.pop(context);
-                        _launchSecuretChat(otherUserQrUrl!);
+                        _launchSecuretWithAction(otherUserQrUrl!, 'chat');
                       },
                     ),
                   ],
@@ -1896,6 +1896,11 @@ class _ChatScreenState extends State<ChatScreen> {
   
   /// Securet 보안통화 시작
   Future<void> _launchSecuretCall(String? otherUserQrUrl) async {
+    await _launchSecuretWithAction(otherUserQrUrl, 'voice_call');
+  }
+  
+  /// Securet 특정 액션으로 시작 (음성/영상/채팅)
+  Future<void> _launchSecuretWithAction(String? otherUserQrUrl, String action) async {
     if (otherUserQrUrl == null || otherUserQrUrl.isEmpty) {
       _showSnackBar('상대방의 Securet 정보가 없습니다', isError: true);
       return;
@@ -1903,38 +1908,54 @@ class _ChatScreenState extends State<ChatScreen> {
     
     try {
       if (kDebugMode) {
-        debugPrint('📞 [Securet] 보안통화 - 원본 URL: $otherUserQrUrl');
-        DebugLogger.log('📞 [Securet 보안통화] URL: $otherUserQrUrl');
+        debugPrint('📞 [Securet] $action - 원본 URL: $otherUserQrUrl');
+        DebugLogger.log('📞 [Securet $action] URL: $otherUserQrUrl');
       }
       
       // URL 형식 검증
       if (!otherUserQrUrl.startsWith('http://') && !otherUserQrUrl.startsWith('https://')) {
         if (kDebugMode) {
           debugPrint('❌ [Securet] 잘못된 URL 형식: $otherUserQrUrl');
-          DebugLogger.log('❌ [Securet] 잘못된 URL 형식: $otherUserQrUrl');
+          DebugLogger.log('❌ [Securet] URL 형식 오류: $otherUserQrUrl');
         }
         _showSnackBar('Securet URL 형식이 올바르지 않습니다', isError: true);
         return;
       }
       
-      // ⚡ 가입 시 입력한 원본 Securet URL을 그대로 새 탭/외부 브라우저에서 열기
-      await url_launcher.openUrlInNewTab(otherUserQrUrl);
-      
-      if (kDebugMode) {
-        debugPrint('✅ [Securet] 보안통화 연결 성공');
-        DebugLogger.log('✅ [Securet] 보안통화 연결 성공');
+      // 🎯 자동 실행 파라미터 추가
+      String modifiedUrl = otherUserQrUrl;
+      if (otherUserQrUrl.contains('securet.kr')) {
+        // Securet URL에 자동 실행 파라미터 추가 시도
+        final separator = otherUserQrUrl.contains('?') ? '&' : '?';
+        modifiedUrl = '$otherUserQrUrl${separator}auto_action=$action';
+        
+        if (kDebugMode) {
+          debugPrint('📞 [Securet] 자동 실행 URL: $modifiedUrl');
+          DebugLogger.log('📞 [Securet] 자동 $action 파라미터 추가');
+        }
       }
       
+      // ⚡ Securet URL을 외부 앱/브라우저에서 열기
+      await url_launcher.openUrlInNewTab(modifiedUrl);
+      
+      if (kDebugMode) {
+        debugPrint('✅ [Securet] $action 연결 성공');
+        DebugLogger.log('✅ [Securet] $action 연결 성공');
+      }
+      
+      String actionName = action == 'voice_call' ? '음성 통화' : 
+                         action == 'video_call' ? '영상 통화' : '채팅';
+      
       if (kIsWeb) {
-        _showSnackBar('Securet 보안통화 새 탭에서 열림', isError: false);
+        _showSnackBar('Securet $actionName 새 탭에서 열림', isError: false);
       } else {
-        _showSnackBar('Securet 앱으로 전환됨', isError: false);
+        _showSnackBar('Securet $actionName 시작 중...', isError: false);
       }
       
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('❌ [Securet] 보안통화 실행 실패: $e');
-        DebugLogger.log('❌ [Securet] 보안통화 실행 실패: $e');
+        debugPrint('❌ [Securet] $action 실행 실패: $e');
+        DebugLogger.log('❌ [Securet] $action 실행 실패: $e');
       }
       
       // 에러 메시지 개선
