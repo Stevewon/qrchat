@@ -960,12 +960,12 @@ class _ChatScreenState extends State<ChatScreen> {
       if (kDebugMode) {
         debugPrint('🔒 [Securet 직접 시작] ${otherUserNickname}님과 Securet 연결');
         debugPrint('🔒 [Securet URL] $otherUserQrUrl');
-        DebugLogger.log('🔒 [Securet] 프로필 탭 → 다이얼로그 표시: $otherUserNickname');
+        DebugLogger.log('🔒 [Securet] 프로필 탭 → 바로 실행: $otherUserNickname');
       }
       
-      // 새로운 다이얼로그 표시 (별첨1 디자인)
+      // 바로 Securet 보안통화 실행 (다이얼로그 없음)
       if (!mounted) return;
-      _showSecuretOptions();
+      await _launchSecuretCall(otherUserQrUrl);
       
     } catch (e) {
       if (kDebugMode) {
@@ -977,8 +977,8 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  /// Securet 옵션 표시 (비밀대화, 보안통화)
-  void _showSecuretOptions() async {
+  /// 간소화된 Securet 옵션 다이얼로그 (롱프레스 시)
+  void _showSimpleSecuretOptions() async {
     // 상대방 정보 가져오기
     final otherUserId = _currentChatRoom.participantIds.firstWhere(
       (id) => id != widget.currentUserId,
@@ -1059,224 +1059,104 @@ class _ChatScreenState extends State<ChatScreen> {
     
     if (!mounted) return;
     
-    // 닉네임 컨트롤러
-    final nicknameController = TextEditingController(
-      text: otherUserNickname ?? '리아',
-    );
-    
-    // 채널 컨트롤러
-    final channelController = TextEditingController();
-    
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 1. 파란색 헤더
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF007AFF),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  child: const Text(
-                    'SECURET',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 파란색 헤더
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Color(0xFF007AFF),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: const Text(
+                'SECURET',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
                 ),
-                
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 2. 채널 입력
-                      const Text(
-                        '채널',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: channelController,
-                        decoration: InputDecoration(
-                          hintText: '여기에 채널 이름을 입력하세요.',
-                          filled: true,
-                          fillColor: Colors.grey[200],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // 3. 3개 원형 버튼
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildCircleButton(
-                            icon: Icons.phone,
-                            label: '음성통화',
-                            color: Colors.orange,
-                            onTap: () {
-                              Navigator.pop(context);
-                              _launchSecuretCall(otherUserQrUrl!);
-                            },
-                          ),
-                          _buildCircleButton(
-                            icon: Icons.videocam,
-                            label: '영상통화',
-                            color: Colors.green,
-                            onTap: () {
-                              Navigator.pop(context);
-                              _launchSecuretCall(otherUserQrUrl!);
-                            },
-                          ),
-                          _buildCircleButton(
-                            icon: Icons.chat_bubble,
-                            label: '채팅',
-                            color: Colors.pink,
-                            onTap: () {
-                              Navigator.pop(context);
-                              _launchSecuretChat(otherUserQrUrl!);
-                            },
-                          ),
-                        ],
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      // 4. 톡지 보내기 버튼
-                      OutlinedButton.icon(
-                        icon: const Icon(Icons.mail_outline),
-                        label: const Text('톡지 보내기 or 메시지 전송'),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 48),
-                          side: const BorderSide(color: Colors.grey),
-                        ),
-                        onPressed: () {
-                          _showSnackBar('톡지 보내기 기능은 준비 중입니다');
-                        },
-                      ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      // 5. 주차 이동 요청 버튼
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF007AFF),
-                          minimumSize: const Size(double.infinity, 48),
-                        ),
-                        onPressed: () {
-                          _showSnackBar('주차 이동 요청 기능은 준비 중입니다');
-                        },
-                        child: const Text(
-                          '주차 이동 요청 (여기를 클릭하시면 자동요청)',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      // 6. 안내 문구
-                      Text(
-                        '친구등록을 하면 쉽게 전화를 걸 수 있습니다.\n아래 닉네임을 수정한 후 확인을 클릭하세요.',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // 7. 닉네임 입력 필드
-                      TextField(
-                        controller: nicknameController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey[200],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      // 8. 취소/확인 버튼
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                minimumSize: const Size(0, 48),
-                                side: const BorderSide(color: Colors.grey),
-                              ),
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('취소'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF007AFF),
-                                minimumSize: const Size(0, 48),
-                              ),
-                              onPressed: () {
-                                // TODO: 닉네임 저장 로직 (나중에 구현)
-                                Navigator.pop(context);
-                                _launchSecuretCall(otherUserQrUrl!);
-                              },
-                              child: const Text(
-                                '확인',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      const SizedBox(height: 8),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            
+            // 안내 문구
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                '${otherUserNickname ?? "상대방"}님과 보안 연결',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            
+            // 3개 원형 버튼
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildCircleButton(
+                    icon: Icons.phone,
+                    label: '음성통화',
+                    color: Colors.orange,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchSecuretCall(otherUserQrUrl!);
+                    },
+                  ),
+                  _buildCircleButton(
+                    icon: Icons.videocam,
+                    label: '영상통화',
+                    color: Colors.green,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchSecuretCall(otherUserQrUrl!);
+                    },
+                  ),
+                  _buildCircleButton(
+                    icon: Icons.chat_bubble,
+                    label: '채팅',
+                    color: Colors.pink,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchSecuretChat(otherUserQrUrl!);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // 취소 버튼
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  side: const BorderSide(color: Colors.grey),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('취소'),
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -1913,8 +1793,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 // 프로필 사진 (1:1은 상대방 사진, 그룹은 그룹 아이콘) - 클릭 가능
                 GestureDetector(
                   onTap: _currentChatRoom.type == ChatRoomType.oneToOne
-                      ? _startSecuretDirectly  // 프로필 탭 시 바로 Securet 연결
+                      ? _startSecuretDirectly  // 짧게 누르면: 바로 Securet 연결
                       : _showGroupSecuretOptions, // 그룹 채팅에서 사용자 선택
+                  onLongPress: _currentChatRoom.type == ChatRoomType.oneToOne
+                      ? _showSimpleSecuretOptions  // 길게 누르면: 옵션 다이얼로그
+                      : null, // 그룹은 롱프레스 불필요
                   child: CircleAvatar(
                     radius: 20,
                     backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
