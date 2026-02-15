@@ -1062,101 +1062,157 @@ class _ChatScreenState extends State<ChatScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 파란색 헤더
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Color(0xFF007AFF),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      isScrollControlled: true,
+      builder: (context) => SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
               ),
-              child: const Text(
-                'SECURET',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 상단 핸들
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 20),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-            
-            // 안내 문구
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Text(
-                '${otherUserNickname ?? "상대방"}님과 보안 연결',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            
-            // 3개 원형 버튼
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              
+              // 로고 & 제목
+              Column(
                 children: [
-                  _buildCircleButton(
-                    icon: Icons.phone,
-                    label: '음성통화',
-                    color: Colors.orange,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchSecuretCall(otherUserQrUrl!);
-                    },
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.security,
+                      color: Color(0xFF1E88E5),
+                      size: 35,
+                    ),
                   ),
-                  _buildCircleButton(
-                    icon: Icons.videocam,
-                    label: '영상통화',
-                    color: Colors.green,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchSecuretCall(otherUserQrUrl!);
-                    },
+                  const SizedBox(height: 16),
+                  const Text(
+                    'SECURET',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 3,
+                    ),
                   ),
-                  _buildCircleButton(
-                    icon: Icons.chat_bubble,
-                    label: '채팅',
-                    color: Colors.pink,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchSecuretChat(otherUserQrUrl!);
-                    },
+                  const SizedBox(height: 8),
+                  Text(
+                    '${otherUserNickname ?? "상대방"}님과 보안 연결',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
-            ),
-            
-            const SizedBox(height: 20),
-            
-            // 취소 버튼
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                  side: const BorderSide(color: Colors.grey),
+              
+              const SizedBox(height: 32),
+              
+              // 3개 카드 버튼
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    _buildModernButton(
+                      icon: Icons.phone,
+                      label: '음성 통화',
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFF6B6B), Color(0xFFEE5A6F)],
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _launchSecuretCall(otherUserQrUrl!);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildModernButton(
+                      icon: Icons.videocam,
+                      label: '영상 통화',
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _launchSecuretCall(otherUserQrUrl!);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildModernButton(
+                      icon: Icons.chat_bubble,
+                      label: '보안 채팅',
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFAB47BC), Color(0xFF8E24AA)],
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _launchSecuretChat(otherUserQrUrl!);
+                      },
+                    ),
+                  ],
                 ),
-                onPressed: () => Navigator.pop(context),
-                child: const Text('취소'),
               ),
-            ),
-            
-            const SizedBox(height: 20),
-          ],
+              
+              const SizedBox(height: 20),
+              
+              // 취소 버튼
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    '취소',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
@@ -1563,6 +1619,63 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+  
+  /// 모던 카드 버튼 (신형 디자인)
+  Widget _buildModernButton({
+    required IconData icon,
+    required String label,
+    required Gradient gradient,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            gradient: gradient,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 20),
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
