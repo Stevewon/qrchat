@@ -2562,10 +2562,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   /// 메시지 삭제
   Future<void> _deleteMessage(ChatMessage message) async {
     try {
-      // Firestore에서 메시지 삭제
+      // Firestore에서 메시지 삭제 (최상위 messages 컬렉션에서)
       await FirebaseFirestore.instance
-          .collection('chat_rooms')
-          .doc(widget.chatRoom.id)
           .collection('messages')
           .doc(message.id)
           .delete();
