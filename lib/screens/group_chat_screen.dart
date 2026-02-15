@@ -1134,7 +1134,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               style: const TextStyle(fontSize: 16),
             ),
             Text(
-              '${_currentChatRoom.participantIds.length}명',
+              '${_currentChatRoom.participantIds.length - 1}명',
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
@@ -1242,7 +1242,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   /// 참여자 이름 표시 (일대일 채팅 스타일)
   String _buildParticipantNames() {
     if (_participantsMap.isEmpty) {
-      return '${_currentChatRoom.participantIds.length}명이 참여 중인 그룹 채팅입니다';
+      return '${_currentChatRoom.participantIds.length - 1}명이 참여 중인 그룹 채팅입니다';
     }
     
     // 자신을 제외한 참여자 목록
