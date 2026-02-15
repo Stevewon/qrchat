@@ -1,0 +1,525 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/securet_auth_service.dart';
+import '../models/securet_user.dart';
+
+/// 지갑 설정 화면
+/// - 1회 입력 후 변경 불가
+/// - 복사 기능 제공
+class WalletSettingsScreen extends StatefulWidget {
+  const WalletSettingsScreen({super.key});
+
+  @override
+  State<WalletSettingsScreen> createState() => _WalletSettingsScreenState();
+}
+
+class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
+  SecuretUser? _currentUser;
+  String? _walletAddress;
+  bool _isLoading = true;
+  bool _hasWallet = false;
+  
+  final TextEditingController _walletController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWalletInfo();
+  }
+
+  @override
+  void dispose() {
+    _walletController.dispose();
+    super.dispose();
+  }
+
+  /// 지갑 정보 로드
+  Future<void> _loadWalletInfo() async {
+    try {
+      final user = await SecuretAuthService.getCurrentUser();
+      if (user == null) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.id)
+          .get();
+
+      if (userDoc.exists) {
+        final data = userDoc.data();
+        final walletAddress = data?['walletAddress'] as String?;
+
+        if (mounted) {
+          setState(() {
+            _currentUser = user;
+            _walletAddress = walletAddress;
+            _hasWallet = walletAddress != null && walletAddress.isNotEmpty;
+            _isLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          _currentUser = user;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('지갑 정보 로드 실패: $e')),
+        );
+      }
+    }
+  }
+
+  /// 지갑 주소 저장
+  Future<void> _saveWalletAddress() async {
+    final address = _walletController.text.trim();
+    
+    if (address.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('지갑 주소를 입력해주세요')),
+      );
+      return;
+    }
+
+    if (address.length < 20) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('올바른 지갑 주소를 입력해주세요')),
+      );
+      return;
+    }
+
+    // 경고 다이얼로그 표시
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: const [
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+            SizedBox(width: 12),
+            Text('지갑 주소 등록'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '⚠️ 중요 안내',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '• 지갑 주소는 1회만 입력 가능합니다\n'
+                    '• 입력 후에는 절대 변경할 수 없습니다\n'
+                    '• 잘못된 주소 입력 시 출금이 불가능합니다\n'
+                    '• 신중하게 확인 후 등록해주세요',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.red.shade900,
+                      height: 1.6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '입력한 주소가 정확한지 다시 한 번 확인해주세요.',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('확인 및 등록'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    // 저장 처리
+    setState(() => _isLoading = true);
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.id)
+          .update({
+        'walletAddress': address,
+        'walletRegisteredAt': FieldValue.serverTimestamp(),
+      });
+
+      if (mounted) {
+        setState(() {
+          _walletAddress = address;
+          _hasWallet = true;
+          _isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ 지갑 주소가 등록되었습니다'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('등록 실패: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// 지갑 주소 복사
+  void _copyWalletAddress() {
+    if (_walletAddress != null && _walletAddress!.isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: _walletAddress!));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('📋 지갑 주소가 복사되었습니다'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '지갑 설정',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 안내 카드
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1976D2).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Row(
+                    children: [
+                      Icon(Icons.account_balance_wallet, color: Colors.white, size: 24),
+                      SizedBox(width: 12),
+                      Text(
+                        '암호화폐 지갑',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'QKEY 출금을 위해 암호화폐 지갑 주소를 등록해주세요.\n'
+                    '지갑 주소는 한 번만 등록 가능하며, 변경할 수 없습니다.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // 지갑 주소가 등록된 경우
+            if (_hasWallet) ...[
+              const Text(
+                '등록된 지갑 주소',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '등록 완료',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.green.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    SelectableText(
+                      _walletAddress!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'monospace',
+                        color: Colors.black87,
+                        height: 1.5,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // 복사 버튼
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _copyWalletAddress,
+                        icon: const Icon(Icons.copy, size: 18),
+                        label: const Text('주소 복사'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1976D2),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // 경고 안내
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.lock, color: Colors.orange.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          '변경 불가',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '등록된 지갑 주소는 보안상의 이유로 변경할 수 없습니다.\n'
+                      '출금 시 등록된 주소로만 전송됩니다.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.orange.shade900,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ]
+            // 지갑 주소가 등록되지 않은 경우
+            else ...[
+              const Text(
+                '지갑 주소 입력',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              
+              TextField(
+                controller: _walletController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: '암호화폐 지갑 주소를 입력하세요\n예: 0x1234567890abcdef...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFF1976D2), width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.all(16),
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // 등록 버튼
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _saveWalletAddress,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1976D2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    '지갑 주소 등록',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // 주의사항
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          '주의사항',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '• 지갑 주소는 1회만 등록 가능합니다\n'
+                      '• 등록 후에는 절대 변경할 수 없습니다\n'
+                      '• 잘못된 주소 입력 시 출금이 불가능합니다\n'
+                      '• 반드시 정확한 주소인지 확인 후 등록하세요\n'
+                      '• 출금은 1,000 QKEY 단위로 가능합니다',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.red.shade900,
+                        height: 1.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

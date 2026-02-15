@@ -16,6 +16,7 @@ import 'my_qr_code_screen.dart';
 import 'admin_qkey_screen.dart';
 // import 'sticker_pack_management_screen.dart'; // 웹 어드민에서만 관리
 import 'qkey_history_screen.dart';
+import 'wallet_settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -248,7 +249,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   /// QKEY 출금 신청 다이얼로그
-  void _showWithdrawDialog() {
+  Future<void> _showWithdrawDialog() async {
     if (_qkeyBalance < QKeyService.withdrawMinAmount) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -262,7 +263,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     
-    final walletController = TextEditingController();
+    // 지갑 주소 확인
+    String? walletAddress;
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.id)
+          .get();
+      
+      if (userDoc.exists) {
+        walletAddress = userDoc.data()?['walletAddress'] as String?;
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('지갑 정보 로드 실패: $e')),
+        );
+      }
+      return;
+    }
+    
+    // 지갑 주소가 등록되지 않은 경우
+    if (walletAddress == null || walletAddress.isEmpty) {
+      final goToWallet = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange),
+              SizedBox(width: 12),
+              Text('지갑 주소 미등록'),
+            ],
+          ),
+          content: const Text(
+            '출금을 위해서는 먼저 지갑 주소를 등록해야 합니다.\n\n'
+            '지갑 설정 화면으로 이동하시겠습니까?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('취소'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1976D2),
+              ),
+              child: const Text('지갑 설정하기'),
+            ),
+          ],
+        ),
+      );
+      
+      if (goToWallet == true && mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const WalletSettingsScreen(),
+          ),
+        );
+      }
+      return;
+    }
+    
     final amountController = TextEditingController();
     
     showDialog(
@@ -325,15 +388,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
               
               const SizedBox(height: 12),
               
-              // 지갑 주소
-              TextField(
-                controller: walletController,
-                decoration: const InputDecoration(
-                  labelText: '지갑 주소',
-                  hintText: '암호화폐 지갑 주소를 입력하세요',
-                  border: OutlineInputBorder(),
+              // 지갑 주소 표시 (수정 불가)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
                 ),
-                maxLines: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.account_balance_wallet,
+                          size: 16,
+                          color: Color(0xFF1976D2),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          '등록된 지갑 주소',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF1976D2),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    SelectableText(
+                      walletAddress!,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               
               const SizedBox(height: 12),
@@ -388,11 +482,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () async {
               final amountText = amountController.text.trim();
-              final walletAddress = walletController.text.trim();
               
-              if (amountText.isEmpty || walletAddress.isEmpty) {
+              if (amountText.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('모든 항목을 입력해주세요')),
+                  const SnackBar(content: Text('출금 금액을 입력해주세요')),
                 );
                 return;
               }
@@ -419,7 +512,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               final result = await QKeyService.requestWithdraw(
                 userId: _currentUser!.id,
                 amount: amount,
-                walletAddress: walletAddress,
+                walletAddress: walletAddress!, // 등록된 지갑 주소 사용
               );
               
               if (mounted) {
@@ -632,6 +725,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   controller: scrollController,
                   children: [
                     const SizedBox(height: 8),
+                    
+                    // 지갑 설정
+                    ListTile(
+                      leading: const Icon(
+                        Icons.account_balance_wallet,
+                        color: Color(0xFF1976D2),
+                      ),
+                      title: const Text('지갑 설정', style: TextStyle(fontSize: 16)),
+                      subtitle: const Text(
+                        '출금용 암호화폐 지갑 주소',
+                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                      onTap: () {
+                        Navigator.pop(context); // 바텀시트 닫기
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WalletSettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    
+                    const Divider(height: 1, indent: 56),
                     
                     // 알림음 설정
                     ListTile(
