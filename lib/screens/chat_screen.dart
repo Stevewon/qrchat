@@ -1898,6 +1898,25 @@ class _ChatScreenState extends State<ChatScreen> {
         // 실제 메시지 표시
         if (index < _messages.length) {
           final message = _messages[index];
+          
+          // ⭐ 시스템 메시지 처리 (중앙 정렬)
+          if (message.senderId == 'system') {
+            return Container(
+              key: ValueKey(message.id),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Center(
+                child: Text(
+                  message.content,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+          
           final isMe = message.senderId == widget.currentUserId;
           
           // 🐛 DEBUG: 메시지 렌더링 로그 (동영상만)

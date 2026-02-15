@@ -744,10 +744,33 @@ class FirebaseChatService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      // 🔥 v9.3.11: 시스템 초대 메시지 완전 제거!
-      // 초대 알림 없이 조용히 참여자 추가만 처리
+      // 6. 초대 메시지 전송 (중앙 정렬 텍스트)
+      String inviteMessage;
+      if (newParticipantNicknames.length == 1) {
+        inviteMessage = '${newParticipantNicknames[0]}님이 들어왔습니다.';
+      } else {
+        final firstGuest = newParticipantNicknames.first;
+        final remainingCount = newParticipantNicknames.length - 1;
+        inviteMessage = '$firstGuest 외 ${remainingCount}명이 들어왔습니다.';
+      }
+      
+      // 시스템 메시지 전송 (senderId = 'system')
+      final messageId = 'system_${DateTime.now().millisecondsSinceEpoch}';
+      await _messagesCollection.doc(messageId).set({
+        'chatRoomId': chatRoomId,
+        'senderId': 'system',
+        'senderNickname': 'system',
+        'senderProfilePhoto': null,
+        'content': inviteMessage,
+        'type': 'text',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': true,
+        'readBy': updatedParticipantIds, // 모두 읽음 처리
+      });
+      
       if (kDebugMode) {
-        debugPrint('✅ 친구 초대 완료! (시스템 메시지 없음)');
+        debugPrint('✅ 친구 초대 완료!');
+        debugPrint('초대 메시지: $inviteMessage');
         debugPrint('채팅방 타입: $chatType');
         if (groupName != null) {
           debugPrint('그룹 이름: $groupName');

@@ -1269,6 +1269,25 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       itemCount: _messages.length,
       itemBuilder: (context, index) {
         final message = _messages[index];
+        
+        // ⭐ 시스템 메시지 처리 (중앙 정렬)
+        if (message.senderId == 'system') {
+          return Container(
+            key: ValueKey(message.id),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Center(
+              child: Text(
+                message.content,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+        
         final isMe = message.senderId == widget.currentUserId;
         
         // 🐛 DEBUG: 그룹방 동영상 메시지 렌더링 로그
@@ -1286,28 +1305,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   /// 메시지 버블 (1:1 기반 + 그룹 기능 추가)
   Widget _buildMessageBubble(ChatMessage message, bool isMe) {
-    // 시스템 메시지 처리
-    if (message.senderId == 'system') {
-      return Center(
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Text(
-            message.content,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[700],
-            ),
-          ),
-        ),
-      );
-    }
-
     // 🔥 참여자 정보 가져오기 (맵에서)
     final sender = _participantsMap[message.senderId];
     final displayNickname = sender?.nickname ?? message.senderNickname;
