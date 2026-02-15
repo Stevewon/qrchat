@@ -438,26 +438,17 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
     final isSelected = _selectedFilter == filter;
     final count = _getStatusCount(filter);
     
-    return FilterChip(
+    return ChoiceChip(
       selected: isSelected,
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 14,
-            color: isSelected ? Colors.white : Colors.grey.shade700,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            '$label ($count)',
-            style: TextStyle(
-              fontSize: 12,
-              color: isSelected ? Colors.white : Colors.grey.shade700,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
+      label: Text(
+        '$label\n($count)',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 11,
+          height: 1.2,
+          color: isSelected ? Colors.white : Colors.grey.shade700,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
       ),
       onSelected: (selected) {
         setState(() {
@@ -466,8 +457,11 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
       },
       selectedColor: const Color(0xFF1976D2),
       backgroundColor: Colors.grey.shade200,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      avatar: isSelected 
+          ? Icon(icon, size: 16, color: Colors.white)
+          : Icon(icon, size: 16, color: Colors.grey.shade700),
     );
   }
 
@@ -508,27 +502,21 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
       ),
       body: Column(
         children: [
-          // 필터 칩 영역
+          // 필터 칩 영역 - Grid 레이아웃으로 변경
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  const SizedBox(width: 4),
-                  _buildFilterChip('all', '전체', Icons.all_inclusive),
-                  const SizedBox(width: 6),
-                  _buildFilterChip('pending', '대기중', Icons.pending_outlined),
-                  const SizedBox(width: 6),
-                  _buildFilterChip('approved', '승인됨', Icons.check_circle_outline),
-                  const SizedBox(width: 6),
-                  _buildFilterChip('completed', '완료', Icons.check_circle),
-                  const SizedBox(width: 6),
-                  _buildFilterChip('rejected', '거부됨', Icons.cancel_outlined),
-                  const SizedBox(width: 4),
-                ],
-              ),
+            padding: const EdgeInsets.all(12),
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              alignment: WrapAlignment.center,
+              children: [
+                _buildFilterChip('all', '전체', Icons.all_inclusive),
+                _buildFilterChip('pending', '대기중', Icons.pending_outlined),
+                _buildFilterChip('approved', '승인됨', Icons.check_circle_outline),
+                _buildFilterChip('completed', '완료', Icons.check_circle),
+                _buildFilterChip('rejected', '거부됨', Icons.cancel_outlined),
+              ],
             ),
           ),
           
