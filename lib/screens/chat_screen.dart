@@ -963,9 +963,9 @@ class _ChatScreenState extends State<ChatScreen> {
         DebugLogger.log('🔒 [Securet] 프로필 탭 → 음성통화 다이얼로그 표시');
       }
       
-      // 짧게 탭해도 다이얼로그를 먼저 표시 (Securet 구형 화면 방지)
+      // 짧게 탭하면 바로 음성 통화 시작 (다이얼로그 없이)
       if (!mounted) return;
-      _showQuickCallDialog(otherUserNickname, otherUserQrUrl);
+      await _launchSecuretCall(otherUserQrUrl);
       
     } catch (e) {
       if (kDebugMode) {
@@ -977,126 +977,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
   
-  /// 빠른 통화 다이얼로그 (짧게 탭 시)
-  void _showQuickCallDialog(String nickname, String qrUrl) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 아이콘
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.phone,
-                  color: Color(0xFF1E88E5),
-                  size: 35,
-                ),
-              ),
-              const SizedBox(height: 20),
-              // 제목
-              Text(
-                '$nickname님과',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Securet 음성 통화',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 24),
-              // 통화 버튼
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        '취소',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF1E88E5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _launchSecuretCall(qrUrl);
-                      },
-                      icon: const Icon(Icons.phone),
-                      label: const Text(
-                        '통화 시작',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   /// 간소화된 Securet 옵션 다이얼로그 (롱프레스 시)
   void _showSimpleSecuretOptions() async {
     // 상대방 정보 가져오기
