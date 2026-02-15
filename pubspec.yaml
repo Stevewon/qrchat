@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Mining Sound Effect Update v1.0.21"
+description: "QRChat - Remove Old Mining Popup v1.0.22"
 publish_to: 'none'
 
-version: 1.0.21+121
+version: 1.0.22+122
 
 environment:
   sdk: ^3.9.2
