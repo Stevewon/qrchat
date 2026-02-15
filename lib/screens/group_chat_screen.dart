@@ -929,7 +929,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           trailing: const Icon(Icons.phone, color: Colors.green),
                           onTap: () {
                             Navigator.pop(context);
-                            _initiateSecuretCall(participantId, participant.nickname);
+                            _showSecuretDialogForParticipant(participantId, participant.nickname);
                           },
                         );
                       }),
@@ -960,6 +960,262 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       ),
                       
                       // 하단 여백은 ListView padding으로 처리
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Securet 다이얼로그 표시 (별첨1 디자인)
+  Future<void> _showSecuretDialogForParticipant(String participantId, String participantNickname) async {
+    // Firestore에서 참여자 QR URL 조회
+    String? qrUrl;
+    
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(participantId)
+          .get();
+      
+      if (userDoc.exists) {
+        qrUrl = userDoc.data()?['qrUrl'] as String?;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ [Securet] 사용자 정보 조회 실패: $e');
+      }
+    }
+    
+    // QR URL 검증
+    if (qrUrl == null || qrUrl.isEmpty) {
+      _showSnackBar(
+        '$participantNickname님이 Securet을 등록하지 않았습니다\n상대방에게 Securet QR 등록을 요청해주세요',
+        isError: true,
+      );
+      return;
+    }
+    
+    if (!qrUrl.startsWith('http://') && !qrUrl.startsWith('https://')) {
+      _showSnackBar('Securet URL 형식이 올바르지 않습니다', isError: true);
+      return;
+    }
+    
+    if (!mounted) return;
+    
+    // 닉네임 컨트롤러
+    final nicknameController = TextEditingController(text: participantNickname);
+    
+    // 채널 컨트롤러
+    final channelController = TextEditingController();
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 1. 파란색 헤더
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF007AFF),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  child: const Text(
+                    'SECURET',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 2. 채널 입력
+                      const Text(
+                        '채널',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: channelController,
+                        decoration: InputDecoration(
+                          hintText: '여기에 채널 이름을 입력하세요.',
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // 3. 3개 원형 버튼
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildCircleButton(
+                            icon: Icons.phone,
+                            label: '음성통화',
+                            color: Colors.orange,
+                            onTap: () {
+                              Navigator.pop(context);
+                              _launchSecuretCall(qrUrl!);
+                            },
+                          ),
+                          _buildCircleButton(
+                            icon: Icons.videocam,
+                            label: '영상통화',
+                            color: Colors.green,
+                            onTap: () {
+                              Navigator.pop(context);
+                              _launchSecuretCall(qrUrl!);
+                            },
+                          ),
+                          _buildCircleButton(
+                            icon: Icons.chat_bubble,
+                            label: '채팅',
+                            color: Colors.pink,
+                            onTap: () {
+                              Navigator.pop(context);
+                              _launchSecuretCall(qrUrl!); // 그룹채팅은 chat도 call로
+                            },
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // 4. 톡지 보내기 버튼
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.mail_outline),
+                        label: const Text('톡지 보내기 or 메시지 전송'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 48),
+                          side: const BorderSide(color: Colors.grey),
+                        ),
+                        onPressed: () {
+                          _showSnackBar('톡지 보내기 기능은 준비 중입니다');
+                        },
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // 5. 주차 이동 요청 버튼
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF007AFF),
+                          minimumSize: const Size(double.infinity, 48),
+                        ),
+                        onPressed: () {
+                          _showSnackBar('주차 이동 요청 기능은 준비 중입니다');
+                        },
+                        child: const Text(
+                          '주차 이동 요청 (여기를 클릭하시면 자동요청)',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // 6. 안내 문구
+                      Text(
+                        '친구등록을 하면 쉽게 전화를 걸 수 있습니다.\n아래 닉네임을 수정한 후 확인을 클릭하세요.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // 7. 닉네임 입력 필드
+                      TextField(
+                        controller: nicknameController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // 8. 취소/확인 버튼
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(0, 48),
+                                side: const BorderSide(color: Colors.grey),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('취소'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF007AFF),
+                                minimumSize: const Size(0, 48),
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _launchSecuretCall(qrUrl!);
+                              },
+                              child: const Text(
+                                '확인',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -1068,6 +1324,43 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         );
       }
     }
+  }
+
+  /// Helper: 원형 버튼 위젯 (Securet 다이얼로그용)
+  Widget _buildCircleButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 32,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showSnackBar(String message, {bool isError = false}) {
