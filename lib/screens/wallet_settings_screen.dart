@@ -56,7 +56,11 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           setState(() {
             _currentUser = user;
             _walletAddress = walletAddress;
-            _hasWallet = walletAddress != null && walletAddress.isNotEmpty;
+            // 지갑 주소가 있고, 공백이 아니며, 이더리움 형식인지 확인
+            final ethereumRegex = RegExp(r'^0x[a-fA-F0-9]{40}$');
+            _hasWallet = walletAddress != null && 
+                         walletAddress.trim().isNotEmpty && 
+                         ethereumRegex.hasMatch(walletAddress.trim());
             _isLoading = false;
           });
         }

@@ -463,6 +463,8 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
         color: isSelected ? Colors.white : Colors.grey.shade700,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 
@@ -506,11 +508,12 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
           // 필터 칩 영역
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
+                  const SizedBox(width: 4),
                   _buildFilterChip('all', '전체', Icons.all_inclusive),
                   const SizedBox(width: 8),
                   _buildFilterChip('pending', '대기중', Icons.pending_outlined),
@@ -520,6 +523,7 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
                   _buildFilterChip('completed', '완료', Icons.check_circle),
                   const SizedBox(width: 8),
                   _buildFilterChip('rejected', '거부됨', Icons.cancel_outlined),
+                  const SizedBox(width: 4),
                 ],
               ),
             ),

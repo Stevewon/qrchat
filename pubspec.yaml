@@ -2,7 +2,7 @@ name: qrchat
 description: "QRChat - Add Message Delete Feature v1.0.23"
 publish_to: 'none'
 
-version: 1.0.41+141
+version: 1.0.42+142
 
 environment:
   sdk: ^3.9.2
