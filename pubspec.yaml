@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Add Terms of Service v1.0.57"
+description: "QRChat - Add Privacy Policy v1.0.58"
 publish_to: 'none'
 
-version: 1.0.57+157
+version: 1.0.58+158
 
 environment:
   sdk: ^3.9.2

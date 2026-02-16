@@ -20,6 +20,7 @@ import 'qkey_history_screen.dart';
 import 'wallet_settings_screen.dart';
 import 'withdrawal_history_screen.dart';
 import 'terms_of_service_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -871,6 +872,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const TermsOfServiceScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    
+                    const Divider(height: 1, indent: 56),
+                    
+                    // 개인정보 처리지침
+                    ListTile(
+                      leading: const Icon(Icons.privacy_tip_outlined, color: Colors.black87),
+                      title: const Text('개인정보 처리지침', style: TextStyle(fontSize: 16)),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                      onTap: () {
+                        Navigator.pop(context); // 바텀시트 닫기
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PrivacyPolicyScreen(),
                           ),
                         );
                       },
