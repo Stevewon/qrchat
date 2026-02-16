@@ -43,6 +43,9 @@ class RewardEventService {
 
   /// 최대 보상 QKEY
   static const int maxReward = 10;
+  
+  /// 출금 가능 최소 QKEY (로그인 보너스 등과 동일)
+  static const int withdrawMinAmount = 1000; // 1,000 QKEY
 
   /// 그룹 채팅에서 메시지가 전송될 때 호출
   /// 
@@ -191,12 +194,12 @@ class RewardEventService {
         return event.rewardAmount;
       });
 
-      // QKEY 지급
+      // QKEY 지급 (bonus 타입으로 기록)
       await QKeyService.addQKey(
         userId: user.id,
         amount: result,
-        type: 'reward_event',
-        description: '그룹 채팅 보상 이벤트',
+        type: 'bonus',
+        description: '🎁 그룹 채팅 보상 이벤트',
       );
 
       debugPrint('✅ ${user.nickname}님이 ${result} QKEY 획득!');
