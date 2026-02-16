@@ -19,6 +19,7 @@ import 'admin_qkey_screen.dart';
 import 'qkey_history_screen.dart';
 import 'wallet_settings_screen.dart';
 import 'withdrawal_history_screen.dart';
+import 'terms_of_service_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -854,6 +855,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () {
                         // 앱 정보 상세 페이지로 이동 (추후 구현)
+                      },
+                    ),
+                    
+                    const Divider(height: 1, indent: 56),
+                    
+                    // 이용약관
+                    ListTile(
+                      leading: const Icon(Icons.description_outlined, color: Colors.black87),
+                      title: const Text('이용약관', style: TextStyle(fontSize: 16)),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                      onTap: () {
+                        Navigator.pop(context); // 바텀시트 닫기
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const TermsOfServiceScreen(),
+                          ),
+                        );
                       },
                     ),
                     
