@@ -14,7 +14,8 @@ class MyQRCodeScreen extends StatelessWidget {
         title: const Text('My QR Code'),
         centerTitle: true,
       ),
-      body: Center(
+      body: SafeArea(
+        child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -114,6 +115,7 @@ class MyQRCodeScreen extends StatelessWidget {
           ),
         ),
       ),
+        ),
     );
   }
 }

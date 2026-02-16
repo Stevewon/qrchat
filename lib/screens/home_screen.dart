@@ -164,7 +164,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return Scaffold(
-      body: screens[_currentIndex],
+      body: SafeArea(
+        child: screens[_currentIndex],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) {

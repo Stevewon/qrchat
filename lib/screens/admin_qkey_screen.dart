@@ -91,8 +91,9 @@ class _AdminQKeyScreenState extends State<AdminQKeyScreen> with SingleTickerProv
           ],
         ),
       ),
-      body: StreamBuilder<List<QKeyTransaction>>(
-        stream: QKeyService.getAllWithdrawals(status: _filterStatus),
+      body: SafeArea(
+        child: StreamBuilder<List<QKeyTransaction>>(
+          stream: QKeyService.getAllWithdrawals(status: _filterStatus),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -125,6 +126,7 @@ class _AdminQKeyScreenState extends State<AdminQKeyScreen> with SingleTickerProv
             },
           );
         },
+        ),
       ),
     );
   }

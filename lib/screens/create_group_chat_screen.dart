@@ -262,7 +262,8 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
         children: [
           // 검색바
           Container(
@@ -420,6 +421,7 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
           ),
         ],
       ),
+        ),
     );
   }
 

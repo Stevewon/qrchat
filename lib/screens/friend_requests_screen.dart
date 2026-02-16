@@ -109,7 +109,8 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
         title: const Text('친구 요청'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: _currentUserId == null
+      body: SafeArea(
+        child: _currentUserId == null
           ? const Center(child: CircularProgressIndicator())
           : StreamBuilder<List<FriendRequest>>(
               stream: _friendService.getFriendRequestsStream(_currentUserId!),
@@ -188,6 +189,7 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
                 );
               },
             ),
+        ),
     );
   }
 

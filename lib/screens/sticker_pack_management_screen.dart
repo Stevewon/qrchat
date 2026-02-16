@@ -41,7 +41,8 @@ class _StickerPackManagementScreenState extends State<StickerPackManagementScree
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
+      body: SafeArea(
+        child: StreamBuilder<QuerySnapshot>(
         stream: _firestore
             .collection('sticker_packs')
             .orderBy('created_at', descending: true)
@@ -268,6 +269,7 @@ class _StickerPackManagementScreenState extends State<StickerPackManagementScree
               ),
             )
           : null,
+        ),
     );
   }
 

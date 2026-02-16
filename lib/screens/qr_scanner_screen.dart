@@ -48,7 +48,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         title: const Text('친구 QR 스캔'),
         centerTitle: true,
       ),
-      body: _buildScanner(),
+      body: SafeArea(
+        child: _buildScanner(),
+        ),
     );
   }
 

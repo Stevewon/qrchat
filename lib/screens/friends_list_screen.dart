@@ -241,11 +241,13 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
           ),
         ],
       ),
-      body: _isLoading
+      body: SafeArea(
+        child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _friends.isEmpty
               ? _buildEmptyState()
               : _buildFriendsList(),
+        ),
     );
   }
 

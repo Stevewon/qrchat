@@ -37,7 +37,8 @@ class _DebugLogScreenState extends State<DebugLogScreen> {
           ),
         ],
       ),
-      body: _logs.isEmpty
+      body: SafeArea(
+        child: _logs.isEmpty
           ? const Center(
               child: Text('로그가 없습니다'),
             )
@@ -70,6 +71,7 @@ class _DebugLogScreenState extends State<DebugLogScreen> {
                 );
               },
             ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {

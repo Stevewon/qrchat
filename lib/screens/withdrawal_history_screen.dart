@@ -431,7 +431,9 @@ class _WithdrawalHistoryScreenState extends State<WithdrawalHistoryScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: SafeArea(
+        child: Center(child: CircularProgressIndicator()),
+        ),
       );
     }
 

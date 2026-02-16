@@ -108,7 +108,8 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
           ],
         ),
       ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
         children: [
           // 잔액 카드
           _buildBalanceCard(),
@@ -162,6 +163,7 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
           ),
         ],
       ),
+        ),
     );
   }
   

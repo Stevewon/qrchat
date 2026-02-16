@@ -2028,20 +2028,22 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // 메시지 목록
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _messages.isEmpty
-                    ? _buildEmptyState()
-                    : _buildMessageList(),
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // 메시지 목록
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _messages.isEmpty
+                      ? _buildEmptyState()
+                      : _buildMessageList(),
+            ),
 
-          // 입력 영역
-          _buildInputArea(),
-        ],
+            // 입력 영역
+            _buildInputArea(),
+          ],
+        ),
       ),
     );
   }

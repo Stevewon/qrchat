@@ -188,7 +188,8 @@ class _FriendSearchScreenState extends State<FriendSearchScreen> {
           ),
         ),
       ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
         children: [
           // 카카오톡 스타일 검색창
           Container(
@@ -262,6 +263,7 @@ class _FriendSearchScreenState extends State<FriendSearchScreen> {
           ),
         ],
       ),
+        ),
     );
   }
 

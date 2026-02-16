@@ -1235,10 +1235,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // 그룹 채팅 참여자 안내 (일대일 채팅 스타일)
-          Container(
+      body: SafeArea(
+        child: Column(
+          children: [
+            // 그룹 채팅 참여자 안내 (일대일 채팅 스타일)
+            Container(
             padding: const EdgeInsets.all(12),
             color: Colors.teal.withValues(alpha: 0.05),
             child: Row(
@@ -1267,9 +1268,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                     : _buildMessageList(),
           ),
 
-          // 입력 영역
-          _buildInputArea(),
-        ],
+            // 입력 영역
+            _buildInputArea(),
+          ],
+        ),
       ),
       ),
     );

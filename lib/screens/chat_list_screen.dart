@@ -208,52 +208,55 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _chatRooms.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.chat_bubble_outline,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        '아직 채팅이 없습니다',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const FriendsListScreen(),
-                            ),
-                          ).then((_) => _loadData());
-                        },
-                        icon: const Icon(Icons.people),
-                        label: const Text('친구 목록 보기'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _chatRooms.isEmpty
+                  ? Center(
+                      child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.chat_bubble_outline,
+                          size: 64,
+                          color: Colors.grey,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        const Text(
+                          '아직 채팅이 없습니다',
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const FriendsListScreen(),
+                              ),
+                            ).then((_) => _loadData());
+                          },
+                          icon: const Icon(Icons.people),
+                          label: const Text('친구 목록 보기'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                  : RefreshIndicator(
+                    onRefresh: _refreshData,
+                    child: ListView.builder(
+                      itemCount: _chatRooms.length,
+                      itemBuilder: (context, index) {
+                        final room = _chatRooms[index];
+                        return _buildChatRoomItem(room);
+                      },
+                    ),
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _refreshData,
-                  child: ListView.builder(
-                    itemCount: _chatRooms.length,
-                    itemBuilder: (context, index) {
-                      final room = _chatRooms[index];
-                      return _buildChatRoomItem(room);
-                    },
-                  ),
-                ),
+        ),
+      ),
     );
   }
 
