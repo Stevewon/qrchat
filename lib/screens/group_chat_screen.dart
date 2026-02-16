@@ -80,6 +80,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   StreamSubscription<List<RewardEvent>>? _rewardEventsSubscription;
   bool _showClaimedAnimation = false;
   int _claimedAmount = 0;
+  
+  // 🎨 마지막으로 사용한 스티커 팩 인덱스 (탭 위치 기억용)
+  int _lastStickerPackIndex = 0;
 
   @override
   void initState() {
@@ -567,32 +570,52 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           return _buildDefaultStickerGrid();
         }
 
+        // 마지막 인덱스가 범위를 벗어나면 0으로 초기화
+        if (_lastStickerPackIndex >= stickerPacks.length) {
+          _lastStickerPackIndex = 0;
+        }
+
         // 카카오톡 스타일: 스티커팩별 탭으로 구분
         return DefaultTabController(
           length: stickerPacks.length,
-          child: Column(
-            children: [
-              // 스티커팩 탭 (상단)
-              TabBar(
-                isScrollable: true,
-                labelColor: Colors.black87,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Theme.of(stickerContext).primaryColor,
-                indicatorWeight: 3,
-                labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                unselectedLabelStyle: const TextStyle(fontSize: 13),
-                tabs: stickerPacks.map((pack) {
-                  final data = pack.data() as Map<String, dynamic>;
-                  final packName = data['pack_name'] as String? ?? '스티커팩';
-                  return Tab(text: packName);
-                }).toList(),
-              ),
+          initialIndex: _lastStickerPackIndex, // 🎨 마지막 사용한 탭으로 시작
+          child: Builder(
+            builder: (BuildContext tabContext) {
+              // 탭 변경 감지
+              final tabController = DefaultTabController.of(tabContext);
+              tabController.addListener(() {
+                if (!tabController.indexIsChanging) {
+                  // 탭이 변경되면 현재 인덱스 저장
+                  setState(() {
+                    _lastStickerPackIndex = tabController.index;
+                  });
+                  debugPrint('🎨 스티커 팩 탭 변경: ${tabController.index}');
+                }
+              });
               
-              const Divider(height: 1, thickness: 1),
-              
-              // 스티커팩별 그리드 (하단)
-              Expanded(
-                child: TabBarView(
+              return Column(
+                children: [
+                  // 스티커팩 탭 (상단)
+                  TabBar(
+                    isScrollable: true,
+                    labelColor: Colors.black87,
+                    unselectedLabelColor: Colors.grey,
+                    indicatorColor: Theme.of(stickerContext).primaryColor,
+                    indicatorWeight: 3,
+                    labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    unselectedLabelStyle: const TextStyle(fontSize: 13),
+                    tabs: stickerPacks.map((pack) {
+                      final data = pack.data() as Map<String, dynamic>;
+                      final packName = data['pack_name'] as String? ?? '스티커팩';
+                      return Tab(text: packName);
+                    }).toList(),
+                  ),
+                  
+                  const Divider(height: 1, thickness: 1),
+                  
+                  // 스티커팩별 그리드 (하단)
+                  Expanded(
+                    child: TabBarView(
                   children: stickerPacks.map((pack) {
                     final data = pack.data() as Map<String, dynamic>;
                     final stickers = data['stickers'] as List<dynamic>? ?? [];
@@ -674,7 +697,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 ),
               ),
             ],
-          ),
+          );
+        },
+      ),
         );
       },
     );

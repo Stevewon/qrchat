@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Group Chat Reward System Integrated v1.0.61"
+description: "QRChat - Remember Last Used Sticker Pack v1.0.62"
 publish_to: 'none'
 
-version: 1.0.61+161
+version: 1.0.62+162
 
 environment:
   sdk: ^3.9.2
