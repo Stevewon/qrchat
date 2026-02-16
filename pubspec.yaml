@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Add Privacy Policy v1.0.58"
+description: "QRChat - Group Chat Reward System v1.0.59"
 publish_to: 'none'
 
-version: 1.0.58+158
+version: 1.0.59+159
 
 environment:
   sdk: ^3.9.2
