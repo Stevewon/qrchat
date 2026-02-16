@@ -878,6 +878,50 @@
         </div>
     </div>
 
+    <!-- QR URL 수정 모달 -->
+    <div id="qrUrlEditModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">🔗 QR URL 수정</div>
+            <div class="modal-body">
+                <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="color: #92400e; font-size: 13px; margin: 0;">
+                        ⚠️ <strong>주의:</strong> QR URL은 Securet 통화 기능에 필수입니다. 잘못된 URL을 입력하면 통화가 불가능합니다.
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">사용자</label>
+                    <p id="qrUrlEditUserInfo" style="padding: 10px; background: #f9fafb; border-radius: 8px; margin: 0;">
+                        <strong id="qrUrlEditNickname">-</strong><br>
+                        <code id="qrUrlEditUserId" style="font-size: 11px; color: #6b7280;">-</code>
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">현재 QR URL</label>
+                    <code id="currentQrUrlDisplay" style="display: block; padding: 10px; background: #f9fafb; border-radius: 8px; font-size: 12px; color: #6b7280; word-break: break-all;">-</code>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">새 QR URL <span style="color: #ef4444;">*</span></label>
+                    <textarea id="newQrUrlInput" rows="3" placeholder="https://securet.kr/securet.php?key=idcard&amp;nick=...&amp;token=...&amp;voip=...&amp;os=android"
+                              style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; resize: vertical; font-family: monospace; font-size: 12px;"></textarea>
+                    <p style="color: #6b7280; font-size: 12px; margin: 5px 0 0 0;">✅ https://securet.kr로 시작하는 전체 URL을 입력하세요</p>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">수정 사유</label>
+                    <input type="text" id="qrUrlEditReason" placeholder="예: 통화 불가 문제 해결, QR URL 누락"
+                           style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeQrUrlEditModal()">취소</button>
+                <button class="btn btn-primary" onclick="applyQrUrlUpdate()">✅ 수정 적용</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -2072,8 +2116,10 @@
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <p style="font-weight: 600; margin-bottom: 8px;">🔗 QR URL</p>
-                        <code style="font-size: 12px; color: #667eea; word-break: break-all;">${user.qrUrl || '정보 없음'}</code>
+                        <p style="font-weight: 600; margin-bottom: 8px;">🔗 QR URL 
+                            <button onclick="editUserQrUrl('${userId}')" style="padding: 4px 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px;">✏️ 수정</button>
+                        </p>
+                        <code style="font-size: 12px; color: ${user.qrUrl ? '#667eea' : '#ef4444'}; word-break: break-all;">${user.qrUrl || '❌ 정보 없음 (통화 불가)'}</code>
                     </div>
                     
                     <div>
@@ -2167,6 +2213,105 @@
             } catch (error) {
                 console.error('Error adjusting QKEY:', error);
                 alert('QKEY 조정 실패: ' + error.message);
+            }
+        };
+
+        // QR URL 수정 모달 열기
+        window.editUserQrUrl = async (userId) => {
+            try {
+                const userDoc = await getDoc(doc(db, 'users', userId));
+                
+                if (!userDoc.exists()) {
+                    alert('사용자를 찾을 수 없습니다');
+                    return;
+                }
+                
+                const user = userDoc.data();
+                window.currentUserDetail = { id: userId, ...user };
+                
+                // 모달 정보 표시
+                document.getElementById('qrUrlEditNickname').textContent = user.nickname || '알 수 없음';
+                document.getElementById('qrUrlEditUserId').textContent = userId;
+                document.getElementById('currentQrUrlDisplay').textContent = user.qrUrl || '❌ 정보 없음 (통화 불가)';
+                document.getElementById('currentQrUrlDisplay').style.color = user.qrUrl ? '#667eea' : '#ef4444';
+                document.getElementById('newQrUrlInput').value = user.qrUrl || '';
+                document.getElementById('qrUrlEditReason').value = '';
+                
+                document.getElementById('qrUrlEditModal').classList.add('show');
+            } catch (error) {
+                console.error('Error loading user for QR edit:', error);
+                alert('사용자 정보 로드 실패: ' + error.message);
+            }
+        };
+
+        // QR URL 수정 모달 닫기
+        window.closeQrUrlEditModal = () => {
+            document.getElementById('qrUrlEditModal').classList.remove('show');
+            window.currentUserDetail = null;
+        };
+
+        // QR URL 수정 적용
+        window.applyQrUrlUpdate = async () => {
+            if (!window.currentUserDetail) return;
+            
+            const userId = window.currentUserDetail.id;
+            const newQrUrl = document.getElementById('newQrUrlInput').value.trim();
+            const reason = document.getElementById('qrUrlEditReason').value.trim();
+            
+            // 검증
+            if (!newQrUrl) {
+                alert('새 QR URL을 입력하세요');
+                return;
+            }
+            
+            if (!newQrUrl.startsWith('https://securet.kr') && !newQrUrl.startsWith('http://securet.kr')) {
+                alert('⚠️ 올바른 Securet URL이 아닙니다\n\nhttps://securet.kr로 시작하는 전체 URL을 입력하세요');
+                return;
+            }
+            
+            if (!reason) {
+                alert('수정 사유를 입력하세요');
+                return;
+            }
+            
+            try {
+                const oldQrUrl = window.currentUserDetail.qrUrl || '';
+                
+                // Firestore 업데이트
+                await updateDoc(doc(db, 'users', userId), {
+                    qrUrl: newQrUrl,
+                    qrCodeUrl: newQrUrl,  // 일관성 유지
+                    qrUrlUpdatedAt: Timestamp.now(),
+                    qrUrlUpdatedBy: window.currentUser.email,
+                    qrUrlUpdateReason: reason
+                });
+                
+                // 수정 로그 기록
+                await addDoc(collection(db, 'qr_url_update_logs'), {
+                    userId: userId,
+                    nickname: window.currentUserDetail.nickname,
+                    oldQrUrl: oldQrUrl,
+                    newQrUrl: newQrUrl,
+                    reason: reason,
+                    timestamp: Timestamp.now(),
+                    adminEmail: window.currentUser.email
+                });
+                
+                alert(`✅ QR URL이 수정되었습니다\n\n사용자: ${window.currentUserDetail.nickname}\n이제 통화 기능을 사용할 수 있습니다.`);
+                closeQrUrlEditModal();
+                
+                // 사용자 목록 새로고침
+                if (document.getElementById('usersSection').style.display !== 'none') {
+                    loadUsers();
+                }
+                
+                // 상세 모달이 열려있으면 새로고침
+                if (document.getElementById('userDetailModal').classList.contains('show')) {
+                    viewUserDetail(userId);
+                }
+            } catch (error) {
+                console.error('Error updating QR URL:', error);
+                alert('QR URL 수정 실패: ' + error.message);
             }
         };
 
@@ -2354,6 +2499,11 @@
             const qkeyModal = document.getElementById('qkeyAdjustModal');
             if (event.target === qkeyModal) {
                 closeQkeyAdjustModal();
+            }
+            
+            const qrUrlModal = document.getElementById('qrUrlEditModal');
+            if (event.target === qrUrlModal) {
+                closeQrUrlEditModal();
             }
         };
     </script>
