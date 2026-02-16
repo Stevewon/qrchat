@@ -67,44 +67,46 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.qr_code_2,
-                size: 120,
-                color: Colors.white,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'QRChat',
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.qr_code_2,
+                  size: 120,
                   color: Colors.white,
-                  letterSpacing: 2,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _version,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
+                const SizedBox(height: 24),
+                const Text(
+                  'QRChat',
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 2,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Powered by Securet',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white60,
+                const SizedBox(height: 8),
+                Text(
+                  _version,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                const Text(
+                  'Powered by Securet',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
