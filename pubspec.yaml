@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Adjust Friend Invite Rewards v1.0.54"
+description: "QRChat - Fix Invite Screen SafeArea v1.0.55"
 publish_to: 'none'
 
-version: 1.0.54+154
+version: 1.0.55+155
 
 environment:
   sdk: ^3.9.2

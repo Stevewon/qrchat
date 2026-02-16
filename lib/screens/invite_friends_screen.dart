@@ -149,9 +149,10 @@ $_appDownloadUrl
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 60), // 하단 여백 60px 추가
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // 상단 일러스트 및 설명
@@ -434,9 +435,13 @@ $_appDownloadUrl
                       ],
                     ),
                   ),
+                  
+                  // 하단 여백 추가
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
+          ),
     );
   }
 
