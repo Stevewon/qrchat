@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Add Message Delete Feature v1.0.23"
+description: "QRChat - Fix QKEY Transaction Type Cast Error v1.0.52"
 publish_to: 'none'
 
-version: 1.0.50+150
+version: 1.0.52+152
 
 environment:
   sdk: ^3.9.2

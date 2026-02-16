@@ -56,6 +56,10 @@ class QKeyTransaction {
 
   /// JSON에서 생성
   factory QKeyTransaction.fromJson(Map<String, dynamic> json, String id) {
+    // amount와 balanceAfter의 null 안전성 처리
+    final amount = json['amount'];
+    final balanceAfter = json['balanceAfter'];
+    
     return QKeyTransaction(
       id: id,
       userId: json['userId'] as String,
@@ -63,8 +67,8 @@ class QKeyTransaction {
         (e) => e.toString().split('.').last == json['type'],
         orElse: () => QKeyTransactionType.earn,
       ),
-      amount: json['amount'] as int,
-      balanceAfter: json['balanceAfter'] as int,
+      amount: amount is int ? amount : (amount is double ? amount.toInt() : 0),
+      balanceAfter: balanceAfter is int ? balanceAfter : (balanceAfter is double ? balanceAfter.toInt() : 0),
       timestamp: (json['timestamp'] as Timestamp).toDate(),
       description: json['description'] as String?,
       withdrawStatus: json['withdrawStatus'] != null

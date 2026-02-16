@@ -2197,10 +2197,11 @@
                     qkeyBalance: newBalance
                 });
                 
-                // 거래 내역 추가
+                // 거래 내역 추가 (balanceAfter 포함)
                 await addDoc(collection(db, 'qkey_transactions'), {
                     userId: userId,
                     amount: adjustAmount,
+                    balanceAfter: newBalance,  // ✅ 추가: 거래 후 잔액
                     type: type === 'add' ? 'admin_grant' : 'admin_deduct',
                     reason: reason,
                     timestamp: Timestamp.now(),
