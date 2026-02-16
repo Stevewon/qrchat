@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - SafeArea Applied to All Screens v1.0.60"
+description: "QRChat - Group Chat Reward System Integrated v1.0.61"
 publish_to: 'none'
 
-version: 1.0.60+160
+version: 1.0.61+161
 
 environment:
   sdk: ^3.9.2

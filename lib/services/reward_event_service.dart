@@ -16,8 +16,11 @@ class RewardEventService {
   /// Firestore 컬렉션 이름
   static const String _collectionName = 'reward_events';
 
-  /// 대화 추적 맵 (chatRoomId -> 마지막 메시지 시간)
-  static final Map<String, DateTime> _chatActivity = {};
+  /// 대화 시작 시간 추적 맵 (chatRoomId -> 대화 시작 시간)
+  static final Map<String, DateTime> _chatStartTime = {};
+
+  /// 마지막 메시지 시간 (chatRoomId -> 마지막 메시지 시간)
+  static final Map<String, DateTime> _lastMessageTime = {};
 
   /// 이벤트 생성 쿨다운 (chatRoomId -> 마지막 이벤트 생성 시간)
   static final Map<String, DateTime> _eventCooldown = {};
@@ -64,23 +67,29 @@ class RewardEventService {
 
       // 2. 대화 활동 기록
       final now = DateTime.now();
-      final lastActivity = _chatActivity[chatRoomId];
+      final startTime = _chatStartTime[chatRoomId];
+      final lastMessage = _lastMessageTime[chatRoomId];
 
-      if (lastActivity == null) {
-        // 첫 메시지
-        _chatActivity[chatRoomId] = now;
-        debugPrint('🎁 채팅방 $chatRoomId 대화 시작');
+      // 첫 메시지이거나 10분 이상 대화가 끊긴 경우 새로운 대화 세션 시작
+      if (startTime == null || (lastMessage != null && now.difference(lastMessage).inMinutes > 10)) {
+        _chatStartTime[chatRoomId] = now;
+        _lastMessageTime[chatRoomId] = now;
+        debugPrint('🎁 채팅방 $chatRoomId 대화 시작 (${now.toString().substring(11, 19)})');
         return;
       }
 
-      // 3. 대화 지속 시간 체크
-      final duration = now.difference(lastActivity).inSeconds;
-      _chatActivity[chatRoomId] = now;
+      // 마지막 메시지 시간 업데이트
+      _lastMessageTime[chatRoomId] = now;
 
-      if (duration < conversationDuration) {
-        debugPrint('🎁 대화 지속 ${duration}초 (${conversationDuration}초 필요)');
+      // 3. 대화 지속 시간 체크 (대화 시작 시간부터 현재까지)
+      final totalDuration = now.difference(startTime).inSeconds;
+
+      if (totalDuration < conversationDuration) {
+        debugPrint('🎁 대화 지속 ${totalDuration}초 / ${conversationDuration}초 필요 (시작: ${startTime.toString().substring(11, 19)})');
         return;
       }
+
+      debugPrint('✅ 대화 ${totalDuration}초 지속! 보상 이벤트 조건 충족');
 
       // 4. 쿨다운 체크
       final lastEvent = _eventCooldown[chatRoomId];
@@ -194,13 +203,23 @@ class RewardEventService {
         return event.rewardAmount;
       });
 
-      // QKEY 지급 (bonus 타입으로 기록)
-      await QKeyService.addQKey(
-        userId: user.id,
-        amount: result,
-        type: 'bonus',
-        description: '🎁 그룹 채팅 보상 이벤트',
-      );
+      // QKEY 지급 (직접 Firestore에 기록)
+      final userRef = FirebaseFirestore.instance.collection('users').doc(user.id);
+      final transactionsRef = FirebaseFirestore.instance.collection('qkey_transactions');
+      
+      // 사용자 잔액 업데이트
+      await userRef.update({
+        'qkeyBalance': FieldValue.increment(result),
+      });
+      
+      // 트랜잭션 기록 추가
+      await transactionsRef.add({
+        'userId': user.id,
+        'amount': result,
+        'type': 'bonus',
+        'description': '🎁 그룹 채팅 보상 이벤트',
+        'timestamp': Timestamp.now(),
+      });
 
       debugPrint('✅ ${user.nickname}님이 ${result} QKEY 획득!');
       return true;

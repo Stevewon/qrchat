@@ -22,6 +22,9 @@ import '../services/app_badge_service.dart';
 import '../services/safe_browsing_service.dart';
 import '../services/chat_state_service.dart';
 import '../services/qkey_service.dart';
+import '../models/reward_event.dart';
+import '../services/reward_event_service.dart';
+import '../widgets/floating_reward_orb.dart';
 import '../widgets/invite_friends_dialog.dart'; // ⭐ 초대 다이얼로그
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/url_launcher.dart' as url_launcher;
@@ -71,6 +74,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   
   // 동영상 썸네일 캐시 (URL → 로컬 파일 경로)
   final Map<String, String?> _thumbnailCache = {};
+  
+  // 🎁 보상 이벤트 관련
+  List<RewardEvent> _activeRewardEvents = [];
+  StreamSubscription<List<RewardEvent>>? _rewardEventsSubscription;
+  bool _showClaimedAnimation = false;
+  int _claimedAmount = 0;
 
   @override
   void initState() {
@@ -92,6 +101,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _initializeChat();
+        _listenToRewardEvents(); // 🎁 보상 이벤트 리스너 시작
       }
     });
   }
@@ -144,6 +154,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     _scrollController.dispose();
     _messagesSubscription?.cancel();
     _chatRoomSubscription?.cancel();
+    _rewardEventsSubscription?.cancel(); // 🎁 보상 이벤트 구독 해제
     
     super.dispose();
   }
@@ -282,6 +293,22 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
+  /// 🎁 보상 이벤트 스트림 구독
+  void _listenToRewardEvents() {
+    _rewardEventsSubscription = RewardEventService
+        .getActiveEvents(widget.chatRoom.id)
+        .listen((events) {
+      if (mounted) {
+        setState(() {
+          _activeRewardEvents = events;
+        });
+        if (events.isNotEmpty) {
+          debugPrint('🎁 활성 보상 이벤트 ${events.length}개');
+        }
+      }
+    });
+  }
+
   /// 메시지 읽음 처리 (1:1과 동일)
   Future<void> _markMessagesAsRead() async {
     try {
@@ -321,6 +348,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       );
 
       debugPrint('✅ [메시지 전송] 성공');
+      
+      // 🎁 그룹 보상 이벤트 트리거
+      await RewardEventService.onMessageSent(
+        chatRoomId: widget.chatRoom.id,
+        participantCount: widget.chatRoom.participantIds.length,
+      );
       
       // 🎁 QKEY 채굴 시도 (방장만, 대화 후 5분, 하루 3회)
       try {
@@ -1236,10 +1269,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            // 그룹 채팅 참여자 안내 (일대일 채팅 스타일)
-            Container(
+            // 기존 Column (메시지 목록 + 입력창)
+            Column(
+              children: [
+                // 그룹 채팅 참여자 안내 (일대일 채팅 스타일)
+                Container(
             padding: const EdgeInsets.all(12),
             color: Colors.teal.withValues(alpha: 0.05),
             child: Row(
@@ -1268,13 +1304,81 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                     : _buildMessageList(),
           ),
 
-            // 입력 영역
-            _buildInputArea(),
-          ],
+              // 입력 영역
+              _buildInputArea(),
+            ],
+          ),
+          
+          // 🎁 보상 이벤트 구체들
+          ..._activeRewardEvents.map((event) => FloatingRewardOrb(
+            key: Key(event.id),
+            event: event,
+            onTap: () => _handleRewardClaim(event),
+          )),
+          
+          // 🎉 보상 획득 애니메이션
+          if (_showClaimedAnimation)
+            Center(
+              child: RewardClaimedAnimation(
+                amount: _claimedAmount,
+                onComplete: () {
+                  if (mounted) {
+                    setState(() {
+                      _showClaimedAnimation = false;
+                    });
+                  }
+                },
+              ),
+            ),
+        ],
         ),
       ),
       ),
     );
+  }
+
+  /// 🎁 보상 획득 처리
+  Future<void> _handleRewardClaim(RewardEvent event) async {
+    try {
+      final currentUser = await SecuretAuthService.getCurrentUser();
+      if (currentUser == null) return;
+
+      final success = await RewardEventService.claimReward(
+        eventId: event.id,
+        user: currentUser,
+      );
+
+      if (success && mounted) {
+        // 획득 애니메이션 표시
+        setState(() {
+          _showClaimedAnimation = true;
+          _claimedAmount = event.rewardAmount;
+        });
+
+        // 햅틱 피드백
+        HapticFeedback.heavyImpact();
+
+        // 알림음 재생
+        try {
+          final player = AudioPlayer();
+          await player.setVolume(0.8);
+          await player.play(AssetSource('sounds/coin_earn.mp3'));
+        } catch (e) {
+          debugPrint('⚠️ 보상 알림음 재생 실패: $e');
+        }
+      } else if (mounted) {
+        // 실패 시 스낵바
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('⚠️ 이미 다른 사용자가 획득했거나 만료되었습니다'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ 보상 획득 오류: $e');
+    }
   }
 
   /// 참여자 이름 표시 (일대일 채팅 스타일)
