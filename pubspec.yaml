@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Remember Last Used Sticker Pack v1.0.62"
+description: "QRChat - Fix Sticker Pack Memory v1.0.63"
 publish_to: 'none'
 
-version: 1.0.62+162
+version: 1.0.63+163
 
 environment:
   sdk: ^3.9.2

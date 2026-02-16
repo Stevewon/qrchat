@@ -579,24 +579,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         return DefaultTabController(
           length: stickerPacks.length,
           initialIndex: _lastStickerPackIndex, // 🎨 마지막 사용한 탭으로 시작
-          child: Builder(
-            builder: (BuildContext tabContext) {
-              // 탭 변경 감지
-              final tabController = DefaultTabController.of(tabContext);
-              tabController.addListener(() {
-                if (!tabController.indexIsChanging) {
-                  // 탭이 변경되면 현재 인덱스 저장
-                  setState(() {
-                    _lastStickerPackIndex = tabController.index;
-                  });
-                  debugPrint('🎨 스티커 팩 탭 변경: ${tabController.index}');
-                }
-              });
-              
-              return Column(
-                children: [
-                  // 스티커팩 탭 (상단)
-                  TabBar(
+          child: Column(
+            children: [
+              // 스티커팩 탭 (상단)
+              TabBar(
                     isScrollable: true,
                     labelColor: Colors.black87,
                     unselectedLabelColor: Colors.grey,
@@ -644,6 +630,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         
                         return GestureDetector(
                           onTap: () {
+                            // 🎨 스티커 선택 시 현재 탭 인덱스 저장
+                            final tabController = DefaultTabController.of(context);
+                            setState(() {
+                              _lastStickerPackIndex = tabController.index;
+                            });
+                            debugPrint('🎨 스티커 선택 - 현재 탭 저장: $_lastStickerPackIndex');
+                            
                             Navigator.pop(stickerContext);
                             _sendSticker(imageUrl);
                           },
@@ -697,9 +690,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 ),
               ),
             ],
-          );
-        },
-      ),
+          ),
         );
       },
     );
