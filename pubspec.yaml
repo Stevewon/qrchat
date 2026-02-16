@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Fix Sticker Pack Memory v1.0.63"
+description: "QRChat - Improved Password Recovery UI v1.0.64"
 publish_to: 'none'
 
-version: 1.0.63+163
+version: 1.0.64+164
 
 environment:
   sdk: ^3.9.2

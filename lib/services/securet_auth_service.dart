@@ -138,18 +138,36 @@ class SecuretAuthService {
     }
 
     try {
+      if (kDebugMode) {
+        debugPrint('🔍 닉네임 찾기 시작...');
+        debugPrint('   QR URL: $qrUrl');
+      }
+      
       final querySnapshot = await _firestore
           .collection('users')
           .where('qrCodeUrl', isEqualTo: qrUrl)
           .limit(1)
           .get();
 
+      if (kDebugMode) {
+        debugPrint('   검색 결과: ${querySnapshot.docs.length}개');
+      }
+
       if (querySnapshot.docs.isEmpty) {
+        if (kDebugMode) {
+          debugPrint('❌ QR URL로 사용자를 찾을 수 없습니다');
+        }
         return null;
       }
 
       final userData = querySnapshot.docs.first.data();
-      return userData['nickname'] ?? '';
+      final nickname = userData['nickname'] ?? '';
+      
+      if (kDebugMode) {
+        debugPrint('✅ 닉네임 찾기 성공: $nickname');
+      }
+      
+      return nickname;
     } catch (e) {
       if (kDebugMode) {
         debugPrint('❌ 닉네임 찾기 오류: $e');
@@ -165,18 +183,36 @@ class SecuretAuthService {
     }
 
     try {
+      if (kDebugMode) {
+        debugPrint('🔍 비밀번호 찾기 시작...');
+        debugPrint('   QR URL: $qrUrl');
+      }
+      
       final querySnapshot = await _firestore
           .collection('users')
           .where('qrCodeUrl', isEqualTo: qrUrl)
           .limit(1)
           .get();
 
+      if (kDebugMode) {
+        debugPrint('   검색 결과: ${querySnapshot.docs.length}개');
+      }
+
       if (querySnapshot.docs.isEmpty) {
+        if (kDebugMode) {
+          debugPrint('❌ QR URL로 사용자를 찾을 수 없습니다');
+        }
         return null;
       }
 
       final userData = querySnapshot.docs.first.data();
-      return userData['password'] ?? '';
+      final password = userData['password'] ?? '';
+      
+      if (kDebugMode) {
+        debugPrint('✅ 비밀번호 찾기 성공: ${password.replaceAll(RegExp(r'.'), '*')} (${password.length}자)');
+      }
+      
+      return password;
     } catch (e) {
       if (kDebugMode) {
         debugPrint('❌ 비밀번호 찾기 오류: $e');

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Clipboard
 import 'package:package_info_plus/package_info_plus.dart';
 import '../services/securet_auth_service.dart';
 import 'home_screen.dart';
@@ -163,44 +164,99 @@ class _LoginScreenState extends State<LoginScreen> {
         });
 
         if (nickname != null && nickname.isNotEmpty) {
+          // ✅ 성공 팝업
           await showDialog(
             context: context,
+            barrierDismissible: false,
             builder: (context) => AlertDialog(
-              title: const Text('✅ 닉네임을 찾았습니다'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              backgroundColor: Colors.white,
+              title: Row(
                 children: [
-                  const Text('가입된 닉네임:'),
-                  const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.green.withOpacity(0.1),
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(Icons.check_circle, color: Colors.green, size: 32),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
                     child: Text(
-                      nickname,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
+                      '닉네임을 찾았습니다!',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
               ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    '가입된 닉네임:',
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue.shade50, Colors.blue.shade100],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue.shade300, width: 2),
+                    ),
+                    child: SelectableText(
+                      nickname,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '위 닉네임을 복사하거나 기억해두세요',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
               actions: [
-                TextButton(
+                TextButton.icon(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: nickname));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('📋 닉네임이 클립보드에 복사되었습니다'),
+                        duration: Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.copy),
+                  label: const Text('복사'),
+                ),
+                TextButton.icon(
                   onPressed: () {
                     Navigator.pop(context);
                     setState(() {
                       _nicknameController.text = nickname;
                     });
                   },
-                  child: const Text('입력하고 닫기'),
+                  icon: const Icon(Icons.input),
+                  label: const Text('입력하기'),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
                   child: const Text('확인'),
                 ),
               ],
@@ -292,44 +348,99 @@ class _LoginScreenState extends State<LoginScreen> {
         });
 
         if (password != null && password.isNotEmpty) {
+          // ✅ 성공 팝업
           await showDialog(
             context: context,
+            barrierDismissible: false,
             builder: (context) => AlertDialog(
-              title: const Text('✅ 비밀번호를 찾았습니다'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              backgroundColor: Colors.white,
+              title: Row(
                 children: [
-                  const Text('가입된 비밀번호:'),
-                  const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.green.withOpacity(0.1),
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(Icons.check_circle, color: Colors.green, size: 32),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
                     child: Text(
-                      password,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
+                      '비밀번호를 찾았습니다!',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
               ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    '가입된 비밀번호:',
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.orange.shade50, Colors.orange.shade100],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange.shade300, width: 2),
+                    ),
+                    child: SelectableText(
+                      password,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '위 비밀번호를 복사하거나 기억해두세요',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
               actions: [
-                TextButton(
+                TextButton.icon(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: password));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('📋 비밀번호가 클립보드에 복사되었습니다'),
+                        duration: Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.copy),
+                  label: const Text('복사'),
+                ),
+                TextButton.icon(
                   onPressed: () {
                     Navigator.pop(context);
                     setState(() {
                       _passwordController.text = password;
                     });
                   },
-                  child: const Text('입력하고 닫기'),
+                  icon: const Icon(Icons.input),
+                  label: const Text('입력하기'),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
                   child: const Text('확인'),
                 ),
               ],
