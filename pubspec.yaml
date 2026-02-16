@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Fix QKEY Transaction Type Cast Error v1.0.52"
+description: "QRChat - Add Friend Invite Feature v1.0.53"
 publish_to: 'none'
 
-version: 1.0.52+152
+version: 1.0.53+153
 
 environment:
   sdk: ^3.9.2

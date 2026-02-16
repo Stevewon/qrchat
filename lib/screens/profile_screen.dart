@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'dart:io';
 import '../services/securet_auth_service.dart';
-// import '../screens/invite_friends_screen.dart'; // 파일 없음 - 임시 비활성화
+import 'invite_friends_screen.dart';
 import '../services/notification_service.dart';
 import '../services/qkey_service.dart';
 import '../models/securet_user.dart';
@@ -769,6 +769,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const WalletSettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    
+                    const Divider(height: 1, indent: 56),
+                    
+                    // 친구 초대
+                    ListTile(
+                      leading: const Icon(
+                        Icons.person_add,
+                        color: Color(0xFF667eea),
+                      ),
+                      title: const Text('친구 초대', style: TextStyle(fontSize: 16)),
+                      subtitle: const Text(
+                        '친구를 초대하고 QKEY 받기',
+                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                      onTap: () {
+                        Navigator.pop(context); // 바텀시트 닫기
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const InviteFriendsScreen(),
                           ),
                         );
                       },
