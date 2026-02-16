@@ -205,7 +205,7 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        _currentBalance.toStringAsFixed(0),
+                        _currentBalance.toString(),
                         style: const TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
