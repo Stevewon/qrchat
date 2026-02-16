@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import '../services/securet_auth_service.dart';
+import '../constants/app_colors.dart';
 
 /// 친구 초대 화면
 /// 
@@ -159,18 +160,11 @@ $_appDownloadUrl
                   Container(
                     padding: const EdgeInsets.all(32),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF667eea),
-                          Color(0xFF764ba2),
-                        ],
-                      ),
+                      gradient: AppColors.headerGradient,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF667eea).withOpacity(0.3),
+                          color: AppColors.primary.withOpacity(0.3),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),

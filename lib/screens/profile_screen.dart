@@ -13,6 +13,7 @@ import '../models/securet_user.dart';
 import '../models/qkey_transaction.dart';
 import 'login_screen.dart';
 import 'my_qr_code_screen.dart';
+import '../constants/app_colors.dart';
 import 'admin_qkey_screen.dart';
 // import 'sticker_pack_management_screen.dart'; // 웹 어드민에서만 관리
 import 'qkey_history_screen.dart';
@@ -258,7 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             '최소 출금 가능 금액은 ${QKeyService.withdrawMinAmount} QKEY입니다.\n'
             '(현재 잔액: $_qkeyBalance QKEY)'
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;

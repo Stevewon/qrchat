@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/app_colors.dart';
 import 'dart:async';
 import '../models/chat_room.dart';
 import '../models/securet_user.dart';
@@ -57,7 +58,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('사용자 정보 로딩 실패: $e'),
-            backgroundColor: Colors.orange[700],
+            backgroundColor: AppColors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -96,7 +97,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('채팅 목록 로딩 실패: $error'),
-              backgroundColor: Colors.orange[700],
+              backgroundColor: AppColors.warning,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -142,7 +143,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('채팅 목록 로딩 실패: $e'),
-            backgroundColor: Colors.orange[700],
+            backgroundColor: AppColors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -158,7 +159,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('채팅'),
-        backgroundColor: Colors.teal,
+        backgroundColor: AppColors.primary,
         actions: [
           // 그룹 채팅 생성 버튼
           IconButton(
@@ -237,7 +238,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         icon: const Icon(Icons.people),
                         label: const Text('친구 목록 보기'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
+                          backgroundColor: AppColors.primary,
                         ),
                       ),
                     ],
@@ -338,7 +339,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   return Stack(
                     children: [
                       CircleAvatar(
-                        backgroundColor: room.isSecuret ? Colors.red : Colors.teal,
+                        backgroundColor: room.isSecuret ? Colors.red : AppColors.primary,
                         radius: 28,
                         backgroundImage: snapshot.hasData && 
                                        snapshot.data != null && 
@@ -384,7 +385,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             : Stack(
                 children: [
                   CircleAvatar(
-                    backgroundColor: room.isSecuret ? Colors.red : Colors.teal,
+                    backgroundColor: room.isSecuret ? Colors.red : AppColors.primary,
                     radius: 28,
                     child: Icon(
                       room.type == ChatRoomType.group ? Icons.group : Icons.person,
@@ -458,7 +459,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: room.isSecuret ? Colors.red : Colors.teal,
+                  color: room.isSecuret ? Colors.red : AppColors.primary,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
@@ -547,7 +548,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('채팅방 나가기 실패'),
-              backgroundColor: Colors.orange[700],
+              backgroundColor: AppColors.warning,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -561,7 +562,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('오류 발생: $e'),
-            backgroundColor: Colors.orange[700],
+            backgroundColor: AppColors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),

@@ -10,6 +10,7 @@ import 'profile_screen.dart';
 import '../services/securet_auth_service.dart';
 import '../services/firebase_notification_service.dart';
 import '../services/qkey_service.dart';
+import '../constants/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -125,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          backgroundColor: const Color(0xFFFFB300),
+          backgroundColor: AppColors.badge,
           duration: const Duration(seconds: 3),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),

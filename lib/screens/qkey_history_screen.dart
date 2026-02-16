@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../models/qkey_transaction.dart';
 import '../services/qkey_service.dart';
 import '../services/securet_auth_service.dart';
+import '../constants/app_colors.dart';
 
 /// 사용자 QKEY 채굴 내역 화면
 class QKeyHistoryScreen extends StatefulWidget {
@@ -87,7 +88,7 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
           'QKEY 채굴 내역',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFFFFB300),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         bottom: TabBar(
@@ -170,15 +171,11 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFB300), Color(0xFFFFA000)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppColors.qkeyGradient,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFFB300).withOpacity(0.3),
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/securet_auth_service.dart';
 import '../models/securet_user.dart';
+import '../constants/app_colors.dart';
 
 /// 지갑 설정 화면
 /// - 1회 입력 후 변경 불가
@@ -93,7 +94,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('❌ 지갑 주소를 입력해주세요'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -112,7 +113,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
             '• 0-9, a-f, A-F만 포함해야 합니다\n\n'
             '예: 0xE0c166B147a742E4FbCf5e5BCf73aCA631f14f0e',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
           duration: const Duration(seconds: 5),
         ),
       );
@@ -220,7 +221,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: AppColors.primary,
             ),
             child: const Text('확인 및 등록'),
           ),
@@ -252,7 +253,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('✅ 지갑 주소가 등록되었습니다'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
       }
@@ -262,7 +263,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('등록 실패: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }

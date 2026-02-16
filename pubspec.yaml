@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Fix Invite Screen SafeArea v1.0.55"
+description: "QRChat - Color Consistency Update v1.0.56"
 publish_to: 'none'
 
-version: 1.0.55+155
+version: 1.0.56+156
 
 environment:
   sdk: ^3.9.2
