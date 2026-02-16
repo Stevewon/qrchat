@@ -217,7 +217,7 @@ $_appDownloadUrl
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text(
-                            '💰 친구 1명당 100 QKEY',
+                            '💰 친구 1명당 10 QKEY',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -381,9 +381,9 @@ $_appDownloadUrl
                         
                         const SizedBox(height: 16),
                         
-                        _buildBenefitItem('친구가 추천인 코드 입력 → 친구 50 QKEY 적립'),
+                        _buildBenefitItem('친구가 추천인 코드 입력 → 친구 5 QKEY 적립'),
                         const SizedBox(height: 8),
-                        _buildBenefitItem('친구가 첫 채팅 시작 → 나에게 100 QKEY 적립'),
+                        _buildBenefitItem('친구가 첫 채팅 시작 → 나에게 10 QKEY 적립'),
                         const SizedBox(height: 8),
                         _buildBenefitItem('초대 인원 제한 없음 (무제한 적립 가능)'),
                       ],
