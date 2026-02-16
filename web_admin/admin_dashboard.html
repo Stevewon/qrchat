@@ -1104,11 +1104,25 @@
                 const statusBadge = getStatusBadge(w.withdrawStatus);
                 const actions = getActionButtons(w);
                 
+                // 지갑 주소 복사 버튼 포함
+                const walletAddressCell = w.walletAddress 
+                    ? `
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <code style="font-size: 11px;">${w.walletAddress.substring(0, 12)}...</code>
+                            <button onclick="copyWalletAddress('${w.walletAddress}')" 
+                                    style="padding: 4px 8px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; white-space: nowrap;"
+                                    title="지갑 주소 복사">
+                                📋 복사
+                            </button>
+                        </div>
+                    `
+                    : '<span style="color: #9ca3af;">주소 없음</span>';
+                
                 tr.innerHTML = `
                     <td>${dateStr}</td>
                     <td><code>${w.userId.substring(0, 8)}...</code></td>
                     <td><strong>${Math.abs(w.amount).toLocaleString()} QKEY</strong></td>
-                    <td><code style="font-size: 11px;">${w.walletAddress?.substring(0, 12)}...</code></td>
+                    <td>${walletAddressCell}</td>
                     <td>${statusBadge}</td>
                     <td>${actions}</td>
                 `;
@@ -1179,7 +1193,15 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">지갑 주소</label>
-                    <div class="wallet-address">${withdrawal.walletAddress || 'N/A'}</div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div class="wallet-address" style="flex: 1;">${withdrawal.walletAddress || 'N/A'}</div>
+                        ${withdrawal.walletAddress ? `
+                            <button onclick="copyWalletAddress('${withdrawal.walletAddress}')" 
+                                    style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap;">
+                                📋 복사
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
                 ${withdrawal.description ? `
                 <div class="form-group">
@@ -1210,6 +1232,28 @@
             document.getElementById('modalTitle').textContent = '출금 신청 상세';
             document.getElementById('modalBody').innerHTML = html;
             document.getElementById('withdrawModal').classList.add('show');
+        };
+
+        // 지갑 주소 복사
+        window.copyWalletAddress = async (address) => {
+            try {
+                await navigator.clipboard.writeText(address);
+                
+                // 성공 메시지 표시
+                const originalBtn = event.target;
+                const originalText = originalBtn.textContent;
+                originalBtn.textContent = '✅ 복사됨!';
+                originalBtn.style.background = '#10b981';
+                
+                setTimeout(() => {
+                    originalBtn.textContent = originalText;
+                    originalBtn.style.background = '#667eea';
+                }, 2000);
+                
+            } catch (err) {
+                console.error('지갑 주소 복사 실패:', err);
+                alert('복사 실패: ' + err.message);
+            }
         };
 
         // 출금 승인
