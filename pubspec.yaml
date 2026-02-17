@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Remove Probability, Guaranteed Reward v1.0.68"
+description: "QRChat - Guaranteed Reward with 5min Cooldown v1.0.69"
 publish_to: 'none'
 
-version: 1.0.68+168
+version: 1.0.69+169
 
 environment:
   sdk: ^3.9.2

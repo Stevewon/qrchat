@@ -39,7 +39,7 @@ class RewardEventService {
   static const int eventExpiration = 30; // 30초
 
   /// 이벤트 생성 쿨다운 (초)
-  static const int eventCooldownSeconds = 60; // 1분 (이전: 5분)
+  static const int eventCooldownSeconds = 300; // 5분
 
   /// 최소 보상 QKEY
   static const int minReward = 1;
