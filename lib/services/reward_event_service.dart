@@ -85,7 +85,7 @@ class RewardEventService {
       // 📱 SharedPreferences에서 항상 확인! (메모리보다 우선!)
       try {
         final prefs = await SharedPreferences.getInstance();
-        final savedTimeMs = prefs.getInt('chat_start_$chatRoomId');
+        final savedTimeMs = prefs.getInt('chat_start_${chatRoomId}');
         debugPrint('🔍 [로컬 저장소] 저장된 값: $savedTimeMs');
         
         if (savedTimeMs != null) {

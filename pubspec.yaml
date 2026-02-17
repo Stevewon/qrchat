@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Always Load from SharedPreferences v1.0.73"
+description: "QRChat - Fixed SharedPreferences Key v1.0.74"
 publish_to: 'none'
 
-version: 1.0.73+173
+version: 1.0.74+174
 
 environment:
   sdk: ^3.9.2
