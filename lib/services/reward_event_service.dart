@@ -75,27 +75,45 @@ class RewardEventService {
       }
       debugPrint('✅ [조건 충족] 참여자 수: ${participantCount}명 >= ${minParticipants}명');
 
-      // 2. 대화 활동 기록 - SharedPreferences 우선!
+      // 2. 대화 활동 기록 - SharedPreferences에서 복원!
       final now = DateTime.now();
       DateTime? startTime = _chatStartTime[chatRoomId];
-      final lastMessage = _lastMessageTime[chatRoomId];
+      DateTime? lastMessage = _lastMessageTime[chatRoomId];
       
       debugPrint('🔍 [메모리 확인] startTime: ${startTime?.toString().substring(11, 19) ?? "없음"}');
+      debugPrint('🔍 [메모리 확인] lastMessage: ${lastMessage?.toString().substring(11, 19) ?? "없음"}');
       
-      // ✅ SharedPreferences에서 복원 시도 (앱 재시작/백그라운드 대비)
+      // ✅ SharedPreferences에서 startTime 복원
       if (startTime == null) {
         try {
           final prefs = await SharedPreferences.getInstance();
           final savedMs = prefs.getInt('chat_start_$chatRoomId');
           if (savedMs != null) {
             startTime = DateTime.fromMillisecondsSinceEpoch(savedMs);
-            _chatStartTime[chatRoomId] = startTime; // 메모리에 복원
-            debugPrint('📂 [복원 성공] SharedPreferences에서 로드: ${startTime.toString().substring(11, 19)}');
+            _chatStartTime[chatRoomId] = startTime;
+            debugPrint('📂 [startTime 복원] ${startTime.toString().substring(11, 19)}');
           } else {
-            debugPrint('📂 [복원 실패] SharedPreferences에 데이터 없음');
+            debugPrint('📂 [startTime] 저장된 데이터 없음');
           }
         } catch (e) {
-          debugPrint('❌ [복원 오류] SharedPreferences 로드 실패: $e');
+          debugPrint('❌ [startTime 복원 오류] $e');
+        }
+      }
+      
+      // ✅ SharedPreferences에서 lastMessage 복원
+      if (lastMessage == null) {
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          final savedMs = prefs.getInt('chat_last_$chatRoomId');
+          if (savedMs != null) {
+            lastMessage = DateTime.fromMillisecondsSinceEpoch(savedMs);
+            _lastMessageTime[chatRoomId] = lastMessage;
+            debugPrint('📂 [lastMessage 복원] ${lastMessage.toString().substring(11, 19)}');
+          } else {
+            debugPrint('📂 [lastMessage] 저장된 데이터 없음');
+          }
+        } catch (e) {
+          debugPrint('❌ [lastMessage 복원 오류] $e');
         }
       }
 
@@ -114,9 +132,10 @@ class RewardEventService {
         try {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setInt('chat_start_$chatRoomId', now.millisecondsSinceEpoch);
-          debugPrint('💾 [저장 성공] SharedPreferences에 저장: ${now.toString().substring(11, 19)}');
+          await prefs.setInt('chat_last_$chatRoomId', now.millisecondsSinceEpoch);
+          debugPrint('💾 [저장 성공] startTime & lastMessage 저장');
         } catch (e) {
-          debugPrint('❌ [저장 오류] SharedPreferences 저장 실패: $e');
+          debugPrint('❌ [저장 오류] $e');
         }
         
         debugPrint('🆕 [새 세션] 첫 메시지 - 대화 시작 시간 기록: ${now.toString().substring(11, 19)}');
@@ -135,7 +154,8 @@ class RewardEventService {
         try {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setInt('chat_start_$chatRoomId', now.millisecondsSinceEpoch);
-          debugPrint('💾 [저장] SharedPreferences 업데이트: ${now.toString().substring(11, 19)}');
+          await prefs.setInt('chat_last_$chatRoomId', now.millisecondsSinceEpoch);
+          debugPrint('💾 [저장] startTime & lastMessage 업데이트');
         } catch (e) {
           debugPrint('❌ [저장 오류] $e');
         }
@@ -146,6 +166,15 @@ class RewardEventService {
 
       // 마지막 메시지 시간 업데이트
       _lastMessageTime[chatRoomId] = now;
+      
+      // ✅ SharedPreferences에 lastMessage 저장
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('chat_last_$chatRoomId', now.millisecondsSinceEpoch);
+        debugPrint('💾 [업데이트] lastMessage 저장: ${now.toString().substring(11, 19)}');
+      } catch (e) {
+        debugPrint('❌ [lastMessage 저장 오류] $e');
+      }
 
       // 3. 대화 지속 시간 체크 (대화 시작 시간부터 현재까지)
       final totalDuration = now.difference(startTime).inSeconds;

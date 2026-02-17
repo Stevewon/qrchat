@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - SharedPreferences 세션 복원 완벽 수정 v1.0.76"
+description: "QRChat - lastMessage 복원으로 10분 리셋 문제 해결 v1.0.77"
 publish_to: 'none'
 
-version: 1.0.76+176
+version: 1.0.77+177
 
 environment:
   sdk: ^3.9.2
