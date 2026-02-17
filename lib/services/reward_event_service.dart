@@ -80,19 +80,29 @@ class RewardEventService {
       DateTime? startTime = _chatStartTime[chatRoomId];
       final lastMessage = _lastMessageTime[chatRoomId];
       
-      // 📱 SharedPreferences에서 먼저 로드 (가장 빠름!)
-      if (startTime == null) {
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          final savedTimeMs = prefs.getInt('chat_start_${chatRoomId}');
-          if (savedTimeMs != null) {
-            startTime = DateTime.fromMillisecondsSinceEpoch(savedTimeMs);
-            _chatStartTime[chatRoomId] = startTime; // 메모리에도 캐싱
-            debugPrint('💾 [로컬 저장소] 대화 시작 시간 로드 성공: ${startTime.toString().substring(11, 19)}');
+      debugPrint('🔍 [메모리 확인] startTime: ${startTime?.toString().substring(11, 19) ?? "없음"}');
+      
+      // 📱 SharedPreferences에서 항상 확인! (메모리보다 우선!)
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final savedTimeMs = prefs.getInt('chat_start_$chatRoomId');
+        debugPrint('🔍 [로컬 저장소] 저장된 값: $savedTimeMs');
+        
+        if (savedTimeMs != null) {
+          final savedTime = DateTime.fromMillisecondsSinceEpoch(savedTimeMs);
+          debugPrint('💾 [로컬 저장소] 대화 시작 시간 로드 성공: ${savedTime.toString().substring(11, 19)}');
+          
+          // 메모리와 다르면 로컬 저장소 우선!
+          if (startTime == null || startTime != savedTime) {
+            debugPrint('⚠️  메모리와 다름! 로컬 저장소 값 사용');
+            startTime = savedTime;
+            _chatStartTime[chatRoomId] = startTime; // 메모리 업데이트
           }
-        } catch (e) {
-          debugPrint('❌ [로컬 저장소] 로드 실패: $e');
+        } else {
+          debugPrint('⚠️  [로컬 저장소] 저장된 값 없음');
         }
+      } catch (e) {
+        debugPrint('❌ [로컬 저장소] 로드 실패: $e');
       }
       
       // 🔥 Firestore에서 대화 시작 시간 가져오기 (백업용)
@@ -121,7 +131,6 @@ class RewardEventService {
         } catch (e, stackTrace) {
           debugPrint('❌ [Firestore] 조회 실패: $e');
           debugPrint('📍 StackTrace: $stackTrace');
-          // Firestore 실패 시에도 계속 진행 (메모리 기반으로 동작)
         }
       }
 
