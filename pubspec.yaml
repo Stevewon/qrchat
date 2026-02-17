@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 텔레그램 지갑 생성 링크 추가 v1.0.85"
+description: "QRChat - 닉네임 변경 기능 및 지갑 생성 링크 개선 v1.0.86"
 publish_to: 'none'
 
-version: 1.0.85+185
+version: 1.0.86+186
 
 environment:
   sdk: ^3.9.2

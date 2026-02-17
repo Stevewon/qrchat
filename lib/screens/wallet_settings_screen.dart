@@ -511,6 +511,73 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   ],
                 ),
               ),
+              
+              const SizedBox(height: 24),
+              
+              // ✅ 텔레그램 지갑 생성 안내 (등록 후에도 표시)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0088CC), Color(0xFF00C6FF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0088CC).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.telegram, color: Colors.white, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          '새 지갑이 필요하신가요?',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      '텔레그램 봇을 통해 무료로 암호화폐 지갑을 생성할 수 있습니다.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _openTelegramWallet,
+                        icon: const Icon(Icons.open_in_new, size: 16),
+                        label: const Text('텔레그램 지갑 생성하기'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF0088CC),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ]
             // 지갑 주소가 등록되지 않은 경우
             else ...[

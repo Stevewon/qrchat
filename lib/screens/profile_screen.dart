@@ -198,6 +198,99 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  /// 닉네임 편집 다이얼로그
+  void _showEditNicknameDialog() {
+    final controller = TextEditingController(text: _currentUser?.nickname ?? '');
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('닉네임 변경'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              maxLength: 20,
+              decoration: const InputDecoration(
+                hintText: '닉네임을 입력하세요',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 18, color: Colors.blue.shade700),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '친구 관계는 그대로 유지됩니다',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.blue.shade900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final newNickname = controller.text.trim();
+              if (newNickname.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('닉네임을 입력해주세요')),
+                );
+                return;
+              }
+              
+              try {
+                // Firestore 업데이트 (닉네임만 변경, 친구 관계는 유지됨)
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(_currentUser!.id)
+                    .update({'nickname': newNickname});
+                
+                setState(() {
+                  _currentUser = _currentUser!.copyWith(nickname: newNickname);
+                });
+                
+                if (mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('✅ 닉네임이 변경되었습니다')),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('업데이트 실패: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// 상태 메시지 편집 다이얼로그
   void _showEditStatusMessageDialog() {
     final controller = TextEditingController(text: _statusMessage);
@@ -1119,13 +1212,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 16),
                   
-                  // 닉네임
-                  Text(
-                    _currentUser?.nickname ?? 'Unknown',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                  // 닉네임 (클릭 가능)
+                  GestureDetector(
+                    onTap: _showEditNicknameDialog,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _currentUser?.nickname ?? 'Unknown',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.edit,
+                          size: 18,
+                          color: Colors.grey.shade600,
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 8),
