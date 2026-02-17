@@ -75,98 +75,29 @@ class RewardEventService {
       }
       debugPrint('✅ [조건 충족] 참여자 수: ${participantCount}명 >= ${minParticipants}명');
 
-      // 2. 대화 활동 기록 - 여러 소스에서 대화 시작 시간 조회
+      // 2. 대화 활동 기록 - 메모리 우선!
       final now = DateTime.now();
       DateTime? startTime = _chatStartTime[chatRoomId];
       final lastMessage = _lastMessageTime[chatRoomId];
       
       debugPrint('🔍 [메모리 확인] startTime: ${startTime?.toString().substring(11, 19) ?? "없음"}');
-      
-      // 📱 SharedPreferences에서 항상 확인! (메모리보다 우선!)
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final savedTimeMs = prefs.getInt('chat_start_${chatRoomId}');
-        debugPrint('🔍 [로컬 저장소] 저장된 값: $savedTimeMs');
-        
-        if (savedTimeMs != null) {
-          final savedTime = DateTime.fromMillisecondsSinceEpoch(savedTimeMs);
-          debugPrint('💾 [로컬 저장소] 대화 시작 시간 로드 성공: ${savedTime.toString().substring(11, 19)}');
-          
-          // 메모리와 다르면 로컬 저장소 우선!
-          if (startTime == null || startTime != savedTime) {
-            debugPrint('⚠️  메모리와 다름! 로컬 저장소 값 사용');
-            startTime = savedTime;
-            _chatStartTime[chatRoomId] = startTime; // 메모리 업데이트
-          }
-        } else {
-          debugPrint('⚠️  [로컬 저장소] 저장된 값 없음');
-        }
-      } catch (e) {
-        debugPrint('❌ [로컬 저장소] 로드 실패: $e');
-      }
-      
-      // 🔥 Firestore에서 대화 시작 시간 가져오기 (백업용)
-      if (startTime == null) {
-        try {
-          debugPrint('🔍 [Firestore] 채팅방 정보 조회 시도: $chatRoomId');
-          final chatRoomRef = _firestore.collection('chat_rooms').doc(chatRoomId);
-          final chatRoomDoc = await chatRoomRef.get();
-          
-          debugPrint('📄 [Firestore] 문서 존재 여부: ${chatRoomDoc.exists}');
-          
-          if (chatRoomDoc.exists) {
-            final data = chatRoomDoc.data();
-            debugPrint('📄 [Firestore] 문서 데이터: ${data?.keys.toList()}');
-            
-            if (data != null && data['conversationStartTime'] != null) {
-              startTime = (data['conversationStartTime'] as Timestamp).toDate();
-              _chatStartTime[chatRoomId] = startTime; // 메모리에도 캐싱
-              debugPrint('💾 [Firestore] 기존 대화 시작 시간 로드 성공: ${startTime.toString().substring(11, 19)}');
-            } else {
-              debugPrint('⚠️  [Firestore] conversationStartTime 필드 없음');
-            }
-          } else {
-            debugPrint('⚠️  [Firestore] 채팅방 문서가 존재하지 않음');
-          }
-        } catch (e, stackTrace) {
-          debugPrint('❌ [Firestore] 조회 실패: $e');
-          debugPrint('📍 StackTrace: $stackTrace');
-        }
-      }
+      debugPrint('🔍 [메모리 확인] lastMessage: ${lastMessage?.toString().substring(11, 19) ?? "없음"}');
 
       debugPrint('📊 [시간 정보]');
       debugPrint('   현재 시간: ${now.toString().substring(11, 19)}');
       debugPrint('   대화 시작 시간: ${startTime?.toString().substring(11, 19) ?? "없음"}');
       debugPrint('   마지막 메시지 시간: ${lastMessage?.toString().substring(11, 19) ?? "없음"}');
+      debugPrint('   startTime == null? ${startTime == null}');
 
       // 첫 메시지이거나 10분 이상 대화가 끊긴 경우 새로운 대화 세션 시작
       if (startTime == null) {
+        debugPrint('⚠️  [판단] startTime이 null → 새 세션 시작');
         _chatStartTime[chatRoomId] = now;
         _lastMessageTime[chatRoomId] = now;
         
-        // 💾 로컬 저장소에 저장 (가장 안전!)
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('chat_start_${chatRoomId}', now.millisecondsSinceEpoch);
-          debugPrint('💾 [로컬 저장소] 대화 시작 시간 저장 성공!');
-        } catch (e) {
-          debugPrint('❌ [로컬 저장소] 저장 실패: $e');
-        }
-        
-        // 🔥 Firestore에도 저장 (백업용)
-        try {
-          final chatRoomRef = _firestore.collection('chat_rooms').doc(chatRoomId);
-          await chatRoomRef.set({
-            'conversationStartTime': Timestamp.fromDate(now),
-            'lastActivityTime': Timestamp.fromDate(now),
-          }, SetOptions(merge: true));
-          debugPrint('💾 [Firestore] 대화 시작 시간 저장 성공!');
-        } catch (e) {
-          debugPrint('❌ [Firestore] 저장 실패: $e');
-        }
-        
         debugPrint('🆕 [새 세션] 첫 메시지 - 대화 시작 시간 기록: ${now.toString().substring(11, 19)}');
         debugPrint('   ℹ️  다음 메시지부터 지속 시간 카운트 시작');
+        debugPrint('   💾 메모리에 저장: _chatStartTime[$chatRoomId] = $now');
         debugPrint('========================================');
         return;
       }
@@ -176,28 +107,6 @@ class RewardEventService {
         debugPrint('🔄 [세션 리셋] 10분 이상 대화 중단 → 새 세션 시작');
         _chatStartTime[chatRoomId] = now;
         _lastMessageTime[chatRoomId] = now;
-        
-        // 💾 로컬 저장소 업데이트
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('chat_start_${chatRoomId}', now.millisecondsSinceEpoch);
-          debugPrint('💾 [로컬 저장소] 세션 리셋 저장 성공!');
-        } catch (e) {
-          debugPrint('❌ [로컬 저장소] 저장 실패: $e');
-        }
-        
-        // 🔥 Firestore에도 저장
-        try {
-          final chatRoomRef = _firestore.collection('chat_rooms').doc(chatRoomId);
-          await chatRoomRef.set({
-            'conversationStartTime': Timestamp.fromDate(now),
-            'lastActivityTime': Timestamp.fromDate(now),
-          }, SetOptions(merge: true));
-          debugPrint('💾 [Firestore] 세션 리셋 저장 성공!');
-        } catch (e) {
-          debugPrint('❌ [Firestore] 저장 실패: $e');
-        }
-        
         debugPrint('========================================');
         return;
       }
