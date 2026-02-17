@@ -12,8 +12,8 @@ class LocalNotificationService {
   /// ⭐ 현재 열려있는 채팅방 ID (알림 음소거용)
   static String? _activeChatRoomId;
   
-  /// ⭐ 알림 카운터 (2회당 1회 알림음 재생용)
-  static int _notificationCount = 0;
+  /// ⭐ 알림음 활성화 상태 (기본: true)
+  static bool _soundEnabled = true;
   
   /// 현재 활성 채팅방 설정 (채팅방 진입 시 호출)
   static void setActiveChatRoom(String? chatRoomId) {
@@ -105,14 +105,9 @@ class LocalNotificationService {
         await initialize();
       }
 
-      // ⭐ 알림 카운터 증가
-      _notificationCount++;
-      
-      // ⭐ 2회당 1회만 알림음 재생 (2, 4, 6, 8... 번째 알림에서만 소리)
-      final shouldPlaySound = (_notificationCount % 2 == 0);
-      
+      // ⭐ 알림음 활성화 여부 체크
       if (kDebugMode) {
-        print('🔔 알림 #$_notificationCount: ${shouldPlaySound ? "🔊 소리 O" : "🔇 소리 X"}');
+        print('🔔 알림 표시: ${_soundEnabled ? "🔊 소리 O" : "🔇 소리 X"}');
       }
 
       // 1. 로컬 알림 표시 (음소거 모드 - 소리 없이 배지만)
@@ -141,15 +136,15 @@ class LocalNotificationService {
         payload: payload,
       );
 
-      // ⭐ 2회당 1회만 알림음 재생
-      if (shouldPlaySound) {
+      // ⭐ 알림음 재생 (매 알림마다)
+      if (_soundEnabled) {
         await playNotificationSound();
         if (kDebugMode) {
-          print('🔊 알림음 재생 (2회당 1회)');
+          print('🔊 알림음 재생');
         }
       } else {
         if (kDebugMode) {
-          print('🔇 알림음 생략 (다음 알림에서 재생)');
+          print('🔇 알림음 꺼짐 (사용자 설정)');
         }
       }
 
@@ -210,4 +205,15 @@ class LocalNotificationService {
   static Future<void> cancel(int id) async {
     await _notifications.cancel(id);
   }
+  
+  /// ⭐ 알림음 활성화/비활성화 설정
+  static void setSoundEnabled(bool enabled) {
+    _soundEnabled = enabled;
+    if (kDebugMode) {
+      print('🔔 알림음 설정 변경: ${enabled ? "활성화" : "비활성화"}');
+    }
+  }
+  
+  /// ⭐ 알림음 활성화 여부 가져오기
+  static bool isSoundEnabled() => _soundEnabled;
 }

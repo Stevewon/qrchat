@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 1:1에서 3인 이상 되면 그룹 보상 활성화 v1.0.82"
+description: "QRChat - 백그라운드 알림음 항상 재생 v1.0.83"
 publish_to: 'none'
 
-version: 1.0.82+182
+version: 1.0.83+183
 
 environment:
   sdk: ^3.9.2

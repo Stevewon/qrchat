@@ -18,7 +18,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print('   내용: ${message.notification?.body}');
   }
 
-  // ⭐ 핵심: 백그라운드에서도 로컬 알림 표시!
+  // ⭐ 핵심: 백그라운드에서도 로컬 알림 + 알림음 표시!
   final title = message.notification?.title ?? '새 메시지';
   final body = message.notification?.body ?? '';
   final chatRoomId = message.data['chat_room_id'] as String?;
@@ -30,7 +30,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   );
   
   if (kDebugMode) {
-    print('🔔 백그라운드 로컬 알림 표시 완료');
+    print('🔔 백그라운드 로컬 알림 + 알림음 표시 완료');
   }
 }
 
