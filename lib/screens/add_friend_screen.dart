@@ -157,30 +157,6 @@ class AddFriendScreen extends StatelessWidget {
                       );
                     },
                   ),
-
-                  // 카카오톡 ID (추후 구현)
-                  _buildMenuCard(
-                    context: context,
-                    icon: Icons.chat_bubble,
-                    label: '카카오톡 ID',
-                    description: '준비 중',
-                    color: const Color(0xFFFFB300),
-                    onTap: () {
-                      _showComingSoonDialog(context, '카카오톡 ID로 친구 추가');
-                    },
-                  ),
-
-                  // 추천친구 (추후 구현)
-                  _buildMenuCard(
-                    context: context,
-                    icon: Icons.people_outline,
-                    label: '추천친구',
-                    description: '준비 중',
-                    color: const Color(0xFF4CAF50),
-                    onTap: () {
-                      _showComingSoonDialog(context, '추천친구 기능');
-                    },
-                  ),
                 ],
               ),
             ),

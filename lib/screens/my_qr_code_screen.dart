@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/securet_user.dart';
 
 class MyQRCodeScreen extends StatelessWidget {
@@ -87,6 +89,78 @@ class MyQRCodeScreen extends StatelessWidget {
                   backgroundColor: Colors.white,
                 ),
               ),
+              const SizedBox(height: 24),
+              
+              // 복사 및 공유 버튼
+              Row(
+                children: [
+                  // 복사 버튼
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: user.qrUrl));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('✅ QR 주소가 복사되었습니다'),
+                            duration: Duration(seconds: 2),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.copy, size: 20),
+                      label: const Text(
+                        '복사',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF667eea),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // 공유 버튼
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Share.share(
+                          'QRChat 친구 추가\n\n'
+                          '닉네임: ${user.nickname}\n'
+                          'QR 주소: ${user.qrUrl}\n\n'
+                          'QRChat 앱에서 "친구 추가 > QR 주소"를 선택하고 위 정보를 입력하세요!',
+                          subject: '${user.nickname}님의 QRChat 친구 추가',
+                        );
+                      },
+                      icon: const Icon(Icons.share, size: 20),
+                      label: const Text(
+                        '공유',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF764ba2),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              
               const SizedBox(height: 24),
               // 안내 메시지
               Container(

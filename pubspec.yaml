@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - QR 주소로 친구 추가 기능 v1.0.87"
+description: "QRChat - QR 코드 복사/공유 기능 및 UI 개선 v1.0.88"
 publish_to: 'none'
 
-version: 1.0.87+187
+version: 1.0.88+188
 
 environment:
   sdk: ^3.9.2
