@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Enhanced Reward System Debug Logging v1.0.66"
+description: "QRChat - Group Chat Reward Debug Enhancement v1.0.67"
 publish_to: 'none'
 
-version: 1.0.66+166
+version: 1.0.67+167
 
 environment:
   sdk: ^3.9.2

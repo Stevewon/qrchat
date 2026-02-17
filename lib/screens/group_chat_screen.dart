@@ -353,9 +353,16 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       debugPrint('✅ [메시지 전송] 성공');
       
       // 🎁 그룹 보상 이벤트 트리거
+      debugPrint('');
+      debugPrint('🎯 [그룹 채팅] 보상 이벤트 트리거 호출');
+      debugPrint('   채팅방 ID: ${widget.chatRoom.id}');
+      debugPrint('   초대된 사람: ${widget.chatRoom.participantIds.length}명');
+      debugPrint('   접속 중: ${widget.chatRoom.activeUserIds.length}명');
+      debugPrint('   현재 사용자: ${widget.currentUserId}');
+      
       await RewardEventService.onMessageSent(
         chatRoomId: widget.chatRoom.id,
-        participantCount: widget.chatRoom.participantIds.length,
+        participantCount: widget.chatRoom.participantIds.length,  // 초대된 모든 사람
       );
       
       // 🎁 QKEY 채굴 시도 (방장만, 대화 후 5분, 하루 3회)
