@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Group Chat Reward Debug Enhancement v1.0.67"
+description: "QRChat - Remove Probability, Guaranteed Reward v1.0.68"
 publish_to: 'none'
 
-version: 1.0.67+167
+version: 1.0.68+168
 
 environment:
   sdk: ^3.9.2

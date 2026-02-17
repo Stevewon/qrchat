@@ -39,7 +39,7 @@ class RewardEventService {
   static const int eventExpiration = 30; // 30초
 
   /// 이벤트 생성 쿨다운 (초)
-  static const int eventCooldownSeconds = 300; // 5분
+  static const int eventCooldownSeconds = 60; // 1분 (이전: 5분)
 
   /// 최소 보상 QKEY
   static const int minReward = 1;
@@ -143,26 +143,16 @@ class RewardEventService {
         debugPrint('✅ [쿨다운] 첫 이벤트 - 쿨다운 없음');
       }
 
-      // 5. 확률 체크
-      final randomValue = _random.nextDouble();
-      final probabilityPercent = (eventProbability * 100).toInt();
-      final randomPercent = (randomValue * 100).toInt();
-      
-      debugPrint('🎲 [확률 체크]');
-      debugPrint('   랜덤 값: ${randomPercent}% (0-100)');
-      debugPrint('   발생 확률: ${probabilityPercent}%');
-      
-      if (randomValue > eventProbability) {
-        debugPrint('❌ [확률 미달] ${randomPercent}% > ${probabilityPercent}% (불발)');
-        debugPrint('   ℹ️  다음 메시지에서 다시 시도 가능');
-        debugPrint('========================================');
-        return;
-      }
-
-      debugPrint('✅ [확률 충족] ${randomPercent}% <= ${probabilityPercent}% (발생!)');
+      // 5. 모든 조건 충족! 확률 없이 무조건 이벤트 생성
+      debugPrint('');
+      debugPrint('🎉🎉🎉 [조건 완료] 모든 조건 충족! 확률 체크 없이 무조건 생성! 🎉🎉🎉');
+      debugPrint('   ✅ 참여자 수: ${participantCount}명 >= ${minParticipants}명');
+      debugPrint('   ✅ 대화 시간: ${totalDuration}초 >= ${conversationDuration}초');
+      debugPrint('   ✅ 쿨다운: 완료');
+      debugPrint('   🎁 보상 이벤트 생성 시작...');
+      debugPrint('');
 
       // 6. 이벤트 생성
-      debugPrint('🎉 [이벤트 생성] 모든 조건 충족! 보상 이벤트 생성 중...');
       await _createRewardEvent(chatRoomId);
       _eventCooldown[chatRoomId] = now;
       debugPrint('========================================');
