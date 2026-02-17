@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Guaranteed Reward with 5min Cooldown v1.0.69"
+description: "QRChat - Firestore Session Persistence v1.0.70"
 publish_to: 'none'
 
-version: 1.0.69+169
+version: 1.0.70+170
 
 environment:
   sdk: ^3.9.2

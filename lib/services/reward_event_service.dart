@@ -74,10 +74,23 @@ class RewardEventService {
       }
       debugPrint('✅ [조건 충족] 참여자 수: ${participantCount}명 >= ${minParticipants}명');
 
-      // 2. 대화 활동 기록
+      // 2. 대화 활동 기록 - Firestore에서 대화 시작 시간 조회
       final now = DateTime.now();
-      final startTime = _chatStartTime[chatRoomId];
+      final chatRoomRef = _firestore.collection('chat_rooms').doc(chatRoomId);
+      final chatRoomDoc = await chatRoomRef.get();
+      
+      DateTime? startTime = _chatStartTime[chatRoomId];
       final lastMessage = _lastMessageTime[chatRoomId];
+      
+      // Firestore에서 대화 시작 시간 가져오기 (앱 재시작에도 유지됨!)
+      if (chatRoomDoc.exists) {
+        final data = chatRoomDoc.data();
+        if (data != null && data['conversationStartTime'] != null) {
+          startTime = (data['conversationStartTime'] as Timestamp).toDate();
+          _chatStartTime[chatRoomId] = startTime; // 메모리에도 캐싱
+          debugPrint('💾 [Firestore] 기존 대화 시작 시간 로드: ${startTime.toString().substring(11, 19)}');
+        }
+      }
 
       debugPrint('📊 [시간 정보]');
       debugPrint('   현재 시간: ${now.toString().substring(11, 19)}');
@@ -88,8 +101,16 @@ class RewardEventService {
       if (startTime == null) {
         _chatStartTime[chatRoomId] = now;
         _lastMessageTime[chatRoomId] = now;
-        debugPrint('🆕 [새 세션] 첫 메시지 - 대화 시작 시간 기록: ${now.toString().substring(11, 19)}');
+        
+        // 🔥 Firestore에 대화 시작 시간 저장 (앱 재시작에도 유지!)
+        await chatRoomRef.set({
+          'conversationStartTime': Timestamp.fromDate(now),
+          'lastActivityTime': Timestamp.fromDate(now),
+        }, SetOptions(merge: true));
+        
+        debugPrint('🆕 [새 세션] 첫 메시지 - 대화 시작 시간 기록 (💾 Firestore 저장): ${now.toString().substring(11, 19)}');
         debugPrint('   ℹ️  다음 메시지부터 지속 시간 카운트 시작');
+        debugPrint('   ✅ 앱 재시작해도 대화 시간 유지됨!');
         debugPrint('========================================');
         return;
       }
@@ -99,6 +120,13 @@ class RewardEventService {
         debugPrint('🔄 [세션 리셋] 10분 이상 대화 중단 → 새 세션 시작');
         _chatStartTime[chatRoomId] = now;
         _lastMessageTime[chatRoomId] = now;
+        
+        // 🔥 Firestore에 새로운 대화 시작 시간 저장
+        await chatRoomRef.set({
+          'conversationStartTime': Timestamp.fromDate(now),
+          'lastActivityTime': Timestamp.fromDate(now),
+        }, SetOptions(merge: true));
+        
         debugPrint('========================================');
         return;
       }
