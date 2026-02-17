@@ -1251,12 +1251,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           PopupMenuButton<String>(
             onSelected: (value) async {
               if (value == 'delete') {
-                // 대화 삭제 확인 다이얼로그
+                // 그룹방 나가기 확인 다이얼로그
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('대화 삭제'),
-                    content: const Text('이 대화방을 나가시겠습니까?\n\n대화 내용은 유지되며, 다시 초대받을 수 있습니다.'),
+                    title: const Text('그룹방 나가기'),
+                    content: const Text('그룹방을 나가시겠습니까?\n\n대화 내용은 유지되며, 다시 초대받을 수 있습니다.'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
@@ -1264,21 +1264,59 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context, true),
-                        child: const Text('나가기', style: TextStyle(color: Colors.red)),
+                        child: const Text('확인', style: TextStyle(color: Colors.red)),
                       ),
                     ],
                   ),
                 );
 
                 if (confirm == true && mounted) {
-                  // 대화방 나가기
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('대화방을 나갔습니다'),
-                      duration: Duration(seconds: 2),
+                  // 로딩 표시
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => const Center(
+                      child: CircularProgressIndicator(),
                     ),
                   );
+
+                  try {
+                    // 그룹 채팅방 나가기
+                    await _chatService.leaveGroupChat(
+                      chatRoomId: widget.chatRoom.id,
+                      userId: widget.currentUserId,
+                      userNickname: widget.currentUserNickname,
+                    );
+
+                    if (mounted) {
+                      // 로딩 닫기
+                      Navigator.pop(context);
+                      // 채팅방 화면 닫기
+                      Navigator.pop(context);
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('그룹방을 나갔습니다'),
+                          backgroundColor: Colors.green,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      // 로딩 닫기
+                      Navigator.pop(context);
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('그룹방 나가기 실패: $e'),
+                          backgroundColor: Colors.red,
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                    debugPrint('❌ 그룹방 나가기 실패: $e');
+                  }
                 }
               }
             },
@@ -1287,9 +1325,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete, color: Colors.red, size: 20),
+                    Icon(Icons.exit_to_app, color: Colors.red, size: 20),
                     SizedBox(width: 8),
-                    Text('대화 삭제', style: TextStyle(color: Colors.red)),
+                    Text('그룹방 나가기', style: TextStyle(color: Colors.red)),
                   ],
                 ),
               ),

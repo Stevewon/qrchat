@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 그룹채팅 UI 개선 v1.0.89"
+description: "QRChat - 그룹채팅 나가기 기능 v1.0.90"
 publish_to: 'none'
 
-version: 1.0.89+189
+version: 1.0.90+190
 
 environment:
   sdk: ^3.9.2

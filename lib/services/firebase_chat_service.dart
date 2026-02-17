@@ -798,4 +798,110 @@ class FirebaseChatService {
       rethrow;
     }
   }
+
+  /// 그룹 채팅방 나가기
+  /// 
+  /// [chatRoomId] 채팅방 ID
+  /// [userId] 나가는 사용자 ID
+  /// [userNickname] 나가는 사용자 닉네임
+  /// 
+  /// Returns: 업데이트된 ChatRoom 객체 (나가는 사용자는 제외됨)
+  Future<ChatRoom> leaveGroupChat({
+    required String chatRoomId,
+    required String userId,
+    required String userNickname,
+  }) async {
+    try {
+      if (kDebugMode) {
+        debugPrint('\n========== 그룹 채팅 나가기 시작 ==========');
+        debugPrint('채팅방 ID: $chatRoomId');
+        debugPrint('나가는 사용자: $userNickname ($userId)');
+      }
+
+      // 1. 채팅방 정보 가져오기
+      final roomDoc = await _chatRoomsCollection.doc(chatRoomId).get();
+      if (!roomDoc.exists) {
+        throw Exception('채팅방을 찾을 수 없습니다');
+      }
+
+      final roomData = roomDoc.data() as Map<String, dynamic>;
+      final currentParticipantIds = List<String>.from(roomData['participantIds'] ?? []);
+      final currentParticipantNicknames = List<String>.from(roomData['participantNicknames'] ?? []);
+
+      // 2. 사용자 제거
+      final userIndex = currentParticipantIds.indexOf(userId);
+      if (userIndex == -1) {
+        throw Exception('채팅방에 참여하고 있지 않습니다');
+      }
+
+      currentParticipantIds.removeAt(userIndex);
+      currentParticipantNicknames.removeAt(userIndex);
+
+      if (kDebugMode) {
+        debugPrint('나가기 후 남은 참가자: ${currentParticipantNicknames.join(", ")}');
+      }
+
+      // 3. 그룹 이름 재생성 (남은 인원으로)
+      String? groupName;
+      if (currentParticipantIds.length > 2) {
+        final displayNames = currentParticipantNicknames.take(3).toList();
+        groupName = displayNames.join(', ');
+        if (currentParticipantNicknames.length > 3) {
+          groupName += ' 외 ${currentParticipantNicknames.length - 3}명';
+        }
+      } else if (currentParticipantIds.length == 2) {
+        // 2명이면 1:1로 전환될 수 있음 (선택적)
+        groupName = null;
+      }
+
+      // 4. Firestore 업데이트
+      await _chatRoomsCollection.doc(chatRoomId).update({
+        'participantIds': currentParticipantIds,
+        'participantNicknames': currentParticipantNicknames,
+        'groupName': groupName,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // 5. 퇴장 메시지 전송 (시스템 메시지)
+      final leaveMessage = '$userNickname님이 나갔습니다.';
+      final messageId = 'system_${DateTime.now().millisecondsSinceEpoch}';
+      await _messagesCollection.doc(messageId).set({
+        'chatRoomId': chatRoomId,
+        'senderId': 'system',
+        'senderNickname': 'system',
+        'senderProfilePhoto': null,
+        'content': leaveMessage,
+        'type': 'text',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': true,
+        'readBy': currentParticipantIds, // 남은 사람들 모두 읽음 처리
+      });
+
+      if (kDebugMode) {
+        debugPrint('✅ 그룹 채팅 나가기 완료!');
+        debugPrint('퇴장 메시지: $leaveMessage');
+        debugPrint('남은 인원: ${currentParticipantIds.length}명');
+        debugPrint('========== 나가기 완료 ==========\n');
+      }
+
+      // 6. 업데이트된 채팅방 정보 반환
+      return ChatRoom(
+        id: chatRoomId,
+        type: currentParticipantIds.length > 2 ? ChatRoomType.group : ChatRoomType.oneToOne,
+        participantIds: currentParticipantIds,
+        participantNicknames: currentParticipantNicknames,
+        lastMessage: roomData['lastMessage'] ?? '',
+        lastMessageTime: roomData['lastMessageTime'] != null
+            ? (roomData['lastMessageTime'] as Timestamp).toDate()
+            : DateTime.now(),
+        unreadCount: roomData['unreadCount'] ?? 0,
+        groupName: groupName,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ 그룹 채팅 나가기 실패: $e');
+      }
+      rethrow;
+    }
+  }
 }
