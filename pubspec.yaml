@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Improved Password Recovery UI v1.0.64"
+description: "QRChat - Enhanced QR URL Search with Debug Logs v1.0.65"
 publish_to: 'none'
 
-version: 1.0.64+164
+version: 1.0.65+165
 
 environment:
   sdk: ^3.9.2

@@ -138,20 +138,46 @@ class SecuretAuthService {
     }
 
     try {
+      // Trim whitespace and normalize URL
+      final normalizedUrl = qrUrl.trim();
+      
       if (kDebugMode) {
         debugPrint('🔍 닉네임 찾기 시작...');
-        debugPrint('   QR URL: $qrUrl');
+        debugPrint('   원본 QR URL: "$qrUrl"');
+        debugPrint('   정규화된 QR URL: "$normalizedUrl"');
+        debugPrint('   URL 길이: ${normalizedUrl.length}');
       }
       
-      final querySnapshot = await _firestore
+      // Try both qrUrl and qrCodeUrl fields
+      final querySnapshot1 = await _firestore
           .collection('users')
-          .where('qrCodeUrl', isEqualTo: qrUrl)
+          .where('qrCodeUrl', isEqualTo: normalizedUrl)
+          .limit(1)
+          .get();
+          
+      final querySnapshot2 = await _firestore
+          .collection('users')
+          .where('qrUrl', isEqualTo: normalizedUrl)
           .limit(1)
           .get();
 
       if (kDebugMode) {
-        debugPrint('   검색 결과: ${querySnapshot.docs.length}개');
+        debugPrint('   qrCodeUrl 검색 결과: ${querySnapshot1.docs.length}개');
+        debugPrint('   qrUrl 검색 결과: ${querySnapshot2.docs.length}개');
+        
+        // Debug: Show first 5 users in collection
+        final allUsers = await _firestore.collection('users').limit(5).get();
+        debugPrint('   === 전체 사용자 샘플 (최대 5명) ===');
+        for (var doc in allUsers.docs) {
+          final data = doc.data();
+          debugPrint('   - ID: ${doc.id}');
+          debugPrint('     nickname: ${data['nickname']}');
+          debugPrint('     qrUrl: "${data['qrUrl']}"');
+          debugPrint('     qrCodeUrl: "${data['qrCodeUrl']}"');
+        }
       }
+
+      final querySnapshot = querySnapshot1.docs.isNotEmpty ? querySnapshot1 : querySnapshot2;
 
       if (querySnapshot.docs.isEmpty) {
         if (kDebugMode) {
@@ -181,21 +207,36 @@ class SecuretAuthService {
     if (qrUrl.isEmpty) {
       throw Exception('QR 주소를 입력해주세요');
     }
+    
+    // Trim whitespace and normalize URL
+    final normalizedUrl = qrUrl.trim();
 
     try {
       if (kDebugMode) {
         debugPrint('🔍 비밀번호 찾기 시작...');
-        debugPrint('   QR URL: $qrUrl');
+        debugPrint('   원본 QR URL: "$qrUrl"');
+        debugPrint('   정규화된 QR URL: "$normalizedUrl"');
+        debugPrint('   URL 길이: ${normalizedUrl.length}');
       }
       
-      final querySnapshot = await _firestore
+      // Try both qrUrl and qrCodeUrl fields
+      final querySnapshot1 = await _firestore
           .collection('users')
-          .where('qrCodeUrl', isEqualTo: qrUrl)
+          .where('qrCodeUrl', isEqualTo: normalizedUrl)
           .limit(1)
           .get();
+          
+      final querySnapshot2 = await _firestore
+          .collection('users')
+          .where('qrUrl', isEqualTo: normalizedUrl)
+          .limit(1)
+          .get();
+          
+      final querySnapshot = querySnapshot1.docs.isNotEmpty ? querySnapshot1 : querySnapshot2;
 
       if (kDebugMode) {
-        debugPrint('   검색 결과: ${querySnapshot.docs.length}개');
+        debugPrint('   qrCodeUrl 검색 결과: ${querySnapshot1.docs.length}개');
+        debugPrint('   qrUrl 검색 결과: ${querySnapshot2.docs.length}개');
       }
 
       if (querySnapshot.docs.isEmpty) {
