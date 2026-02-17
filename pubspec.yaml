@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - QR 코드 복사/공유 기능 및 UI 개선 v1.0.88"
+description: "QRChat - 그룹채팅 UI 개선 v1.0.89"
 publish_to: 'none'
 
-version: 1.0.88+188
+version: 1.0.89+189
 
 environment:
   sdk: ^3.9.2
