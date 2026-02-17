@@ -8,6 +8,7 @@ import '../services/securet_auth_service.dart';
 import 'friend_search_screen.dart';
 import 'friend_requests_screen.dart';
 import 'chat_screen.dart';
+import 'add_friend_screen.dart';
 
 /// 친구 목록 화면
 class FriendsListScreen extends StatefulWidget {
@@ -208,14 +209,32 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
         title: const Text('친구'),
         elevation: 0,
         actions: [
+          // 친구 추가 버튼
+          IconButton(
+            icon: const Icon(Icons.person_add_alt_1),
+            tooltip: '친구 추가',
+            onPressed: () async {
+              final currentUser = await SecuretAuthService.getCurrentUser();
+              if (currentUser != null && mounted) {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddFriendScreen(currentUser: currentUser),
+                  ),
+                );
+                _loadFriends();
+              }
+            },
+          ),
           // 친구 요청 버튼
           IconButton(
             icon: Stack(
               children: [
-                const Icon(Icons.person_add),
+                const Icon(Icons.notifications_outlined),
                 // TODO: 새 요청이 있으면 배지 표시
               ],
             ),
+            tooltip: '친구 요청',
             onPressed: () async {
               await Navigator.push(
                 context,
