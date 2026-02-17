@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Firestore 에러 상세 로깅 v1.0.78"
+description: "QRChat - print() 강제 출력 디버그 v1.0.79"
 publish_to: 'none'
 
-version: 1.0.78+178
+version: 1.0.79+179
 
 environment:
   sdk: ^3.9.2

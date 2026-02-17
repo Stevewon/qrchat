@@ -353,6 +353,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       debugPrint('✅ [메시지 전송] 성공');
       
       // 🎁 그룹 보상 이벤트 트리거
+      print('');
+      print('🎯 [그룹 채팅] 보상 이벤트 트리거 호출');
+      print('   채팅방 ID: ${widget.chatRoom.id}');
+      print('   초대된 사람: ${widget.chatRoom.participantIds.length}명');
+      print('   접속 중: ${widget.chatRoom.activeUserIds.length}명');
+      print('   현재 사용자: ${widget.currentUserId}');
       debugPrint('');
       debugPrint('🎯 [그룹 채팅] 보상 이벤트 트리거 호출');
       debugPrint('   채팅방 ID: ${widget.chatRoom.id}');

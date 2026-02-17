@@ -60,6 +60,12 @@ class RewardEventService {
     required int participantCount,
   }) async {
     try {
+      print('');
+      print('========================================');
+      print('🎁 [보상 시스템] 메시지 전송 감지');
+      print('   채팅방 ID: $chatRoomId');
+      print('   참여자 수: $participantCount명');
+      print('========================================');
       debugPrint('');
       debugPrint('========================================');
       debugPrint('🎁 [보상 시스템] 메시지 전송 감지');
