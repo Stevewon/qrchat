@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - QKEY 내역 잔액 표시 수정 v1.0.84"
+description: "QRChat - 텔레그램 지갑 생성 링크 추가 v1.0.85"
 publish_to: 'none'
 
-version: 1.0.84+184
+version: 1.0.85+185
 
 environment:
   sdk: ^3.9.2
