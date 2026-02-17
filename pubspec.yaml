@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - print() 강제 출력 디버그 v1.0.79"
+description: "QRChat - 보상 잔액 표시 수정 v1.0.80"
 publish_to: 'none'
 
-version: 1.0.79+179
+version: 1.0.80+180
 
 environment:
   sdk: ^3.9.2

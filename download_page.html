@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRChat v1.0.79 백업 다운로드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .status {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        .status h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        .status ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .status li {
+            padding: 5px 0;
+            color: #1b5e20;
+        }
+        .status li:before {
+            content: "✅ ";
+            margin-right: 10px;
+        }
+        .download-section {
+            margin: 30px 0;
+        }
+        .download-card {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .download-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .download-card.recommended {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: 2px solid #ff9800;
+        }
+        .download-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .badge {
+            background: #ff9800;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .download-card p {
+            color: #666;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .download-card .file-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 0.9em;
+            color: #888;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+            text-align: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .download-btn:hover {
+            background: #5568d3;
+        }
+        .info-section {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .info-section h3 {
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #999;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💾 QRChat v1.0.79</h1>
+        <p class="subtitle">백업 다운로드 센터</p>
+        
+        <div class="status">
+            <h3>🎉 보상 시스템 정상 작동 중!</h3>
+            <ul>
+                <li>그룹 채팅 보상 시스템 완벽 작동</li>
+                <li>Firestore 인덱스 생성 완료</li>
+                <li>최소 3명, 2분 대화, 5분 쿨다운</li>
+                <li>1-10 QKEY 랜덤 보상</li>
+            </ul>
+        </div>
+
+        <div class="download-section">
+            <h2 style="color: #333; margin-bottom: 20px;">📦 백업 파일 다운로드</h2>
+            
+            <div class="download-card recommended">
+                <h3>
+                    <span>⭐ 경량 백업 (권장)</span>
+                    <span class="badge">추천</span>
+                </h3>
+                <div class="file-info">
+                    <span>📁 qrchat_backup_v1.0.79_final_2026-02-17.tar.gz</span>
+                    <span>📊 7.9MB</span>
+                </div>
+                <p>
+                    <strong>포함 내용:</strong><br>
+                    • 모든 Dart 소스 코드 (lib/)<br>
+                    • Android 설정 (android/)<br>
+                    • 의존성 정의 (pubspec.yaml)<br>
+                    • README.md, .gitignore
+                </p>
+                <a href="qrchat_backup_v1.0.79_final_2026-02-17.tar.gz" class="download-btn" download>
+                    ⬇️ 경량 백업 다운로드
+                </a>
+            </div>
+
+            <div class="download-card">
+                <h3>🗂️ 복원 가이드</h3>
+                <div class="file-info">
+                    <span>📁 BACKUP_INFO.txt</span>
+                    <span>📊 7.0KB</span>
+                </div>
+                <p>
+                    <strong>포함 내용:</strong><br>
+                    • 백업 파일 정보<br>
+                    • 복원 방법 단계별 가이드<br>
+                    • 주요 기능 상태<br>
+                    • 알려진 이슈 및 해결책<br>
+                    • 개발 이력 (v1.0.70 ~ v1.0.79)
+                </p>
+                <a href="BACKUP_INFO.txt" class="download-btn" download>
+                    📄 복원 가이드 다운로드
+                </a>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>🔧 빠른 복원 방법</h3>
+            <p style="color: #555; line-height: 1.8;">
+                <strong>1단계:</strong> 백업 파일 다운로드<br>
+                <strong>2단계:</strong> 압축 해제<br>
+                <code>tar -xzf qrchat_backup_v1.0.79_final_2026-02-17.tar.gz</code><br>
+                <strong>3단계:</strong> Flutter 의존성 설치<br>
+                <code>cd qrchat && flutter pub get</code><br>
+                <strong>4단계:</strong> APK 빌드<br>
+                <code>flutter build apk --release</code><br>
+                <strong>5단계:</strong> 설치<br>
+                <code>adb install build/app/outputs/flutter-apk/app-release.apk</code>
+            </p>
+        </div>
+
+        <div class="info-section" style="background: #ffebee; border-left-color: #f44336;">
+            <h3 style="color: #c62828;">⚠️ 중요: Firestore 인덱스 확인!</h3>
+            <p style="color: #555; line-height: 1.8;">
+                복원 후 반드시 Firestore 인덱스를 확인하세요:<br><br>
+                <strong>필수 인덱스:</strong> reward_events<br>
+                • chatRoomId (Ascending)<br>
+                • status (Ascending)<br>
+                • createdAt (Descending)<br><br>
+                <a href="https://console.firebase.google.com/project/qrchat-b7a67/firestore/indexes" 
+                   style="color: #1976d2; text-decoration: none; font-weight: bold;"
+                   target="_blank">
+                   🔗 Firebase Console에서 확인하기 →
+                </a>
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>QRChat v1.0.79 (Build 179)</p>
+            <p>백업 날짜: 2026-02-17</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/Stevewon/qrchat/releases/tag/v1.0.79" 
+                   style="color: #667eea; text-decoration: none;"
+                   target="_blank">
+                   GitHub Release →
+                </a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

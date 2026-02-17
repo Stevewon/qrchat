@@ -356,15 +356,23 @@ class RewardEventService {
       final userRef = FirebaseFirestore.instance.collection('users').doc(user.id);
       final transactionsRef = FirebaseFirestore.instance.collection('qkey_transactions');
       
+      // 현재 잔액 조회
+      final userDoc = await userRef.get();
+      final currentBalance = (userDoc.data()?['qkeyBalance'] as int?) ?? 0;
+      final newBalance = currentBalance + result;
+      
       // 사용자 잔액 업데이트
       await userRef.update({
-        'qkeyBalance': FieldValue.increment(result),
+        'qkeyBalance': newBalance,
+        'qkey_balance': newBalance, // 동기화
+        'totalQKeyEarned': FieldValue.increment(result),
       });
       
-      // 트랜잭션 기록 추가
+      // 트랜잭션 기록 추가 (balanceAfter 포함!)
       await transactionsRef.add({
         'userId': user.id,
         'amount': result,
+        'balanceAfter': newBalance, // ✅ 추가!
         'type': 'bonus',
         'description': '🎁 그룹 채팅 보상 이벤트',
         'timestamp': Timestamp.now(),
