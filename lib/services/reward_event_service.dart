@@ -260,15 +260,31 @@ class RewardEventService {
         positionY: positionY,
       );
 
+      debugPrint('💾 [Firestore] 이벤트 저장 시도...');
+      debugPrint('   컬렉션: $_collectionName');
+      debugPrint('   채팅방 ID: $chatRoomId');
+      debugPrint('   데이터: ${event.toFirestore()}');
+      
       final docRef = await _firestore.collection(_collectionName).add(event.toFirestore());
       
       debugPrint('✅ [Firestore] 이벤트 저장 완료!');
       debugPrint('   문서 ID: ${docRef.id}');
       debugPrint('   컬렉션: $_collectionName');
+      debugPrint('   경로: $_collectionName/${docRef.id}');
       debugPrint('🎉🎉🎉 보상 이벤트 생성 성공! 채팅방에서 황금 구슬이 나타납니다! 🎉🎉🎉');
-    } catch (e) {
-      debugPrint('❌ 보상 이벤트 생성 오류: $e');
-      debugPrint('   스택 트레이스: ${StackTrace.current}');
+    } catch (e, stackTrace) {
+      debugPrint('');
+      debugPrint('❌❌❌ [치명적 오류] 보상 이벤트 생성 실패! ❌❌❌');
+      debugPrint('   오류 타입: ${e.runtimeType}');
+      debugPrint('   오류 메시지: $e');
+      debugPrint('   스택 트레이스:');
+      debugPrint('$stackTrace');
+      debugPrint('');
+      debugPrint('🔍 [가능한 원인]');
+      debugPrint('   1. Firestore 권한 문제');
+      debugPrint('   2. 네트워크 연결 문제');
+      debugPrint('   3. 잘못된 데이터 형식');
+      debugPrint('');
     }
   }
 
