@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Firestore Session Persistence v1.0.70"
+description: "QRChat - Enhanced Firestore Error Handling v1.0.71"
 publish_to: 'none'
 
-version: 1.0.70+170
+version: 1.0.71+171
 
 environment:
   sdk: ^3.9.2
