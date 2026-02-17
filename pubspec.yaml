@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Simplified Memory Only v1.0.75"
+description: "QRChat - SharedPreferences 세션 복원 완벽 수정 v1.0.76"
 publish_to: 'none'
 
-version: 1.0.75+175
+version: 1.0.76+176
 
 environment:
   sdk: ^3.9.2
