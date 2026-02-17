@@ -36,23 +36,23 @@ class _FloatingRewardOrbState extends State<FloatingRewardOrb>
   void initState() {
     super.initState();
 
-    // 상하 떠다니기 애니메이션
+    // 상하 떠다니기 애니메이션 (살짝살짝 부드럽게)
     _floatingController = AnimationController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(milliseconds: 2500),
       vsync: this,
     )..repeat(reverse: true);
 
     _floatingAnimation = Tween<double>(
-      begin: -10.0,
-      end: 10.0,
+      begin: -8.0,
+      end: 8.0,
     ).animate(CurvedAnimation(
       parent: _floatingController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInOutCubic, // 매우 부드러운 곡선
     ));
 
-    // 회전 애니메이션
+    // 회전 애니메이션 (천천히)
     _rotationController = AnimationController(
-      duration: const Duration(seconds: 10),
+      duration: const Duration(seconds: 8),
       vsync: this,
     )..repeat();
 
@@ -61,15 +61,15 @@ class _FloatingRewardOrbState extends State<FloatingRewardOrb>
       end: 2 * pi,
     ).animate(_rotationController);
 
-    // 펄스 (크기 변화) 애니메이션
+    // 펄스 (크기 변화) 애니메이션 - 더 섬세하게
     _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 2000),
       vsync: this,
     )..repeat(reverse: true);
 
     _pulseAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.15,
+      end: 1.08,
     ).animate(CurvedAnimation(
       parent: _pulseController,
       curve: Curves.easeInOut,
@@ -104,61 +104,133 @@ class _FloatingRewardOrbState extends State<FloatingRewardOrb>
               scale: _pulseAnimation.value,
               child: GestureDetector(
                 onTap: widget.onTap,
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        Colors.amber[200]!,
-                        Colors.amber[400]!,
-                        Colors.orange[600]!,
-                      ],
-                      stops: const [0.0, 0.5, 1.0],
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // 외부 글로우 효과 (더 큰 반경)
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.amber.withOpacity(0.4),
+                            blurRadius: 30,
+                            spreadRadius: 10,
+                          ),
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.3),
+                            blurRadius: 40,
+                            spreadRadius: 15,
+                          ),
+                        ],
+                      ),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.amber.withOpacity(0.5),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
-                      BoxShadow(
-                        color: Colors.orange.withOpacity(0.3),
-                        blurRadius: 30,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // 반짝이는 효과
-                      Transform.rotate(
-                        angle: _rotationAnimation.value,
-                        child: Icon(
-                          Icons.auto_awesome,
-                          color: Colors.white.withOpacity(0.8),
-                          size: 30,
-                        ),
-                      ),
-                      // QKEY 금액 표시
-                      Text(
-                        '${widget.event.rewardAmount}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black45,
-                              blurRadius: 4,
-                            ),
+                    // 메인 구체
+                    Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          center: const Alignment(-0.3, -0.4), // 왼쪽 위에서 빛 들어옴
+                          radius: 0.8,
+                          colors: [
+                            const Color(0xFFFFFFFF), // 하이라이트 (밝은 흰색)
+                            const Color(0xFFFFF9C4), // 밝은 노랑
+                            Colors.amber[300]!,
+                            Colors.amber[600]!,
+                            Colors.orange[700]!, // 가장자리 어두운 오렌지
+                            Colors.orange[900]!, // 그림자 효과
                           ],
+                          stops: const [0.0, 0.15, 0.4, 0.7, 0.9, 1.0],
                         ),
+                        boxShadow: [
+                          // 아래쪽 그림자 (입체감)
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                            spreadRadius: -3,
+                          ),
+                          // 골든 글로우
+                          BoxShadow(
+                            color: Colors.amber.withOpacity(0.6),
+                            blurRadius: 25,
+                            spreadRadius: 3,
+                          ),
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.4),
+                            blurRadius: 35,
+                            spreadRadius: 8,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // 반짝이는 효과 (뒤쪽)
+                          Transform.rotate(
+                            angle: _rotationAnimation.value,
+                            child: Icon(
+                              Icons.auto_awesome,
+                              color: Colors.white.withOpacity(0.6),
+                              size: 35,
+                            ),
+                          ),
+                          // 반짝이는 효과 (앞쪽)
+                          Transform.rotate(
+                            angle: -_rotationAnimation.value * 0.7,
+                            child: Icon(
+                              Icons.auto_awesome,
+                              color: Colors.white.withOpacity(0.4),
+                              size: 28,
+                            ),
+                          ),
+                          // 내부 하이라이트 (3D 느낌)
+                          Positioned(
+                            top: 8,
+                            left: 10,
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: RadialGradient(
+                                  colors: [
+                                    Colors.white.withOpacity(0.8),
+                                    Colors.white.withOpacity(0.0),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          // QKEY 금액 표시
+                          Text(
+                            '${widget.event.rewardAmount}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.6),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                                Shadow(
+                                  color: Colors.orange.withOpacity(0.8),
+                                  blurRadius: 12,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

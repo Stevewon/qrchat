@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRChat v1.0.79 - 최종 빌드 다운로드</title>
+    <title>QRChat v1.0.80 - 보상 잔액 표시 수정</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -45,6 +45,19 @@
             font-size: 2em;
             margin-bottom: 10px;
         }
+        .update-notice {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+        .update-notice h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
         .download-card {
             background: #f5f5f5;
             border-radius: 15px;
@@ -79,6 +92,14 @@
             border-radius: 20px;
             font-size: 0.6em;
             font-weight: bold;
+        }
+        .badge.new {
+            background: #f44336;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         .file-info {
             display: flex;
@@ -117,17 +138,24 @@
             color: #e65100;
             margin-bottom: 15px;
         }
-        .features {
+        .comparison {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin: 20px 0;
         }
-        .feature {
-            background: #e8f5e9;
+        .comparison-box {
             padding: 15px;
             border-radius: 10px;
             text-align: center;
+        }
+        .comparison-box.before {
+            background: #ffebee;
+            border: 2px solid #f44336;
+        }
+        .comparison-box.after {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
         }
         .footer {
             text-align: center;
@@ -140,55 +168,86 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎉 QRChat v1.0.79</h1>
-        <p class="subtitle">최종 빌드 완료!</p>
+        <h1>🐛 QRChat v1.0.80</h1>
+        <p class="subtitle">보상 잔액 표시 수정!</p>
         
+        <div class="update-notice">
+            <h2>🆕 v1.0.80 업데이트!</h2>
+            <p style="font-size: 1.2em;">보상 내역에서 "잔액 0" 버그 수정!</p>
+        </div>
+
         <div class="success-banner">
-            <h2>✅ 보상 시스템 완벽 작동!</h2>
-            <p style="font-size: 1.2em;">황금 구슬 나타남! 🏆</p>
+            <h2>✅ 보상 시스템 완벽!</h2>
+            <p style="font-size: 1.2em;">황금 구슬 + 정확한 잔액 표시! 🏆</p>
+        </div>
+
+        <div class="comparison">
+            <div class="comparison-box before">
+                <h4>❌ Before (v1.0.79)</h4>
+                <p style="margin: 10px 0; font-size: 0.9em;">
+                    보너스<br>
+                    🎁 그룹 채팅 보상 이벤트<br>
+                    +1 QKEY<br>
+                    <strong style="color: #f44336;">잔액 0 ❌</strong>
+                </p>
+            </div>
+            <div class="comparison-box after">
+                <h4>✅ After (v1.0.80)</h4>
+                <p style="margin: 10px 0; font-size: 0.9em;">
+                    보너스<br>
+                    🎁 그룹 채팅 보상 이벤트<br>
+                    +1 QKEY<br>
+                    <strong style="color: #4caf50;">잔액 1613 ✅</strong>
+                </p>
+            </div>
         </div>
 
         <div class="download-card main">
             <h3>
-                <span>📱 QRChat APK</span>
-                <span class="badge">최신</span>
+                <span>📱 QRChat v1.0.80</span>
+                <span class="badge new">NEW!</span>
             </h3>
+            <div class="file-info">
+                <span>📁 qrchat_v1.0.80.apk</span>
+                <span>📊 70MB</span>
+            </div>
+            <p style="line-height: 1.8; margin: 15px 0;">
+                <strong>버전:</strong> v1.0.80 (Build 180)<br>
+                <strong>빌드:</strong> Release (서명 완료)<br>
+                <strong>날짜:</strong> 2026-02-17<br>
+                <strong>수정:</strong> 보상 잔액 표시 버그 수정 ✅
+            </p>
+            <a href="qrchat_v1.0.80.apk" class="download-btn" download>
+                ⬇️ v1.0.80 다운로드 (70MB)
+            </a>
+        </div>
+
+        <div class="info-box">
+            <h3>🔧 수정 내용</h3>
+            <p style="color: #555; line-height: 1.8;">
+                <strong>문제:</strong><br>
+                보상 획득 시 QKEY 내역에서 "잔액 0"으로 표시<br><br>
+                <strong>원인:</strong><br>
+                트랜잭션 기록에 <code>balanceAfter</code> 필드 누락<br><br>
+                <strong>해결:</strong><br>
+                ✅ <code>balanceAfter</code> 필드 추가<br>
+                ✅ <code>qkey_balance</code> 동기화<br>
+                ✅ <code>totalQKeyEarned</code> 자동 증가
+            </p>
+        </div>
+
+        <div class="download-card">
+            <h3>📦 이전 버전 (v1.0.79)</h3>
             <div class="file-info">
                 <span>📁 qrchat_v1.0.79_FINAL.apk</span>
                 <span>📊 70MB</span>
             </div>
-            <p style="line-height: 1.8; margin: 15px 0;">
-                <strong>버전:</strong> v1.0.79 (Build 179)<br>
-                <strong>빌드:</strong> Release (서명 완료)<br>
-                <strong>날짜:</strong> 2026-02-17<br>
-                <strong>상태:</strong> 프로덕션 준비 완료 ✅
+            <p style="color: #666; line-height: 1.6; margin: 10px 0;">
+                보상 시스템 완벽 작동 (황금 구슬 나타남!)
             </p>
             <a href="qrchat_v1.0.79_FINAL.apk" class="download-btn" download>
-                ⬇️ APK 다운로드 (70MB)
+                ⬇️ v1.0.79 다운로드
             </a>
-        </div>
-
-        <div class="features">
-            <div class="feature">
-                <div style="font-size: 2em;">💰</div>
-                <strong>보상 시스템</strong>
-                <p style="font-size: 0.9em; color: #666;">완벽 작동</p>
-            </div>
-            <div class="feature">
-                <div style="font-size: 2em;">👥</div>
-                <strong>그룹 채팅</strong>
-                <p style="font-size: 0.9em; color: #666;">3명 이상</p>
-            </div>
-            <div class="feature">
-                <div style="font-size: 2em;">⏱️</div>
-                <strong>대화 시간</strong>
-                <p style="font-size: 0.9em; color: #666;">2분 이상</p>
-            </div>
-            <div class="feature">
-                <div style="font-size: 2em;">🎁</div>
-                <strong>QKEY 보상</strong>
-                <p style="font-size: 0.9em; color: #666;">1-10 랜덤</p>
-            </div>
         </div>
 
         <div class="download-card">
@@ -198,30 +257,18 @@
                 <span>📊 7.9MB</span>
             </div>
             <p style="color: #666; line-height: 1.6; margin: 10px 0;">
-                완전한 소스 코드 백업 (lib, android, pubspec.yaml 포함)
+                완전한 소스 코드 백업
             </p>
             <a href="qrchat_backup_v1.0.79_final_2026-02-17.tar.gz" class="download-btn" download>
                 ⬇️ 소스 백업 다운로드
             </a>
         </div>
 
-        <div class="download-card">
-            <h3>📄 문서 파일</h3>
-            <div style="display: grid; gap: 10px;">
-                <a href="BACKUP_INFO.txt" class="download-btn" download style="font-size: 1em; padding: 10px 20px;">
-                    📋 백업 복원 가이드 (7KB)
-                </a>
-                <a href="FINAL_BUILD_INFO.txt" class="download-btn" download style="font-size: 1em; padding: 10px 20px;">
-                    📊 최종 빌드 정보 (8KB)
-                </a>
-            </div>
-        </div>
-
-        <div class="info-box">
-            <h3>🚀 빠른 설치</h3>
+        <div class="info-box" style="background: #e8f5e9; border-left-color: #4caf50;">
+            <h3 style="color: #2e7d32;">🚀 빠른 설치</h3>
             <p style="color: #555; line-height: 1.8;">
                 <strong>방법 1 (PC에서):</strong><br>
-                <code style="background: #f5f5f5; padding: 5px 10px; border-radius: 5px;">adb install qrchat_v1.0.79_FINAL.apk</code>
+                <code style="background: #f5f5f5; padding: 5px 10px; border-radius: 5px;">adb install qrchat_v1.0.80.apk</code>
                 <br><br>
                 <strong>방법 2 (휴대폰에서):</strong><br>
                 1. APK 파일 다운로드<br>
@@ -231,7 +278,7 @@
         </div>
 
         <div class="info-box" style="background: #ffebee; border-left-color: #f44336;">
-            <h3 style="color: #c62828;">⚠️ 중요: Firestore 인덱스 필수!</h3>
+            <h3 style="color: #c62828;">⚠️ 중요: Firestore 인덱스!</h3>
             <p style="color: #555; line-height: 1.8;">
                 보상 시스템이 작동하려면 Firestore 인덱스가 필요합니다:<br><br>
                 <strong>Collection:</strong> reward_events<br>
@@ -248,18 +295,24 @@
         </div>
 
         <div class="footer">
-            <p style="font-size: 1.2em; margin-bottom: 10px;"><strong>QRChat v1.0.79</strong> (Build 179)</p>
+            <p style="font-size: 1.2em; margin-bottom: 10px;"><strong>QRChat v1.0.80</strong> (Build 180)</p>
             <p>빌드 날짜: 2026-02-17</p>
             <p style="margin-top: 15px;">
-                <a href="https://github.com/Stevewon/qrchat/releases/tag/v1.0.79" 
+                <a href="https://github.com/Stevewon/qrchat/releases/tag/v1.0.80" 
                    style="color: #667eea; text-decoration: none; font-weight: bold;"
                    target="_blank">
-                   🔗 GitHub Release →
+                   🔗 GitHub Release v1.0.80 →
+                </a>
+                <br>
+                <a href="https://github.com/Stevewon/qrchat/releases/tag/v1.0.79" 
+                   style="color: #667eea; text-decoration: none;"
+                   target="_blank">
+                   🔗 GitHub Release v1.0.79 →
                 </a>
             </p>
             <p style="margin-top: 20px; color: #4caf50; font-weight: bold;">
-                ✅ 황금 구슬 테스트 완료!<br>
-                모든 기능 정상 작동 중! 🎉
+                ✅ 황금 구슬 + 정확한 잔액 표시!<br>
+                모든 기능 완벽 작동 중! 🎉
             </p>
         </div>
     </div>
