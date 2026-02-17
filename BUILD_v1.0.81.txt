@@ -1,0 +1,60 @@
+# QRChat v1.0.81 빌드 안내
+
+## ✅ 코드 변경 완료
+황금구슬 3D 효과 및 애니메이션 개선이 완료되었습니다!
+
+### 🎨 주요 개선사항
+- 더 선명한 3D 구형 디자인 (6단계 그라디언트)
+- 부드러운 위아래 움직임 (-8px ~ +8px)
+- 하이라이트 및 그림자 효과 추가
+- 이중 회전 반짝임 효과
+- 구체 크기 증가 (60px → 70px)
+
+## 📦 APK 빌드 방법
+
+### 옵션 1: 로컬 빌드 (권장)
+PC에 Android Studio와 Flutter가 설치되어 있다면:
+
+```bash
+# 1. 최신 코드 가져오기
+git pull origin main
+
+# 2. 의존성 설치
+flutter pub get
+
+# 3. APK 빌드
+flutter build apk --release
+
+# 4. APK 위치
+# build/app/outputs/flutter-apk/app-release.apk
+```
+
+### 옵션 2: GitHub에서 다운로드
+잠시 후 GitHub Actions CI/CD가 자동으로 APK를 빌드합니다.
+(약 5-10분 소요)
+
+**다운로드 링크:**
+https://github.com/Stevewon/qrchat/releases/tag/v1.0.81
+
+## 🔗 GitHub 링크
+- **릴리스 페이지**: https://github.com/Stevewon/qrchat/releases/tag/v1.0.81
+- **커밋 히스토리**: https://github.com/Stevewon/qrchat/commits/main
+- **소스 코드**: https://github.com/Stevewon/qrchat
+
+## 📝 변경된 파일
+- lib/widgets/floating_reward_orb.dart (3D 효과 및 애니메이션)
+- pubspec.yaml (버전 업데이트: 1.0.80 → 1.0.81)
+
+## 🎯 테스트 방법
+1. 새 APK 설치 (v1.0.81)
+2. 그룹 채팅방 열기 (3명 이상)
+3. 메시지 전송 후 2분 30초 대기
+4. 다시 메시지 전송
+5. 개선된 황금구슬 확인!
+
+## ℹ️ 참고사항
+현재 샌드박스 환경에 Android SDK가 없어 직접 빌드할 수 없습니다.
+위의 두 가지 옵션 중 하나를 선택해주세요.
+
+빌드 날짜: 2026-02-17
+버전: 1.0.81 (Build 181)

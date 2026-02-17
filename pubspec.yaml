@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 황금구슬 3D 효과 및 애니메이션 개선 v1.0.81"
+description: "QRChat - 1:1에서 3인 이상 되면 그룹 보상 활성화 v1.0.82"
 publish_to: 'none'
 
-version: 1.0.81+181
+version: 1.0.82+182
 
 environment:
   sdk: ^3.9.2

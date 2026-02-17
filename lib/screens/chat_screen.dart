@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart'; // TapGestureRecognizer
-import 'package:flutter/services.dart'; // Clipboard
+import 'package:flutter/services.dart'; // Clipboard, HapticFeedback
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gal/gal.dart'; // 이미지/동영상 저장
 import 'package:video_thumbnail/video_thumbnail.dart'; // 동영상 썸네일
+import 'package:audioplayers/audioplayers.dart'; // 🔊 알림음
 import 'dart:async';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -15,12 +16,17 @@ import 'package:path_provider/path_provider.dart';
 import '../models/chat_room.dart';
 import '../models/chat_message.dart';
 import '../models/friend.dart';
+import '../models/securet_user.dart';
 import '../services/firebase_chat_service.dart';
 import '../services/firebase_friend_service.dart';
+import '../services/securet_auth_service.dart';
 import '../services/notification_service.dart';
 import '../services/app_badge_service.dart';
 import '../services/chat_state_service.dart';
 import '../services/qkey_service.dart';
+import '../models/reward_event.dart';
+import '../services/reward_event_service.dart';
+import '../widgets/floating_reward_orb.dart';
 import '../widgets/invite_friends_dialog.dart';
 import 'debug_log_screen.dart';
 import 'video_player_screen.dart'; // 동영상 재생 화면
@@ -58,6 +64,12 @@ class _ChatScreenState extends State<ChatScreen> {
   StreamSubscription? _messagesSubscription;
   StreamSubscription<ChatRoom?>? _chatRoomSubscription;
   late ChatRoom _currentChatRoom; // 채팅방 정보 (업데이트 가능)
+  
+  // 🎁 보상 이벤트 (3인 이상일 때)
+  List<RewardEvent> _activeRewardEvents = [];
+  StreamSubscription<List<RewardEvent>>? _rewardEventsSubscription;
+  bool _showClaimedAnimation = false;
+  int _claimedAmount = 0;
   
   // QKEY 적립 제거 (더 이상 타이머 사용 안 함)
   
@@ -99,6 +111,9 @@ class _ChatScreenState extends State<ChatScreen> {
     // 먼저 메시지 리스닝 시작
     _listenToMessages();
     
+    // 🎁 보상 이벤트 스트림 구독 (3인 이상일 때 활성화)
+    _listenToRewardEvents();
+    
     // 그 다음 읽음 처리 (약간의 딜레이 후)
     Future.delayed(const Duration(milliseconds: 500), () {
       _markMessagesAsRead();
@@ -116,6 +131,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollController.dispose();
     _messagesSubscription?.cancel();
     _chatRoomSubscription?.cancel();
+    _rewardEventsSubscription?.cancel(); // 🎁 보상 이벤트 구독 해제
     
     // QKEY 타이머 제거됨
     
@@ -216,6 +232,22 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       },
     );
+  }
+
+  /// 🎁 보상 이벤트 스트림 구독
+  void _listenToRewardEvents() {
+    _rewardEventsSubscription = RewardEventService
+        .getActiveEvents(widget.chatRoom.id)
+        .listen((events) {
+      if (mounted) {
+        setState(() {
+          _activeRewardEvents = events;
+        });
+        if (events.isNotEmpty) {
+          debugPrint('🎁 활성 보상 이벤트 ${events.length}개');
+        }
+      }
+    });
   }
 
   /// 메시지 읽음 처리
@@ -320,8 +352,76 @@ class _ChatScreenState extends State<ChatScreen> {
 
     if (!success) {
       _showSnackBar('메시지 전송에 실패했습니다', isError: true);
+      return;
     }
+    
+    // 🎁 보상 이벤트 체크 (3인 이상일 때)
+    try {
+      final participantCount = _currentChatRoom.participantIds.length;
+      
+      if (kDebugMode) {
+        debugPrint('');
+        debugPrint('🎁 [보상 시스템 체크]');
+        debugPrint('   채팅방 ID: ${widget.chatRoom.id}');
+        debugPrint('   참여자 수: $participantCount명');
+        debugPrint('');
+      }
+      
+      await RewardEventService.onMessageSent(
+        chatRoomId: widget.chatRoom.id,
+        participantCount: participantCount,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('⚠️ 보상 이벤트 체크 실패: $e');
+      }
+    }
+    
     // Firebase 스트림이 자동으로 새 메시지를 받아옴
+  }
+
+  /// 🎁 보상 획득 처리
+  Future<void> _handleRewardClaim(RewardEvent event) async {
+    try {
+      final currentUser = await SecuretAuthService.getCurrentUser();
+      if (currentUser == null) return;
+
+      final success = await RewardEventService.claimReward(
+        eventId: event.id,
+        user: currentUser,
+      );
+
+      if (success && mounted) {
+        // 획득 애니메이션 표시
+        setState(() {
+          _showClaimedAnimation = true;
+          _claimedAmount = event.rewardAmount;
+        });
+
+        // 햅틱 피드백
+        HapticFeedback.heavyImpact();
+
+        // 알림음 재생
+        try {
+          final player = AudioPlayer();
+          await player.setVolume(0.8);
+          await player.play(AssetSource('sounds/coin_earn.mp3'));
+        } catch (e) {
+          debugPrint('⚠️ 보상 알림음 재생 실패: $e');
+        }
+      } else if (mounted) {
+        // 실패 시 스낵바
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('⚠️ 이미 다른 사용자가 획득했거나 만료되었습니다'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ 보상 획득 오류: $e');
+    }
   }
 
   /// 첨부 옵션 다이얼로그 표시 (카카오톡 스타일)
@@ -2028,22 +2128,49 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 메시지 목록
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _messages.isEmpty
-                      ? _buildEmptyState()
-                      : _buildMessageList(),
-            ),
+      body: Stack(
+        children: [
+          // 메인 채팅 UI
+          SafeArea(
+            child: Column(
+              children: [
+                // 메시지 목록
+                Expanded(
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _messages.isEmpty
+                          ? _buildEmptyState()
+                          : _buildMessageList(),
+                ),
 
-            // 입력 영역
-            _buildInputArea(),
-          ],
-        ),
+                // 입력 영역
+                _buildInputArea(),
+              ],
+            ),
+          ),
+          
+          // 🎁 보상 구체들 (3인 이상일 때만)
+          ..._activeRewardEvents.map((event) => FloatingRewardOrb(
+            key: Key(event.id),
+            event: event,
+            onTap: () => _handleRewardClaim(event),
+          )),
+          
+          // 🎉 보상 획득 애니메이션
+          if (_showClaimedAnimation)
+            Center(
+              child: RewardClaimedAnimation(
+                amount: _claimedAmount,
+                onComplete: () {
+                  if (mounted) {
+                    setState(() {
+                      _showClaimedAnimation = false;
+                    });
+                  }
+                },
+              ),
+            ),
+        ],
       ),
     );
   }
