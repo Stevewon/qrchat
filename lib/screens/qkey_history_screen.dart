@@ -301,6 +301,15 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
     final typeIcon = _getTypeIcon(transaction.type);
     final typeText = _getTypeText(transaction.type);
     
+    // ✅ balanceAfter가 0이거나 없는 경우 계산
+    // (이전 데이터 호환성을 위해)
+    int displayBalance = transaction.balanceAfter;
+    if (displayBalance == 0 && transaction.amount > 0) {
+      // 현재 잔액에서 역산 (근사치)
+      displayBalance = _currentBalance - transaction.amount;
+      if (displayBalance < 0) displayBalance = 0;
+    }
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 1,
@@ -407,11 +416,13 @@ class _QKeyHistoryScreenState extends State<QKeyHistoryScreen> with SingleTicker
                     ),
                   ),
                   const SizedBox(height: 4),
+                  // ✅ balanceAfter가 0이면 "정보 없음" 표시
                   Text(
-                    '잔액 ${transaction.balanceAfter}',
+                    displayBalance > 0 ? '잔액 $displayBalance' : '잔액 정보 없음',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[500],
+                      color: displayBalance > 0 ? Colors.grey[500] : Colors.grey[400],
+                      fontStyle: displayBalance > 0 ? FontStyle.normal : FontStyle.italic,
                     ),
                   ),
                 ],
