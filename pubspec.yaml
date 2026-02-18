@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 그룹채팅 나가기 기능 v1.0.90"
+description: "QRChat - 백그라운드 알림음 2회당 1회 재생 v1.0.91"
 publish_to: 'none'
 
-version: 1.0.90+190
+version: 1.0.91+191
 
 environment:
   sdk: ^3.9.2

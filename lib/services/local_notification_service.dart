@@ -15,6 +15,12 @@ class LocalNotificationService {
   /// ⭐ 알림음 활성화 상태 (기본: true)
   static bool _soundEnabled = true;
   
+  /// ⭐ 채팅방별 알림음 카운터 (2회당 1회 재생용)
+  static final Map<String, int> _soundCountPerChatRoom = {};
+  
+  /// ⭐ 채팅방별 마지막 알림 시간 (동일 채팅방 연속 알림 방지)
+  static final Map<String, DateTime> _lastNotificationTime = {};
+  
   /// 현재 활성 채팅방 설정 (채팅방 진입 시 호출)
   static void setActiveChatRoom(String? chatRoomId) {
     _activeChatRoomId = chatRoomId;
@@ -136,11 +142,48 @@ class LocalNotificationService {
         payload: payload,
       );
 
-      // ⭐ 알림음 재생 (매 알림마다)
-      if (_soundEnabled) {
+      // ⭐ 알림음 재생 (2회당 1회 제한)
+      if (_soundEnabled && payload != null) {
+        // 채팅방별 카운터 초기화
+        _soundCountPerChatRoom[payload] ??= 0;
+        
+        // 카운터 증가
+        _soundCountPerChatRoom[payload] = _soundCountPerChatRoom[payload]! + 1;
+        
+        // 2회당 1회 알림음 재생
+        if (_soundCountPerChatRoom[payload]! % 2 == 1) {
+          // 홀수번째 (1, 3, 5, ...) 알림에만 소리
+          await playNotificationSound();
+          if (kDebugMode) {
+            print('🔊 알림음 재생 (${_soundCountPerChatRoom[payload]}번째 알림, 2회당 1회)');
+          }
+        } else {
+          // 짝수번째 (2, 4, 6, ...) 알림은 소리 없음
+          if (kDebugMode) {
+            print('🔇 알림음 생략 (${_soundCountPerChatRoom[payload]}번째 알림, 2회당 1회 제한)');
+          }
+        }
+        
+        // 마지막 알림 시간 기록
+        _lastNotificationTime[payload] = DateTime.now();
+        
+        // 10분 경과 시 카운터 초기화 (새로운 대화로 간주)
+        Future.delayed(const Duration(minutes: 10), () {
+          if (_lastNotificationTime[payload] != null) {
+            final elapsed = DateTime.now().difference(_lastNotificationTime[payload]!);
+            if (elapsed >= const Duration(minutes: 10)) {
+              _soundCountPerChatRoom[payload] = 0;
+              if (kDebugMode) {
+                print('🔄 알림음 카운터 초기화 (10분 경과): $payload');
+              }
+            }
+          }
+        });
+      } else if (_soundEnabled && payload == null) {
+        // payload 없는 경우 (시스템 알림 등) 항상 소리
         await playNotificationSound();
         if (kDebugMode) {
-          print('🔊 알림음 재생');
+          print('🔊 알림음 재생 (시스템 알림)');
         }
       } else {
         if (kDebugMode) {
