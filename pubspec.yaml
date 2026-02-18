@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 백그라운드 알림음 2회당 1회 재생 v1.0.91"
+description: "QRChat - 백그라운드 알림음 수정 (FCM 핸들러 올바른 위치) v1.0.92"
 publish_to: 'none'
 
-version: 1.0.91+191
+version: 1.0.92+192
 
 environment:
   sdk: ^3.9.2

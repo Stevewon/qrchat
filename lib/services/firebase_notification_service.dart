@@ -1,38 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'securet_auth_service.dart';
 import 'local_notification_service.dart';
 import 'chat_state_service.dart';
 
-// 백그라운드 메시지 핸들러 (최상위 함수여야 함)
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Firebase 초기화 필요 (백그라운드에서 동작 시)
-  await Firebase.initializeApp();
-  
-  if (kDebugMode) {
-    print('📱 백그라운드 메시지 수신: ${message.messageId}');
-    print('   제목: ${message.notification?.title}');
-    print('   내용: ${message.notification?.body}');
-  }
-
-  // ⭐ 핵심: 백그라운드에서도 로컬 알림 + 알림음 표시!
-  final title = message.notification?.title ?? '새 메시지';
-  final body = message.notification?.body ?? '';
-  final chatRoomId = message.data['chat_room_id'] as String?;
-  
-  await LocalNotificationService.showNotification(
-    title: title,
-    body: body,
-    payload: chatRoomId,
-  );
-  
-  if (kDebugMode) {
-    print('🔔 백그라운드 로컬 알림 + 알림음 표시 완료');
-  }
-}
+/// ⭐ 주의: 백그라운드 메시지 핸들러는 main.dart에서 등록됨!
+/// FirebaseMessaging.onBackgroundMessage()는 main() 함수에서만 호출해야 함
 
 class FirebaseNotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -58,8 +32,8 @@ class FirebaseNotificationService {
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional) {
-        // 백그라운드 메시지 핸들러 등록
-        FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+        // ⭐ 백그라운드 핸들러는 main.dart에서 이미 등록됨!
+        // (중복 등록 방지)
 
         // FCM 토큰 가져오기 및 저장
         await _saveFCMToken();
