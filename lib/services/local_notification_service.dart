@@ -128,23 +128,42 @@ class LocalNotificationService {
         await initialize();
       }
 
+      // ⭐ payload가 없으면 기본값 사용 (전역 카운터)
+      final chatRoomId = payload ?? 'global';
+      
+      if (kDebugMode) {
+        print('📩 알림 수신: 채팅방=$chatRoomId, 제목=$title, 내용=$body');
+      }
+
       // ⭐ SharedPreferences로 카운터 관리 (백그라운드 isolate 간 공유)
       final prefs = await SharedPreferences.getInstance();
-      final counterKey = 'notification_counter_$payload';
-      final lastTimeKey = 'notification_last_time_$payload';
+      final counterKey = 'notification_counter_$chatRoomId';
+      final lastTimeKey = 'notification_last_time_$chatRoomId';
       
       // 현재 카운터 읽기
       int counter = prefs.getInt(counterKey) ?? 0;
       
+      if (kDebugMode) {
+        print('📊 저장된 카운터 읽기: $counter (키: $counterKey)');
+      }
+      
       // 마지막 알림 시간 확인 (10분 경과 시 카운터 초기화)
       final lastTimeMs = prefs.getInt(lastTimeKey) ?? 0;
-      final lastTime = DateTime.fromMillisecondsSinceEpoch(lastTimeMs);
-      final elapsed = DateTime.now().difference(lastTime);
       
-      if (elapsed.inMinutes >= 10) {
-        counter = 0; // 카운터 초기화
+      // ⭐ lastTimeMs가 0이면 첫 알림이므로 리셋하지 않음
+      if (lastTimeMs > 0) {
+        final lastTime = DateTime.fromMillisecondsSinceEpoch(lastTimeMs);
+        final elapsed = DateTime.now().difference(lastTime);
+        
         if (kDebugMode) {
-          print('🔄 알림음 카운터 초기화 (10분 경과): $payload');
+          print('⏰ 마지막 알림 시간: $lastTime (${elapsed.inMinutes}분 전)');
+        }
+        
+        if (elapsed.inMinutes >= 10) {
+          counter = 0; // 카운터 초기화
+          if (kDebugMode) {
+            print('🔄 알림음 카운터 초기화 (10분 경과): $chatRoomId');
+          }
         }
       }
       
@@ -155,11 +174,15 @@ class LocalNotificationService {
       await prefs.setInt(counterKey, counter);
       await prefs.setInt(lastTimeKey, DateTime.now().millisecondsSinceEpoch);
       
+      if (kDebugMode) {
+        print('💾 카운터 저장 완료: $counter (키: $counterKey)');
+      }
+      
       // ⭐ 2회당 1회 알림음 재생 여부 결정
       final shouldPlaySound = (counter % 2 == 1); // 홀수번째만 소리
       
       if (kDebugMode) {
-        print('🔔 알림 #$counter: ${shouldPlaySound ? "🔊 소리 O" : "🔇 소리 X"} (채팅방: $payload)');
+        print('🔔 알림 #$counter: ${shouldPlaySound ? "🔊 소리 O" : "🔇 소리 X"} (채팅방: $chatRoomId)');
       }
 
       // ⭐ 알림 채널 선택 (소리 여부에 따라)
