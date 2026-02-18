@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 알림 복구 및 중복 방지 v1.0.97"
+description: "QRChat - 채팅방 알림 차단 수정 v1.0.98"
 publish_to: 'none'
 
-version: 1.0.97+197
+version: 1.0.98+198
 
 environment:
   sdk: ^3.9.2

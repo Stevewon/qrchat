@@ -21,6 +21,7 @@ import '../services/firebase_chat_service.dart';
 import '../services/firebase_friend_service.dart';
 import '../services/securet_auth_service.dart';
 import '../services/notification_service.dart';
+import '../services/local_notification_service.dart';  // ⭐ 추가
 import '../services/app_badge_service.dart';
 import '../services/chat_state_service.dart';
 import '../services/qkey_service.dart';
@@ -104,6 +105,7 @@ class _ChatScreenState extends State<ChatScreen> {
     
     // ⭐ 채팅방 진입 추적 (알림 차단용)
     ChatStateService().enterChatRoom(widget.chatRoom.id);
+    LocalNotificationService.setActiveChatRoom(widget.chatRoom.id);  // ⭐ 추가
     
     // 채팅방 정보 실시간 업데이트
     _listenToChatRoom();
@@ -126,6 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     // ⭐ 채팅방 나가기 추적 (알림 재개용)
     ChatStateService().exitChatRoom();
+    LocalNotificationService.setActiveChatRoom(null);  // ⭐ 추가
     
     _messageController.dispose();
     _scrollController.dispose();

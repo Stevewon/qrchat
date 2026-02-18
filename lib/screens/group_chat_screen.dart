@@ -18,6 +18,7 @@ import '../services/firebase_chat_service.dart';
 import '../services/firebase_friend_service.dart';
 import '../services/securet_auth_service.dart';
 import '../services/notification_service.dart';
+import '../services/local_notification_service.dart';  // ⭐ 추가
 import '../services/app_badge_service.dart';
 import '../services/safe_browsing_service.dart';
 import '../services/chat_state_service.dart';
@@ -91,6 +92,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     
     // ⭐ 그룹 채팅방 진입 추적 (알림 차단용)
     ChatStateService().enterChatRoom(widget.chatRoom.id);
+    LocalNotificationService.setActiveChatRoom(widget.chatRoom.id);  // ⭐ 추가
     
     // ⭐ Firestore에 현재 사용자 활성 상태 기록
     _addActiveUser();
@@ -149,6 +151,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   void dispose() {
     // ⭐ 그룹 채팅방 나가기 추적 (알림 재개용)
     ChatStateService().exitChatRoom();
+    LocalNotificationService.setActiveChatRoom(null);  // ⭐ 추가
     
     // ⭐ Firestore에서 현재 사용자 활성 상태 제거
     _removeActiveUser();
