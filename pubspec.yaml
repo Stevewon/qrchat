@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 백그라운드 알림음 수정 (FCM 핸들러 올바른 위치) v1.0.92"
+description: "QRChat - 백그라운드 알림음 완전 수정 (시스템 레벨 소리 재생) v1.0.93"
 publish_to: 'none'
 
-version: 1.0.92+192
+version: 1.0.93+193
 
 environment:
   sdk: ^3.9.2

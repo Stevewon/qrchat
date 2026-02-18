@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io' show Platform;
 
 /// 로컬 알림 서비스 (포그라운드 및 백그라운드 알림)
@@ -57,11 +58,23 @@ class LocalNotificationService {
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
-      // Android 알림 채널 생성 (조용한 알림 - 소리 없음)
-      const AndroidNotificationChannel channel = AndroidNotificationChannel(
-        'qrchat_messages', // 채널 ID
-        'QRChat 메시지', // 채널 이름
-        description: '새로운 채팅 메시지 알림 (조용한 알림)',
+      // ⭐ Android 알림 채널 2개 생성
+      // 1. 소리 있는 채널 (백그라운드 홀수번째 알림용)
+      const AndroidNotificationChannel soundChannel = AndroidNotificationChannel(
+        'qrchat_messages_sound', // 채널 ID
+        'QRChat 메시지 (소리)', // 채널 이름
+        description: '새로운 채팅 메시지 알림 (소리 있음)',
+        importance: Importance.high,
+        playSound: true,  // ⭐ 알림음 켜기
+        enableVibration: true,  // ⭐ 진동 켜기
+        sound: RawResourceAndroidNotificationSound('notification'),  // ⭐ 커스텀 알림음
+      );
+
+      // 2. 소리 없는 채널 (백그라운드 짝수번째 알림용)
+      const AndroidNotificationChannel silentChannel = AndroidNotificationChannel(
+        'qrchat_messages_silent', // 채널 ID
+        'QRChat 메시지 (무음)', // 채널 이름
+        description: '새로운 채팅 메시지 알림 (소리 없음)',
         importance: Importance.high,
         playSound: false,  // ⭐ 알림음 끄기
         enableVibration: false,  // ⭐ 진동 끄기
@@ -69,12 +82,16 @@ class LocalNotificationService {
 
       await _notifications
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(channel);
+          ?.createNotificationChannel(soundChannel);
+          
+      await _notifications
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(silentChannel);
 
       _isInitialized = true;
 
       if (kDebugMode) {
-        print('✅ 로컬 알림 서비스 초기화 완료');
+        print('✅ 로컬 알림 서비스 초기화 완료 (2개 채널: 소리 O / 소리 X)');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -111,85 +128,71 @@ class LocalNotificationService {
         await initialize();
       }
 
-      // ⭐ 알림음 활성화 여부 체크
+      // ⭐ SharedPreferences로 카운터 관리 (백그라운드 isolate 간 공유)
+      final prefs = await SharedPreferences.getInstance();
+      final counterKey = 'notification_counter_$payload';
+      final lastTimeKey = 'notification_last_time_$payload';
+      
+      // 현재 카운터 읽기
+      int counter = prefs.getInt(counterKey) ?? 0;
+      
+      // 마지막 알림 시간 확인 (10분 경과 시 카운터 초기화)
+      final lastTimeMs = prefs.getInt(lastTimeKey) ?? 0;
+      final lastTime = DateTime.fromMillisecondsSinceEpoch(lastTimeMs);
+      final elapsed = DateTime.now().difference(lastTime);
+      
+      if (elapsed.inMinutes >= 10) {
+        counter = 0; // 카운터 초기화
+        if (kDebugMode) {
+          print('🔄 알림음 카운터 초기화 (10분 경과): $payload');
+        }
+      }
+      
+      // 카운터 증가
+      counter++;
+      
+      // 카운터 저장
+      await prefs.setInt(counterKey, counter);
+      await prefs.setInt(lastTimeKey, DateTime.now().millisecondsSinceEpoch);
+      
+      // ⭐ 2회당 1회 알림음 재생 여부 결정
+      final shouldPlaySound = (counter % 2 == 1); // 홀수번째만 소리
+      
       if (kDebugMode) {
-        print('🔔 알림 표시: ${_soundEnabled ? "🔊 소리 O" : "🔇 소리 X"}');
+        print('🔔 알림 #$counter: ${shouldPlaySound ? "🔊 소리 O" : "🔇 소리 X"} (채팅방: $payload)');
       }
 
-      // 1. 로컬 알림 표시 (음소거 모드 - 소리 없이 배지만)
+      // ⭐ 알림 채널 선택 (소리 여부에 따라)
+      final channelId = shouldPlaySound ? 'qrchat_messages_sound' : 'qrchat_messages_silent';
+      final channelName = shouldPlaySound ? 'QRChat 메시지 (소리)' : 'QRChat 메시지 (무음)';
+
+      // 1. 로컬 알림 표시
       await _notifications.show(
         DateTime.now().millisecondsSinceEpoch.remainder(100000), // 고유 ID
         title,
         body,
-        const NotificationDetails(
+        NotificationDetails(
           android: AndroidNotificationDetails(
-            'qrchat_messages',
-            'QRChat 메시지',
+            channelId,  // ⭐ 동적 채널 선택
+            channelName,
             channelDescription: '새로운 채팅 메시지 알림',
             importance: Importance.high,
             priority: Priority.high,
-            playSound: false,  // ⭐ 알림음 끄기 (수동으로 재생)
-            enableVibration: false,  // ⭐ 진동 끄기
+            playSound: shouldPlaySound,  // ⭐ 동적 소리 설정
+            enableVibration: shouldPlaySound,  // ⭐ 동적 진동 설정
+            sound: shouldPlaySound ? const RawResourceAndroidNotificationSound('notification') : null,
             icon: '@mipmap/ic_launcher',
-            onlyAlertOnce: true,  // ⭐ 한 번만 알림
+            onlyAlertOnce: false,  // ⭐ 매번 알림 표시
           ),
           iOS: DarwinNotificationDetails(
             presentAlert: true,
             presentBadge: true,
-            presentSound: false,  // ⭐ 알림음 끄기 (수동으로 재생)
+            presentSound: shouldPlaySound,  // ⭐ 동적 소리 설정
+            sound: shouldPlaySound ? 'notification.mp3' : null,
           ),
         ),
         payload: payload,
       );
-
-      // ⭐ 알림음 재생 (2회당 1회 제한)
-      if (_soundEnabled && payload != null) {
-        // 채팅방별 카운터 초기화
-        _soundCountPerChatRoom[payload] ??= 0;
-        
-        // 카운터 증가
-        _soundCountPerChatRoom[payload] = _soundCountPerChatRoom[payload]! + 1;
-        
-        // 2회당 1회 알림음 재생
-        if (_soundCountPerChatRoom[payload]! % 2 == 1) {
-          // 홀수번째 (1, 3, 5, ...) 알림에만 소리
-          await playNotificationSound();
-          if (kDebugMode) {
-            print('🔊 알림음 재생 (${_soundCountPerChatRoom[payload]}번째 알림, 2회당 1회)');
-          }
-        } else {
-          // 짝수번째 (2, 4, 6, ...) 알림은 소리 없음
-          if (kDebugMode) {
-            print('🔇 알림음 생략 (${_soundCountPerChatRoom[payload]}번째 알림, 2회당 1회 제한)');
-          }
-        }
-        
-        // 마지막 알림 시간 기록
-        _lastNotificationTime[payload] = DateTime.now();
-        
-        // 10분 경과 시 카운터 초기화 (새로운 대화로 간주)
-        Future.delayed(const Duration(minutes: 10), () {
-          if (_lastNotificationTime[payload] != null) {
-            final elapsed = DateTime.now().difference(_lastNotificationTime[payload]!);
-            if (elapsed >= const Duration(minutes: 10)) {
-              _soundCountPerChatRoom[payload] = 0;
-              if (kDebugMode) {
-                print('🔄 알림음 카운터 초기화 (10분 경과): $payload');
-              }
-            }
-          }
-        });
-      } else if (_soundEnabled && payload == null) {
-        // payload 없는 경우 (시스템 알림 등) 항상 소리
-        await playNotificationSound();
-        if (kDebugMode) {
-          print('🔊 알림음 재생 (시스템 알림)');
-        }
-      } else {
-        if (kDebugMode) {
-          print('🔇 알림음 꺼짐 (사용자 설정)');
-        }
-      }
 
       if (kDebugMode) {
         print('✅ 알림 표시 완료: $title - $body');
