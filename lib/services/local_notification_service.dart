@@ -202,19 +202,33 @@ class LocalNotificationService {
       // 카운터 증가
       counter++;
       
+      if (kDebugMode) {
+        print('📈 카운터 증가: ${counter - 1} → $counter');
+      }
+      
       // 카운터 및 마지막 메시지 저장
       await prefs.setInt(counterKey, counter);
       await prefs.setInt(lastTimeKey, DateTime.now().millisecondsSinceEpoch);
       await prefs.setString(lastMsgKey, body); // 중복 방지용 메시지 저장
       
+      // ⭐ 저장 후 재확인 (검증용)
+      final savedCounter = prefs.getInt(counterKey) ?? -1;
       if (kDebugMode) {
         print('💾 카운터 저장 완료: $counter (키: $counterKey)');
+        print('✅ 저장 검증: SharedPreferences에서 읽은 값 = $savedCounter');
+        if (savedCounter != counter) {
+          print('⚠️⚠️⚠️ 경고: 저장된 값($savedCounter)과 현재 값($counter)이 다릅니다!');
+        }
       }
       
       // ⭐ 2회당 1회 알림음 재생 여부 결정
       final shouldPlaySound = (counter % 2 == 1); // 홀수번째만 소리
       
       if (kDebugMode) {
+        print('🎵 알림음 재생 로직:');
+        print('   → counter = $counter');
+        print('   → counter % 2 = ${counter % 2}');
+        print('   → shouldPlaySound = $shouldPlaySound');
         print('🔔 알림 #$counter: ${shouldPlaySound ? "🔊 소리 O" : "🔇 소리 X"} (채팅방: $chatRoomId)');
       }
 
@@ -222,9 +236,22 @@ class LocalNotificationService {
       final channelId = shouldPlaySound ? 'qrchat_messages_sound' : 'qrchat_messages_silent';
       final channelName = shouldPlaySound ? 'QRChat 메시지 (소리)' : 'QRChat 메시지 (무음)';
 
+      if (kDebugMode) {
+        print('📢 알림 채널 선택:');
+        print('   → channelId: $channelId');
+        print('   → playSound: $shouldPlaySound');
+        print('   → enableVibration: $shouldPlaySound');
+        print('   → sound: ${shouldPlaySound ? "notification.mp3" : "null"}');
+      }
+
       // 1. 로컬 알림 표시
+      final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+      if (kDebugMode) {
+        print('🔔 알림 표시 시작... (ID: $notificationId)');
+      }
+      
       await _notifications.show(
-        DateTime.now().millisecondsSinceEpoch.remainder(100000), // 고유 ID
+        notificationId,
         title,
         body,
         NotificationDetails(
@@ -251,7 +278,13 @@ class LocalNotificationService {
       );
 
       if (kDebugMode) {
-        print('✅ 알림 표시 완료: $title - $body');
+        print('✅✅✅ 알림 표시 완료 ===================================');
+        print('   → 제목: $title');
+        print('   → 내용: $body');
+        print('   → 채널: $channelId');
+        print('   → 소리: ${shouldPlaySound ? "🔊 재생됨" : "🔇 무음"}');
+        print('   → 카운터: #$counter');
+        print('===========================================================');
       }
     } catch (e) {
       if (kDebugMode) {

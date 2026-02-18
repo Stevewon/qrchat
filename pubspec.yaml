@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 닉네임 실시간 동기화 v1.0.99"
+description: "QRChat - 알림음 로직 디버깅 강화 v1.0.100"
 publish_to: 'none'
 
-version: 1.0.99+199
+version: 1.0.100+200
 
 environment:
   sdk: ^3.9.2
