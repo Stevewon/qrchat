@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 배지 초기화 및 카운터 수정 v1.0.95"
+description: "QRChat - Firestore 리스너 중복 알림 수정 v1.0.96"
 publish_to: 'none'
 
-version: 1.0.95+195
+version: 1.0.96+196
 
 environment:
   sdk: ^3.9.2
