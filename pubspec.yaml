@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - 백그라운드 알림음 디버깅 강화 v1.0.94"
+description: "QRChat - 배지 초기화 및 카운터 수정 v1.0.95"
 publish_to: 'none'
 
-version: 1.0.94+194
+version: 1.0.95+195
 
 environment:
   sdk: ^3.9.2

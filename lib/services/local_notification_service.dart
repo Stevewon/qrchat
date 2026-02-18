@@ -23,10 +23,31 @@ class LocalNotificationService {
   static final Map<String, DateTime> _lastNotificationTime = {};
   
   /// 현재 활성 채팅방 설정 (채팅방 진입 시 호출)
-  static void setActiveChatRoom(String? chatRoomId) {
+  static Future<void> setActiveChatRoom(String? chatRoomId) async {
     _activeChatRoomId = chatRoomId;
-    if (kDebugMode) {
-      print('🔇 활성 채팅방 설정: $_activeChatRoomId');
+    
+    // ⭐ 채팅방 진입 시 알림 전체 삭제 (배지 숫자 0으로)
+    await cancelAll();
+    
+    // ⭐ 채팅방 진입 시 카운터 초기화 (다음 알림은 소리 나도록)
+    if (chatRoomId != null) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final counterKey = 'notification_counter_$chatRoomId';
+        await prefs.remove(counterKey); // 카운터 삭제
+        
+        if (kDebugMode) {
+          print('🔇 활성 채팅방 설정 + 카운터 초기화: $chatRoomId');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('⚠️ 카운터 초기화 실패: $e');
+        }
+      }
+    } else {
+      if (kDebugMode) {
+        print('🔇 활성 채팅방 해제 (null)');
+      }
     }
   }
   
