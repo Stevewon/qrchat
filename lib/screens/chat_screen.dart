@@ -64,7 +64,9 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _showEmojiPicker = false; // 이모티콘 패널 표시 여부
   StreamSubscription? _messagesSubscription;
   StreamSubscription<ChatRoom?>? _chatRoomSubscription;
+  StreamSubscription<DocumentSnapshot>? _otherUserSubscription;  // ⭐ 추가: 상대방 정보 실시간 구독
   late ChatRoom _currentChatRoom; // 채팅방 정보 (업데이트 가능)
+  String? _otherUserNickname;  // ⭐ 추가: 상대방 닉네임 (실시간 업데이트)
   
   // 🎁 보상 이벤트 (3인 이상일 때)
   List<RewardEvent> _activeRewardEvents = [];
@@ -107,6 +109,11 @@ class _ChatScreenState extends State<ChatScreen> {
     ChatStateService().enterChatRoom(widget.chatRoom.id);
     LocalNotificationService.setActiveChatRoom(widget.chatRoom.id);  // ⭐ 추가
     
+    // ⭐ 1:1 채팅방인 경우 상대방 닉네임 실시간 구독
+    if (_currentChatRoom.type == ChatRoomType.oneToOne) {
+      _listenToOtherUserNickname();
+    }
+    
     // 채팅방 정보 실시간 업데이트
     _listenToChatRoom();
     
@@ -134,6 +141,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollController.dispose();
     _messagesSubscription?.cancel();
     _chatRoomSubscription?.cancel();
+    _otherUserSubscription?.cancel();  // ⭐ 추가
     _rewardEventsSubscription?.cancel(); // 🎁 보상 이벤트 구독 해제
     
     // QKEY 타이머 제거됨
@@ -158,6 +166,38 @@ class _ChatScreenState extends State<ChatScreen> {
       onError: (error) {
         if (kDebugMode) {
           debugPrint('❌ [채팅방 스트림 오류] $error');
+        }
+      },
+    );
+  }
+
+  /// ⭐ 상대방 닉네임 실시간 구독 (1:1 채팅용)
+  void _listenToOtherUserNickname() {
+    // 상대방 ID 가져오기
+    final otherUserId = _currentChatRoom.getOtherParticipantId(widget.currentUserId);
+    if (otherUserId.isEmpty) return;
+    
+    // Firestore에서 상대방 정보 실시간 구독
+    _otherUserSubscription = FirebaseFirestore.instance
+        .collection('users')
+        .doc(otherUserId)
+        .snapshots()
+        .listen(
+      (snapshot) {
+        if (snapshot.exists && mounted) {
+          final data = snapshot.data();
+          setState(() {
+            _otherUserNickname = data?['nickname'] as String? ?? 'Unknown';
+          });
+          
+          if (kDebugMode) {
+            debugPrint('🔄 [닉네임 업데이트] $_otherUserNickname');
+          }
+        }
+      },
+      onError: (error) {
+        if (kDebugMode) {
+          debugPrint('❌ [닉네임 스트림 오류] $error');
         }
       },
     );
@@ -2012,7 +2052,10 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     // 채팅방 제목 (1:1은 상대방 이름, 그룹은 그룹 이름)
-    final chatTitle = _currentChatRoom.getTitle(widget.currentUserNickname);
+    // ⭐ 1:1 채팅은 실시간 닉네임, 그룹은 기존 로직 사용
+    final chatTitle = _currentChatRoom.type == ChatRoomType.oneToOne && _otherUserNickname != null
+        ? _otherUserNickname!
+        : _currentChatRoom.getTitle(widget.currentUserNickname);
     // 참가자 수
     final participantCount = _currentChatRoom.participantIds.length;
     
