@@ -26,8 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // ⚠️ Firestore 리스너 비활성화: FCM이 이미 알림을 보내므로 중복 방지
-    // _startNotificationListener();
+    _startNotificationListener(); // Firestore 리스너 재활성화
     _checkLoginBonus(); // 로그인 보너스 확인
   }
   

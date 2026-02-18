@@ -160,6 +160,19 @@ class LocalNotificationService {
       final prefs = await SharedPreferences.getInstance();
       final counterKey = 'notification_counter_$chatRoomId';
       final lastTimeKey = 'notification_last_time_$chatRoomId';
+      final lastMsgKey = 'notification_last_msg_$chatRoomId';
+      
+      // ⭐⭐ 중복 알림 방지: 1초 이내 동일 메시지 무시
+      final lastTimeMs = prefs.getInt(lastTimeKey) ?? 0;
+      final lastMsg = prefs.getString(lastMsgKey) ?? '';
+      final now = DateTime.now().millisecondsSinceEpoch;
+      
+      if (lastTimeMs > 0 && (now - lastTimeMs) < 1000 && lastMsg == body) {
+        if (kDebugMode) {
+          print('🚫 중복 알림 무시: 1초 이내 동일 메시지 (${now - lastTimeMs}ms 전)');
+        }
+        return; // 중복 알림 차단
+      }
       
       // 현재 카운터 읽기
       int counter = prefs.getInt(counterKey) ?? 0;
@@ -169,8 +182,6 @@ class LocalNotificationService {
       }
       
       // 마지막 알림 시간 확인 (10분 경과 시 카운터 초기화)
-      final lastTimeMs = prefs.getInt(lastTimeKey) ?? 0;
-      
       // ⭐ lastTimeMs가 0이면 첫 알림이므로 리셋하지 않음
       if (lastTimeMs > 0) {
         final lastTime = DateTime.fromMillisecondsSinceEpoch(lastTimeMs);
@@ -191,9 +202,10 @@ class LocalNotificationService {
       // 카운터 증가
       counter++;
       
-      // 카운터 저장
+      // 카운터 및 마지막 메시지 저장
       await prefs.setInt(counterKey, counter);
       await prefs.setInt(lastTimeKey, DateTime.now().millisecondsSinceEpoch);
+      await prefs.setString(lastMsgKey, body); // 중복 방지용 메시지 저장
       
       if (kDebugMode) {
         print('💾 카운터 저장 완료: $counter (키: $counterKey)');

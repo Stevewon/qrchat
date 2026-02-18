@@ -1,8 +1,8 @@
 name: qrchat
-description: "QRChat - Firestore 리스너 중복 알림 수정 v1.0.96"
+description: "QRChat - 알림 복구 및 중복 방지 v1.0.97"
 publish_to: 'none'
 
-version: 1.0.96+196
+version: 1.0.97+197
 
 environment:
   sdk: ^3.9.2
