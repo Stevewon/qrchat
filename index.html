@@ -3,318 +3,1081 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRChat v1.0.80 - 보상 잔액 표시 수정</title>
+    <meta name="description" content="QRChat - QR 코드로 친구를 추가하고 안전하게 채팅하세요. 보안 채팅, 그룹 채팅, 사진/동영상 공유.">
+    <meta name="keywords" content="QRChat, 큐알챗, QR코드, 채팅, 보안채팅, 메신저, 친구추가">
+    <meta property="og:title" content="QRChat - QR 코드 기반 보안 채팅 앱">
+    <meta property="og:description" content="QR 코드로 친구를 추가하고 안전하게 채팅하세요">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://qrchat.io">
+    <title>QRChat - QR 코드 기반 보안 채팅 앱</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Modern color palette - vibrant and professional */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --secondary-dark: #db2777;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --success: #10b981;
+            --danger: #ef4444;
+            
+            /* Neutral colors */
+            --text-dark: #1e293b;
+            --text-medium: #475569;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --border-light: #e2e8f0;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-vibrant: linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #f59e0b 100%);
+            --gradient-purple: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            --gradient-blue: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --gradient-orange: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
+            --shadow-xl: 0 16px 48px rgba(0,0,0,0.20);
+            
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            --spacing-2xl: 4rem;
+            --spacing-3xl: 6rem;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+            background: var(--bg-light);
         }
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 900px;
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Header - Modern glassmorphism */
+        header {
+            background: rgba(99, 102, 241, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            color: white;
+            padding: 1.2rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        header.scrolled {
+            background: rgba(99, 102, 241, 0.95);
+            box-shadow: var(--shadow-lg);
+            padding: 0.8rem 0;
+        }
+
+        nav {
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
         }
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 2.8em;
-            text-align: center;
-        }
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.2em;
-        }
-        .success-banner {
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-        }
-        .success-banner h2 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        .update-notice {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
-        }
-        .update-notice h2 {
+
+        .logo {
             font-size: 1.8em;
-            margin-bottom: 10px;
-        }
-        .download-card {
-            background: #f5f5f5;
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .download-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-        .download-card.main {
-            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-            color: white;
-            border: 3px solid #ff9800;
-        }
-        .download-card.main h3 {
-            color: white;
-        }
-        .download-card h3 {
-            color: #333;
-            margin-bottom: 15px;
+            font-weight: 800;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            font-size: 1.5em;
-        }
-        .badge {
-            background: #ff9800;
+            gap: 0.6rem;
             color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.6em;
-            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
         }
-        .badge.new {
-            background: #f44336;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        .file-info {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            font-size: 1.1em;
-            padding: 10px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 8px;
-        }
-        .download-btn {
-            display: block;
-            background: #667eea;
-            color: white;
-            padding: 15px 40px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2em;
-            text-align: center;
-            margin-top: 15px;
-            transition: background 0.3s, transform 0.2s;
-        }
-        .download-btn:hover {
-            background: #5568d3;
+
+        .logo:hover {
             transform: scale(1.05);
         }
-        .info-box {
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
+
+        .logo i {
+            font-size: 1.3em;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
-        .info-box h3 {
-            color: #e65100;
-            margin-bottom: 15px;
+
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-xl);
+            list-style: none;
+            align-items: center;
         }
-        .comparison {
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-light);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section - Stunning gradient with particles */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            position: relative;
+            color: white;
+            padding: 160px var(--spacing-lg) 100px;
+            text-align: center;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(99, 102, 241, 0.2) 0%, transparent 50%);
+            animation: pulse 10s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: var(--spacing-md);
+            font-weight: 800;
+            line-height: 1.2;
+            animation: fadeInUp 0.8s ease-out;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            letter-spacing: -0.02em;
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-xl);
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            margin-top: var(--spacing-xl);
+        }
+
+        /* Modern 3D buttons with amazing effects */
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem 2.5rem;
+            background: white;
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.2),
+                0 1px 3px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.8);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-6px) scale(1.05);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.3),
+                0 5px 10px rgba(0,0,0,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+
+        .download-btn:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .download-btn i {
+            font-size: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .download-btn:hover i {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .download-btn.android {
+            background: linear-gradient(135deg, #3ddc84 0%, #2bb968 100%);
+            color: white;
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .download-btn.android:hover {
+            background: linear-gradient(135deg, #2bb968 0%, #1fa855 100%);
+            box-shadow: 
+                0 20px 50px rgba(61, 220, 132, 0.4),
+                0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .download-btn.ios {
+            background: linear-gradient(135deg, #000000 0%, #434343 100%);
+            color: white;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .download-btn.ios:hover {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .download-btn.direct {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .download-btn.direct:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 
+                0 20px 50px rgba(245, 158, 11, 0.4),
+                0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .download-btn small {
+            display: block;
+            font-size: 0.75em;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .download-btn strong {
+            display: block;
+            font-size: 1em;
+            font-weight: 700;
+        }
+
+        /* Features Section - Card redesign */
+        .features {
+            padding: var(--spacing-3xl) var(--spacing-lg);
+            max-width: 1280px;
+            margin: 0 auto;
+            background: var(--bg-light);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: var(--spacing-2xl);
+            color: var(--text-dark);
+            font-weight: 800;
+            position: relative;
+            padding-bottom: var(--spacing-md);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 5px;
+            background: var(--gradient-vibrant);
+            border-radius: 3px;
+        }
+
+        .features-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-2xl);
         }
-        .comparison-box {
-            padding: 15px;
+
+        .feature-card {
+            background: var(--bg-white);
+            padding: var(--spacing-xl);
+            border-radius: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-vibrant);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-light);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--spacing-md);
+            background: var(--gradient-vibrant);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: rotateY(360deg) scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: var(--text-medium);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: var(--spacing-3xl) var(--spacing-lg);
+        }
+
+        .screenshots-container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .screenshot-grid {
+            display: flex;
+            gap: var(--spacing-xl);
+            overflow-x: auto;
+            padding: var(--spacing-lg) 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .screenshot-grid::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .screenshot-grid::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
             border-radius: 10px;
+        }
+
+        .screenshot-grid::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .screenshot {
+            flex: 0 0 340px;
+            scroll-snap-align: center;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            background: white;
+            padding: var(--spacing-md);
+            transition: transform 0.3s ease;
+        }
+
+        .screenshot:hover {
+            transform: scale(1.05);
+        }
+
+        .screenshot img {
+            width: 100%;
+            border-radius: 16px;
+        }
+
+        /* How It Works - Modern timeline */
+        .how-it-works {
+            padding: var(--spacing-3xl) var(--spacing-lg);
+            max-width: 1280px;
+            margin: 0 auto;
+            background: var(--bg-white);
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-2xl);
+        }
+
+        .step {
             text-align: center;
+            position: relative;
+            padding: var(--spacing-lg);
+            background: var(--bg-light);
+            border-radius: 20px;
+            transition: all 0.4s ease;
         }
-        .comparison-box.before {
-            background: #ffebee;
-            border: 2px solid #f44336;
+
+        .step:hover {
+            background: white;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-8px);
         }
-        .comparison-box.after {
-            background: #e8f5e9;
-            border: 2px solid #4caf50;
+
+        .step-number {
+            width: 70px;
+            height: 70px;
+            background: var(--gradient-vibrant);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 auto var(--spacing-md);
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s ease;
         }
-        .footer {
+
+        .step:hover .step-number {
+            transform: scale(1.15) rotate(360deg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .step h3 {
+            font-size: 1.4rem;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .step p {
+            color: var(--text-medium);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        /* CTA Section - Eye-catching */
+        .cta {
+            background: var(--gradient-vibrant);
+            color: white;
+            padding: var(--spacing-3xl) var(--spacing-lg);
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 2px solid #ddd;
-            color: #999;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta h2 {
+            font-size: 3.5rem;
+            margin-bottom: var(--spacing-md);
+            font-weight: 800;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .cta p {
+            font-size: 1.4rem;
+            margin-bottom: var(--spacing-xl);
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        /* Footer - Modern and clean */
+        footer {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: var(--spacing-3xl) var(--spacing-lg) var(--spacing-lg);
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .footer-section h3 {
+            margin-bottom: var(--spacing-md);
+            color: var(--accent-light);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .footer-section p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .footer-section a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-light);
+            transform: translateX(5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: 1.8rem;
+            margin-top: var(--spacing-sm);
+        }
+
+        .social-links a {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-5px) rotate(5deg);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            margin-top: var(--spacing-xl);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Scroll reveal animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Coming soon badge - improved */
+        .coming-soon {
+            display: inline-block;
+            background: rgba(255,255,255,0.25);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75em;
+            margin-left: 0.5rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .cta h2 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .download-buttons {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+
+            .download-btn {
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .features-grid,
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cta h2 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Loading animation */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🐛 QRChat v1.0.80</h1>
-        <p class="subtitle">보상 잔액 표시 수정!</p>
+    <!-- Header -->
+    <header id="header">
+        <nav>
+            <div class="logo">
+                <i class="fas fa-qrcode"></i>
+                QRChat
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">기능</a></li>
+                <li><a href="#how-it-works">사용법</a></li>
+                <li><a href="#download">다운로드</a></li>
+                <li><a href="https://github.com/Stevewon/qrchat" target="_blank">GitHub</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>🔐 QRChat</h1>
+            <p class="subtitle">QR 코드로 친구를 추가하고<br>안전하게 채팅하세요</p>
+            <div class="download-buttons">
+                <a href="https://github.com/Stevewon/qrchat/releases/latest" class="download-btn android">
+                    <i class="fab fa-google-play"></i>
+                    <div>
+                        <small>지금 다운로드</small>
+                        <strong>Android APK</strong>
+                    </div>
+                </a>
+                <a href="https://github.com/Stevewon/qrchat" class="download-btn ios">
+                    <i class="fab fa-apple"></i>
+                    <div>
+                        <small>개발 중</small>
+                        <strong>iOS 버전</strong>
+                        <span class="coming-soon">준비 중</span>
+                    </div>
+                </a>
+                <a href="https://github.com/Stevewon/qrchat/releases" class="download-btn direct">
+                    <i class="fas fa-download"></i>
+                    <div>
+                        <small>직접 다운로드</small>
+                        <strong>APK 파일</strong>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2 class="section-title reveal">주요 기능</h2>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <h3>QR 코드 친구 추가</h3>
+                <p>복잡한 ID나 전화번호 없이 QR 코드만으로 간편하게 친구를 추가하세요.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>보안 채팅 (Securet)</h3>
+                <p>민감한 대화는 보안 채팅으로! 종단간 암호화로 안전하게 대화하세요.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>그룹 채팅</h3>
+                <p>친구들과 함께 그룹 채팅을 만들고 동시에 대화를 나누세요.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3>사진/동영상 공유</h3>
+                <p>사진, 동영상, 파일을 빠르고 안전하게 공유하세요.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>스마트 알림</h3>
+                <p>2회당 1회 알림음으로 배터리를 절약하면서도 메시지를 놓치지 마세요.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h3>로그인 보너스</h3>
+                <p>매일 로그인하고 보너스를 받으세요. 재미있는 리워드 시스템!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <h2 class="section-title reveal">사용 방법</h2>
+        <div class="steps">
+            <div class="step reveal">
+                <div class="step-number">1</div>
+                <h3>앱 다운로드</h3>
+                <p>GitHub Releases에서 최신 Android APK를 다운로드하세요.</p>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">2</div>
+                <h3>QR 주소 생성</h3>
+                <p>고유한 QR 주소를 생성하여 나만의 계정을 만드세요.</p>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">3</div>
+                <h3>친구 추가</h3>
+                <p>QR 코드를 스캔하거나 내 QR 코드를 공유하여 친구를 추가하세요.</p>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">4</div>
+                <h3>채팅 시작!</h3>
+                <p>친구와 안전하게 채팅을 시작하세요. 보안 채팅도 사용해보세요!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="download" class="cta">
+        <div class="cta-content">
+            <h2>지금 시작하세요!</h2>
+            <p>QRChat과 함께 더 안전하고 편리한 채팅을 경험해보세요.</p>
+            <div class="download-buttons">
+                <a href="https://github.com/Stevewon/qrchat/releases/latest" class="download-btn android">
+                    <i class="fab fa-android"></i>
+                    <div>
+                        <strong>Android APK 다운로드</strong>
+                    </div>
+                </a>
+                <a href="https://github.com/Stevewon/qrchat" class="download-btn ios">
+                    <i class="fab fa-apple"></i>
+                    <div>
+                        <strong>iOS 버전 준비 중</strong>
+                    </div>
+                </a>
+                <a href="https://github.com/Stevewon/qrchat/releases" class="download-btn direct">
+                    <i class="fas fa-download"></i>
+                    <div>
+                        <strong>직접 다운로드</strong>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>QRChat</h3>
+                <p>QR 코드 기반 보안 채팅 앱</p>
+                <div class="social-links">
+                    <a href="https://github.com/Stevewon/qrchat" target="_blank" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h3>다운로드</h3>
+                <ul>
+                    <li><a href="https://github.com/Stevewon/qrchat/releases/latest">Android APK 다운로드</a></li>
+                    <li><a href="https://github.com/Stevewon/qrchat">iOS 버전 (준비 중)</a></li>
+                    <li><a href="https://github.com/Stevewon/qrchat/releases/latest">APK 다운로드</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>정보</h3>
+                <ul>
+                    <li><a href="https://github.com/Stevewon/qrchat">GitHub 소스</a></li>
+                    <li><a href="https://github.com/Stevewon/qrchat/releases">릴리스 노트</a></li>
+                    <li><a href="https://github.com/Stevewon/qrchat/issues">버그 리포트</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>개발자</h3>
+                <ul>
+                    <li><a href="https://github.com/Stevewon">Stevewon</a></li>
+                    <li>Version: v1.0.100</li>
+                    <li>Build: 200</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2026 QRChat. All rights reserved. | Made with ❤️ by Stevewon</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect - glassmorphism
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Scroll reveal animation
+        const reveals = document.querySelectorAll('.reveal');
         
-        <div class="update-notice">
-            <h2>🆕 v1.0.80 업데이트!</h2>
-            <p style="font-size: 1.2em;">보상 내역에서 "잔액 0" 버그 수정!</p>
-        </div>
+        function checkReveal() {
+            reveals.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 100;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        }
 
-        <div class="success-banner">
-            <h2>✅ 보상 시스템 완벽!</h2>
-            <p style="font-size: 1.2em;">황금 구슬 + 정확한 잔액 표시! 🏆</p>
-        </div>
+        window.addEventListener('scroll', checkReveal);
+        checkReveal(); // Check on page load
 
-        <div class="comparison">
-            <div class="comparison-box before">
-                <h4>❌ Before (v1.0.79)</h4>
-                <p style="margin: 10px 0; font-size: 0.9em;">
-                    보너스<br>
-                    🎁 그룹 채팅 보상 이벤트<br>
-                    +1 QKEY<br>
-                    <strong style="color: #f44336;">잔액 0 ❌</strong>
-                </p>
-            </div>
-            <div class="comparison-box after">
-                <h4>✅ After (v1.0.80)</h4>
-                <p style="margin: 10px 0; font-size: 0.9em;">
-                    보너스<br>
-                    🎁 그룹 채팅 보상 이벤트<br>
-                    +1 QKEY<br>
-                    <strong style="color: #4caf50;">잔액 1613 ✅</strong>
-                </p>
-            </div>
-        </div>
+        // Add floating animation to hero buttons
+        const heroButtons = document.querySelectorAll('.hero .download-btn');
+        heroButtons.forEach((btn, index) => {
+            btn.style.animation = `float 3s ease-in-out ${index * 0.2}s infinite`;
+        });
 
-        <div class="download-card main">
-            <h3>
-                <span>📱 QRChat v1.0.80</span>
-                <span class="badge new">NEW!</span>
-            </h3>
-            <div class="file-info">
-                <span>📁 qrchat_v1.0.80.apk</span>
-                <span>📊 70MB</span>
-            </div>
-            <p style="line-height: 1.8; margin: 15px 0;">
-                <strong>버전:</strong> v1.0.80 (Build 180)<br>
-                <strong>빌드:</strong> Release (서명 완료)<br>
-                <strong>날짜:</strong> 2026-02-17<br>
-                <strong>수정:</strong> 보상 잔액 표시 버그 수정 ✅
-            </p>
-            <a href="qrchat_v1.0.80.apk" class="download-btn" download>
-                ⬇️ v1.0.80 다운로드 (70MB)
-            </a>
-        </div>
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
 
-        <div class="info-box">
-            <h3>🔧 수정 내용</h3>
-            <p style="color: #555; line-height: 1.8;">
-                <strong>문제:</strong><br>
-                보상 획득 시 QKEY 내역에서 "잔액 0"으로 표시<br><br>
-                <strong>원인:</strong><br>
-                트랜잭션 기록에 <code>balanceAfter</code> 필드 누락<br><br>
-                <strong>해결:</strong><br>
-                ✅ <code>balanceAfter</code> 필드 추가<br>
-                ✅ <code>qkey_balance</code> 동기화<br>
-                ✅ <code>totalQKeyEarned</code> 자동 증가
-            </p>
-        </div>
+        // Add ripple effect to buttons
+        document.querySelectorAll('.download-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
 
-        <div class="download-card">
-            <h3>📦 이전 버전 (v1.0.79)</h3>
-            <div class="file-info">
-                <span>📁 qrchat_v1.0.79_FINAL.apk</span>
-                <span>📊 70MB</span>
-            </div>
-            <p style="color: #666; line-height: 1.6; margin: 10px 0;">
-                보상 시스템 완벽 작동 (황금 구슬 나타남!)
-            </p>
-            <a href="qrchat_v1.0.79_FINAL.apk" class="download-btn" download>
-                ⬇️ v1.0.79 다운로드
-            </a>
-        </div>
-
-        <div class="download-card">
-            <h3>📦 소스 코드 백업</h3>
-            <div class="file-info">
-                <span>📁 qrchat_backup_v1.0.79_final_2026-02-17.tar.gz</span>
-                <span>📊 7.9MB</span>
-            </div>
-            <p style="color: #666; line-height: 1.6; margin: 10px 0;">
-                완전한 소스 코드 백업
-            </p>
-            <a href="qrchat_backup_v1.0.79_final_2026-02-17.tar.gz" class="download-btn" download>
-                ⬇️ 소스 백업 다운로드
-            </a>
-        </div>
-
-        <div class="info-box" style="background: #e8f5e9; border-left-color: #4caf50;">
-            <h3 style="color: #2e7d32;">🚀 빠른 설치</h3>
-            <p style="color: #555; line-height: 1.8;">
-                <strong>방법 1 (PC에서):</strong><br>
-                <code style="background: #f5f5f5; padding: 5px 10px; border-radius: 5px;">adb install qrchat_v1.0.80.apk</code>
-                <br><br>
-                <strong>방법 2 (휴대폰에서):</strong><br>
-                1. APK 파일 다운로드<br>
-                2. 파일 탭하여 설치<br>
-                3. "알 수 없는 출처" 허용
-            </p>
-        </div>
-
-        <div class="info-box" style="background: #ffebee; border-left-color: #f44336;">
-            <h3 style="color: #c62828;">⚠️ 중요: Firestore 인덱스!</h3>
-            <p style="color: #555; line-height: 1.8;">
-                보상 시스템이 작동하려면 Firestore 인덱스가 필요합니다:<br><br>
-                <strong>Collection:</strong> reward_events<br>
-                <strong>Fields:</strong><br>
-                • chatRoomId (Ascending)<br>
-                • status (Ascending)<br>
-                • createdAt (Descending)<br><br>
-                <a href="https://console.firebase.google.com/project/qrchat-b7a67/firestore/indexes" 
-                   style="color: #1976d2; text-decoration: none; font-weight: bold;"
-                   target="_blank">
-                   🔗 Firebase Console에서 확인 →
-                </a>
-            </p>
-        </div>
-
-        <div class="footer">
-            <p style="font-size: 1.2em; margin-bottom: 10px;"><strong>QRChat v1.0.80</strong> (Build 180)</p>
-            <p>빌드 날짜: 2026-02-17</p>
-            <p style="margin-top: 15px;">
-                <a href="https://github.com/Stevewon/qrchat/releases/tag/v1.0.80" 
-                   style="color: #667eea; text-decoration: none; font-weight: bold;"
-                   target="_blank">
-                   🔗 GitHub Release v1.0.80 →
-                </a>
-                <br>
-                <a href="https://github.com/Stevewon/qrchat/releases/tag/v1.0.79" 
-                   style="color: #667eea; text-decoration: none;"
-                   target="_blank">
-                   🔗 GitHub Release v1.0.79 →
-                </a>
-            </p>
-            <p style="margin-top: 20px; color: #4caf50; font-weight: bold;">
-                ✅ 황금 구슬 + 정확한 잔액 표시!<br>
-                모든 기능 완벽 작동 중! 🎉
-            </p>
-        </div>
-    </div>
+        // Console welcome message
+        console.log('%c🔐 QRChat', 'font-size: 30px; font-weight: bold; color: #6366f1;');
+        console.log('%cWelcome to QRChat! 안전한 채팅을 경험하세요.', 'font-size: 14px; color: #64748b;');
+        console.log('%cGitHub: https://github.com/Stevewon/qrchat', 'font-size: 12px; color: #10b981;');
+    </script>
 </body>
 </html>

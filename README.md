@@ -1,133 +1,119 @@
-# QR Chat - Flutter Application
+# QRChat Website
 
-Version: 9.13.0
+Official website for QRChat - QR Code Based Secure Chat App
 
-## 📱 Description
-QR Chat is a Flutter-based mobile application for real-time chat communication using QR codes. Users can scan QR codes to connect and chat with each other.
+## 🌐 Live Site
+- Production: https://qrchat.io
+- GitHub Pages: https://stevewon.github.io/qrchat
 
-## ✨ Features
-- QR Code-based user connection
-- Real-time messaging
-- Profile photos
-- Firebase integration
-- Push notifications (FCM)
-- Cross-platform support (Android, iOS, Web, Desktop)
+## 📁 Structure
 
-## 🛠 Tech Stack
-- **Framework**: Flutter 3.9.2+
-- **Backend**: Firebase
-  - Firebase Auth
-  - Cloud Firestore
-  - Firebase Storage
-  - Firebase Messaging (FCM)
-- **State Management**: Provider pattern
-- **Platform**: Android, iOS, Web, Linux, macOS, Windows
-
-## 📋 Prerequisites
-- Flutter SDK 3.9.2 or higher
-- Dart SDK
-- Android Studio / Xcode (for mobile development)
-- Firebase account and project setup
-
-## 🚀 Getting Started
-
-### 1. Install Dependencies
-```bash
-flutter pub get
+```
+qrchat-website/
+├── index.html          # Main landing page
+├── privacy.html        # Privacy policy
+├── terms.html          # Terms of service
+├── download.html       # Download page
+└── README.md          # This file
 ```
 
-### 2. Firebase Setup
-See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for detailed Firebase configuration instructions.
+## 🎨 Features
 
-### 3. Run the App
-```bash
-# Run on connected device
-flutter run
+- **Responsive Design**: Works on all devices
+- **Modern UI**: Clean and professional design
+- **App Store Buttons**: Google Play and App Store ready
+- **Feature Showcase**: 6 key features highlighted
+- **How It Works**: Step-by-step guide
+- **Social Links**: GitHub integration
 
-# Run on specific platform
-flutter run -d android
-flutter run -d ios
-flutter run -d chrome
+## 🚀 Deployment
+
+### GitHub Pages
+1. Push to GitHub repository
+2. Enable GitHub Pages in repository settings
+3. Set source to `main` branch
+
+### Custom Domain (qrchat.io)
+1. Add CNAME file with `qrchat.io`
+2. Configure DNS:
+   ```
+   Type: A
+   Name: @
+   Value: 185.199.108.153
+          185.199.109.153
+          185.199.110.153
+          185.199.111.153
+
+   Type: CNAME
+   Name: www
+   Value: stevewon.github.io
+   ```
+
+### Cloudflare Pages
+1. Connect GitHub repository
+2. Build settings:
+   - Build command: (none)
+   - Build output directory: `/`
+   - Root directory: `qrchat-website`
+3. Add custom domain: qrchat.io
+
+## 📱 App Store Links
+
+Update these placeholders when apps are published:
+
+- **Google Play**: `#` → `https://play.google.com/store/apps/details?id=com.qrchat.app`
+- **App Store**: `#` → `https://apps.apple.com/app/qrchat/id123456789`
+
+## 🔧 Customization
+
+### Colors
+Edit CSS variables in `index.html`:
+```css
+:root {
+    --primary: #667eea;
+    --secondary: #764ba2;
+    --accent: #f093fb;
+}
 ```
 
-### 4. Build Release
-```bash
-# Android APK
-flutter build apk --release
+### Content
+- Update feature descriptions
+- Add more screenshots
+- Modify download links
 
-# Android App Bundle
-flutter build appbundle --release
+## 📊 Analytics
 
-# iOS
-flutter build ios --release
+Add Google Analytics or other tracking:
 
-# Web
-flutter build web --release
+```html
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'GA_TRACKING_ID');
+</script>
 ```
 
-## 📁 Project Structure
-```
-lib/
-├── main.dart              # Application entry point
-├── firebase_options.dart  # Firebase configuration
-├── models/               # Data models
-├── screens/              # UI screens
-├── services/             # Business logic & Firebase services
-├── utils/                # Utility functions
-└── widgets/              # Reusable UI components
+## 🔗 Links
 
-assets/
-└── sounds/               # Sound files (notifications)
-
-android/                  # Android platform code
-ios/                      # iOS platform code
-web/                      # Web platform code
-```
-
-## 🔧 Configuration
-- **pubspec.yaml**: Dependencies and app metadata
-- **android/app/build.gradle.kts**: Android build configuration
-- **ios/Runner/Info.plist**: iOS configuration
-- **Firebase**: See FIREBASE_SETUP.md
-
-## 📱 Supported Platforms
-- ✅ Android
-- ✅ iOS
-- ✅ Web
-- ✅ Linux
-- ✅ macOS
-- ✅ Windows
-
-## 📦 Key Dependencies
-- `firebase_core`: ^3.6.0
-- `firebase_auth`: ^5.3.1
-- `cloud_firestore`: ^5.4.3
-- `firebase_storage`: ^12.3.2
-- `firebase_messaging`: ^15.1.3
-- `package_info_plus`: ^8.1.2
-
-## 🔐 Security
-- Firebase security rules configured
-- Authentication required for messaging
-- Secure storage for user data
-
-## 📝 Version History
-- v9.13.0 - Current version
-- v9.18.1 - Latest APK release
-- v7.5.0 - Previous stable version
-
-## 🤝 Contributing
-1. Create a feature branch
-2. Make your changes
-3. Test thoroughly
-4. Submit a pull request
+- **GitHub**: https://github.com/Stevewon/qrchat
+- **Latest Release**: https://github.com/Stevewon/qrchat/releases/latest
+- **Source Backup**: Available on request
 
 ## 📄 License
-Proprietary - All rights reserved
 
-## 📞 Support
-For issues and questions, please open an issue in the repository.
+Copyright © 2026 QRChat. All rights reserved.
+
+## 👤 Developer
+
+- **Name**: Stevewon
+- **GitHub**: https://github.com/Stevewon
+- **Project**: QRChat v1.0.100
 
 ---
 
-**Repository**: https://github.com/Stevewon/qrchat
+**Version**: 1.0.0  
+**Last Updated**: 2026-02-19  
+**Status**: Production Ready ✅
