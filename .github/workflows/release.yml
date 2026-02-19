@@ -1,0 +1,182 @@
+name: 🚀 Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags (v2.0.0, v2.0.1, etc.)
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  # Build for Linux
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.1'
+          channel: 'stable'
+      
+      - name: 📦 Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            libnotify-dev libayatana-appindicator3-dev
+      
+      - name: 📱 Get dependencies
+        run: flutter pub get
+      
+      - name: 🏗️ Build Linux
+        run: flutter build linux --release
+      
+      - name: 📦 Create .deb package
+        run: |
+          mkdir -p releases/qrchat-${{ github.ref_name }}/DEBIAN
+          mkdir -p releases/qrchat-${{ github.ref_name }}/usr/bin
+          mkdir -p releases/qrchat-${{ github.ref_name }}/usr/share/applications
+          
+          cp -r build/linux/x64/release/bundle/* releases/qrchat-${{ github.ref_name }}/usr/bin/
+          
+          cat > releases/qrchat-${{ github.ref_name }}/DEBIAN/control << EOF
+          Package: qrchat
+          Version: ${{ github.ref_name }}
+          Section: net
+          Priority: optional
+          Architecture: amd64
+          Maintainer: QRChat Team <support@qrchat.io>
+          Description: QRChat Desktop - KakaoTalk-style PC Messenger
+          EOF
+          
+          dpkg-deb --build releases/qrchat-${{ github.ref_name }} releases/qrchat_${{ github.ref_name }}_amd64.deb
+      
+      - name: 📤 Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: releases/*.deb
+
+  # Build for Windows
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.1'
+          channel: 'stable'
+      
+      - name: 📱 Get dependencies
+        run: flutter pub get
+      
+      - name: 🏗️ Build Windows
+        run: flutter build windows --release
+      
+      - name: 📦 Create MSIX
+        run: flutter pub run msix:create
+      
+      - name: 📦 Create Portable ZIP
+        run: |
+          cd build/windows/x64/runner/Release
+          Compress-Archive -Path * -DestinationPath ../../../../../QRChat-${{ github.ref_name }}-windows-portable.zip
+      
+      - name: 📤 Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: |
+            *.msix
+            *.zip
+
+  # Build for macOS
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.1'
+          channel: 'stable'
+      
+      - name: 📱 Get dependencies
+        run: flutter pub get
+      
+      - name: 🏗️ Build macOS
+        run: flutter build macos --release
+      
+      - name: 📦 Create DMG
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "QRChat ${{ github.ref_name }}" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --app-drop-link 600 185 \
+            "QRChat-${{ github.ref_name }}-macos.dmg" \
+            "build/macos/Build/Products/Release/qrchat.app"
+      
+      - name: 📤 Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: "*.dmg"
+
+  # Create GitHub Release
+  release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 📥 Download all artifacts
+        uses: actions/download-artifact@v4
+      
+      - name: 📝 Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: QRChat Desktop ${{ github.ref_name }}
+          body: |
+            # 🎉 QRChat Desktop ${{ github.ref_name }}
+            
+            ## 📥 Downloads
+            
+            ### Windows
+            - **MSIX Installer** (Recommended): `qrchat.msix`
+            - **Portable ZIP**: `QRChat-${{ github.ref_name }}-windows-portable.zip`
+            
+            ### macOS
+            - **DMG Installer**: `QRChat-${{ github.ref_name }}-macos.dmg`
+            
+            ### Linux
+            - **Debian Package**: `qrchat_${{ github.ref_name }}_amd64.deb`
+            
+            ## ✨ Features
+            - 카카오톡 스타일 PC 메신저
+            - 시스템 트레이 통합
+            - 자동 업데이트
+            - 멀티 플랫폼 지원
+            
+            ## 🔄 Auto-Update
+            This version supports automatic updates!
+            
+            ---
+            
+            **Full Changelog**: https://github.com/Stevewon/qrchat/compare/v1.0.85...v${{ github.ref_name }}
+          files: |
+            linux-build/*
+            windows-build/*
+            macos-build/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
