@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -22,37 +22,27 @@
         }
 
         :root {
-            /* Modern color palette - vibrant and professional */
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary: #ec4899;
-            --secondary-dark: #db2777;
-            --accent: #f59e0b;
-            --accent-light: #fbbf24;
-            --success: #10b981;
-            --danger: #ef4444;
+            /* KakaoTalk inspired clean palette */
+            --kakao-yellow: #FEE500;
+            --kakao-brown: #3C1E1E;
+            --primary: #FFD500;
+            --primary-dark: #F5C000;
+            --secondary: #5B5B5B;
+            --accent: #00C73C;
             
-            /* Neutral colors */
-            --text-dark: #1e293b;
-            --text-medium: #475569;
-            --text-light: #64748b;
-            --bg-light: #f8fafc;
-            --bg-white: #ffffff;
-            --border-light: #e2e8f0;
+            /* Clean neutral colors */
+            --text-dark: #191919;
+            --text-medium: #666666;
+            --text-light: #999999;
+            --bg-white: #FFFFFF;
+            --bg-gray: #F7F7F7;
+            --bg-light: #FAFAFA;
+            --border: #E8E8E8;
             
-            /* Gradients */
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-vibrant: linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #f59e0b 100%);
-            --gradient-purple: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
-            --gradient-blue: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-            --gradient-orange: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            
-            /* Shadows */
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
-            --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
-            --shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
-            --shadow-xl: 0 16px 48px rgba(0,0,0,0.20);
+            /* Subtle shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.10);
             
             /* Spacing */
             --spacing-xs: 0.5rem;
@@ -61,45 +51,39 @@
             --spacing-lg: 2rem;
             --spacing-xl: 3rem;
             --spacing-2xl: 4rem;
-            --spacing-3xl: 6rem;
+            --spacing-3xl: 5rem;
         }
 
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: var(--text-dark);
-            line-height: 1.7;
+            line-height: 1.6;
+            background: var(--bg-white);
             overflow-x: hidden;
-            background: var(--bg-light);
         }
 
-        /* Smooth scrolling */
         html {
             scroll-behavior: smooth;
         }
 
-        /* Header - Modern glassmorphism */
+        /* Header - Clean minimal style */
         header {
-            background: rgba(99, 102, 241, 0.1);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-            color: white;
-            padding: 1.2rem 0;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         header.scrolled {
-            background: rgba(99, 102, 241, 0.95);
-            box-shadow: var(--shadow-lg);
-            padding: 0.8rem 0;
+            box-shadow: var(--shadow-md);
         }
 
         nav {
-            max-width: 1280px;
+            max-width: 1200px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -108,706 +92,316 @@
         }
 
         .logo {
-            font-size: 1.8em;
-            font-weight: 800;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text-dark);
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
+            gap: 0.5rem;
         }
 
         .logo i {
-            font-size: 1.3em;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            color: var(--kakao-yellow);
+            font-size: 1.8rem;
         }
 
         .nav-links {
             display: flex;
-            gap: var(--spacing-xl);
+            gap: 2.5rem;
             list-style: none;
             align-items: center;
         }
 
         .nav-links a {
-            color: white;
+            color: var(--text-dark);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 1.05rem;
-            position: relative;
-            padding: 0.5rem 0;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 3px;
-            background: var(--accent);
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
         }
 
         .nav-links a:hover {
-            color: var(--accent-light);
-            transform: translateY(-2px);
+            color: var(--kakao-brown);
         }
 
-        /* Hero Section - Futuristic animated background */
+        /* Hero Section - Clean and bright */
         .hero {
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            position: relative;
-            color: white;
-            padding: 160px var(--spacing-lg) 100px;
+            background: var(--bg-white);
+            padding: 120px var(--spacing-lg) 80px;
             text-align: center;
-            overflow: hidden;
-            min-height: 100vh;
+            min-height: 85vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Fix overlap issue */
-            isolation: isolate;
-        }
-
-        /* Animated grid background */
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
-            opacity: 0.3;
-        }
-
-        @keyframes gridMove {
-            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
-            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
-        }
-
-        /* Floating geometric shapes */
-        .hero::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
-            animation: floatShapes 15s ease-in-out infinite;
-        }
-
-        @keyframes floatShapes {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        /* Particle system container */
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            animation: particleFloat 20s linear infinite;
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.8),
-                        0 0 20px rgba(236, 72, 153, 0.4);
-        }
-
-        @keyframes particleFloat {
-            0% {
-                transform: translateY(100vh) translateX(0) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) translateX(100px) scale(1);
-                opacity: 0;
-            }
-        }
-
-        /* Geometric shapes */
-        .geometric-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .hexagon {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            opacity: 0.1;
-            animation: rotateHexagon 20s linear infinite;
-        }
-
-        .hexagon::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: rgba(99, 102, 241, 0.3);
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            border: 2px solid rgba(99, 102, 241, 0.5);
-        }
-
-        @keyframes rotateHexagon {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.2); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-
-        .triangle {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 50px solid transparent;
-            border-right: 50px solid transparent;
-            border-bottom: 86px solid rgba(236, 72, 153, 0.2);
-            opacity: 0.15;
-            animation: floatTriangle 15s ease-in-out infinite;
-        }
-
-        @keyframes floatTriangle {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-50px) rotate(180deg); }
-        }
-
-        .circle {
-            position: absolute;
-            width: 150px;
-            height: 150px;
-            border: 3px solid rgba(245, 158, 11, 0.3);
-            border-radius: 50%;
-            opacity: 0.2;
-            animation: pulseCircle 8s ease-in-out infinite;
-        }
-
-        @keyframes pulseCircle {
-            0%, 100% { transform: scale(1); opacity: 0.2; }
-            50% { transform: scale(1.3); opacity: 0.4; }
-        }
-
-        /* Scan line effect */
-        .scan-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(99, 102, 241, 0.8) 50%, 
-                transparent 100%);
-            animation: scanMove 4s linear infinite;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
-        }
-
-        @keyframes scanMove {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(100vh); }
-        }
-
-        /* Neon glow text effect */
-        .neon-text {
-            text-shadow: 
-                0 0 10px rgba(99, 102, 241, 0.8),
-                0 0 20px rgba(99, 102, 241, 0.6),
-                0 0 30px rgba(236, 72, 153, 0.4),
-                0 0 40px rgba(236, 72, 153, 0.3);
         }
 
         .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
         .hero h1 {
-            font-size: 4.5rem;
-            margin-bottom: var(--spacing-md);
-            font-weight: 800;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
             line-height: 1.2;
-            animation: fadeInUp 0.8s ease-out;
-            letter-spacing: -0.02em;
         }
 
-        .hero h1.neon-text {
-            text-shadow: 
-                0 0 10px rgba(99, 102, 241, 1),
-                0 0 20px rgba(99, 102, 241, 0.8),
-                0 0 30px rgba(236, 72, 153, 0.6),
-                0 0 40px rgba(236, 72, 153, 0.4),
-                0 0 50px rgba(245, 158, 11, 0.2);
+        .hero h1 .emoji {
+            display: inline-block;
+            font-size: 4rem;
         }
 
-        .hero .subtitle {
-            font-size: 1.5rem;
-            margin-bottom: var(--spacing-xl);
-            opacity: 0.95;
-            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-medium);
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
             font-weight: 400;
-            line-height: 1.6;
         }
 
         .download-buttons {
             display: flex;
-            gap: var(--spacing-md);
+            gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
-            animation: fadeInUp 0.8s ease-out 0.4s backwards;
-            margin-top: var(--spacing-xl);
         }
 
-        /* Modern 3D buttons with amazing effects */
-        .download-btn {
+        /* KakaoTalk style buttons */
+        .btn {
             display: inline-flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1.2rem 2.5rem;
-            background: white;
-            color: var(--primary);
+            gap: 0.8rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
             text-decoration: none;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 10px 30px rgba(0,0,0,0.2),
-                0 1px 3px rgba(0,0,0,0.1),
-                inset 0 1px 0 rgba(255,255,255,0.8);
-            position: relative;
-            overflow: hidden;
-            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
 
-        .download-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
+        .btn-primary {
+            background: var(--kakao-yellow);
+            color: var(--kakao-brown);
         }
 
-        .download-btn:hover::before {
-            left: 100%;
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
-        .download-btn:hover {
-            transform: translateY(-6px) scale(1.05);
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.3),
-                0 5px 10px rgba(0,0,0,0.15),
-                inset 0 1px 0 rgba(255,255,255,0.9);
+        .btn-secondary {
+            background: var(--text-dark);
+            color: var(--bg-white);
         }
 
-        .download-btn:active {
-            transform: translateY(-2px) scale(1.02);
+        .btn-secondary:hover {
+            background: var(--kakao-brown);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
-        .download-btn i {
-            font-size: 2rem;
-            transition: transform 0.3s ease;
+        .btn-outline {
+            background: var(--bg-white);
+            color: var(--text-dark);
+            border: 2px solid var(--border);
         }
 
-        .download-btn:hover i {
-            transform: scale(1.2) rotate(5deg);
+        .btn-outline:hover {
+            border-color: var(--text-dark);
+            background: var(--bg-gray);
         }
 
-        .download-btn.android {
-            background: linear-gradient(135deg, #3ddc84 0%, #2bb968 100%);
-            color: white;
-            border-color: rgba(255,255,255,0.3);
+        .btn i {
+            font-size: 1.3rem;
         }
 
-        .download-btn.android:hover {
-            background: linear-gradient(135deg, #2bb968 0%, #1fa855 100%);
-            box-shadow: 
-                0 20px 50px rgba(61, 220, 132, 0.4),
-                0 5px 15px rgba(0,0,0,0.2);
+        /* Feature Badge */
+        .badge {
+            display: inline-block;
+            background: var(--bg-gray);
+            color: var(--text-medium);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
         }
 
-        .download-btn.ios {
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            color: white;
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        .download-btn.ios:hover {
-            background: linear-gradient(135deg, #434343 0%, #000000 100%);
-            box-shadow: 
-                0 20px 50px rgba(0, 0, 0, 0.5),
-                0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .download-btn.direct {
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            color: white;
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .download-btn.direct:hover {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            box-shadow: 
-                0 20px 50px rgba(245, 158, 11, 0.4),
-                0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .download-btn small {
-            display: block;
-            font-size: 0.75em;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        .download-btn strong {
-            display: block;
-            font-size: 1em;
-            font-weight: 700;
-        }
-
-        /* Features Section - Card redesign */
+        /* Features Section - Card style */
         .features {
             padding: var(--spacing-3xl) var(--spacing-lg);
-            max-width: 1280px;
-            margin: 0 auto;
             background: var(--bg-light);
         }
 
         .section-title {
             text-align: center;
-            font-size: 3rem;
-            margin-bottom: var(--spacing-2xl);
+            font-size: 2.5rem;
+            font-weight: 900;
             color: var(--text-dark);
-            font-weight: 800;
-            position: relative;
-            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
         }
 
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 5px;
-            background: var(--gradient-vibrant);
-            border-radius: 3px;
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-medium);
+            margin-top: 1rem;
+            font-weight: 400;
         }
 
         .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: var(--spacing-xl);
-            margin-top: var(--spacing-2xl);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
         }
 
         .feature-card {
             background: var(--bg-white);
-            padding: var(--spacing-xl);
-            border-radius: 24px;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
             text-align: center;
-            border: 2px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: var(--gradient-vibrant);
-            transform: scaleX(0);
-            transition: transform 0.5s ease;
-        }
-
-        .feature-card:hover::before {
-            transform: scaleX(1);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
         }
 
         .feature-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: var(--shadow-xl);
-            border-color: var(--primary-light);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
         }
 
         .feature-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto var(--spacing-md);
-            background: var(--gradient-vibrant);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: white;
-            box-shadow: var(--shadow-md);
-            transition: all 0.4s ease;
-        }
-
-        .feature-card:hover .feature-icon {
-            transform: rotateY(360deg) scale(1.1);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .feature-card h3 {
-            font-size: 1.6rem;
-            margin-bottom: var(--spacing-sm);
-            color: var(--text-dark);
-            font-weight: 700;
-        }
-
-        .feature-card p {
-            color: var(--text-medium);
-            line-height: 1.8;
-            font-size: 1.05rem;
-        }
-
-        /* Screenshots Section */
-        .screenshots {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            padding: var(--spacing-3xl) var(--spacing-lg);
-        }
-
-        .screenshots-container {
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-
-        .screenshot-grid {
-            display: flex;
-            gap: var(--spacing-xl);
-            overflow-x: auto;
-            padding: var(--spacing-lg) 0;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .screenshot-grid::-webkit-scrollbar {
-            height: 10px;
-        }
-
-        .screenshot-grid::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.05);
-            border-radius: 10px;
-        }
-
-        .screenshot-grid::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        .screenshot {
-            flex: 0 0 340px;
-            scroll-snap-align: center;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-            background: white;
-            padding: var(--spacing-md);
-            transition: transform 0.3s ease;
-        }
-
-        .screenshot:hover {
-            transform: scale(1.05);
-        }
-
-        .screenshot img {
-            width: 100%;
-            border-radius: 16px;
-        }
-
-        /* How It Works - Modern timeline */
-        .how-it-works {
-            padding: var(--spacing-3xl) var(--spacing-lg);
-            max-width: 1280px;
-            margin: 0 auto;
-            background: var(--bg-white);
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: var(--spacing-xl);
-            margin-top: var(--spacing-2xl);
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-            padding: var(--spacing-lg);
-            background: var(--bg-light);
-            border-radius: 20px;
-            transition: all 0.4s ease;
-        }
-
-        .step:hover {
-            background: white;
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-8px);
-        }
-
-        .step-number {
             width: 70px;
             height: 70px;
-            background: var(--gradient-vibrant);
-            color: white;
-            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            background: var(--bg-light);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
-            font-weight: 800;
-            margin: 0 auto var(--spacing-md);
-            box-shadow: var(--shadow-md);
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
         }
 
-        .step:hover .step-number {
-            transform: scale(1.15) rotate(360deg);
-            box-shadow: var(--shadow-lg);
+        .feature-card:hover .feature-icon {
+            background: var(--kakao-yellow);
+            transform: scale(1.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            line-height: 1.7;
+        }
+
+        /* How It Works - Simple steps */
+        .how-it-works {
+            padding: var(--spacing-3xl) var(--spacing-lg);
+            background: var(--bg-white);
+        }
+
+        .steps {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--kakao-yellow);
+            color: var(--kakao-brown);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin: 0 auto 1.5rem;
         }
 
         .step h3 {
-            font-size: 1.4rem;
-            margin-bottom: var(--spacing-sm);
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--text-dark);
+            margin-bottom: 0.8rem;
         }
 
         .step p {
+            font-size: 0.95rem;
             color: var(--text-medium);
-            line-height: 1.7;
-            font-size: 1.05rem;
+            line-height: 1.6;
         }
 
-        /* CTA Section - Eye-catching */
+        /* CTA Section - Bright and inviting */
         .cta {
-            background: var(--gradient-vibrant);
-            color: white;
+            background: var(--bg-light);
             padding: var(--spacing-3xl) var(--spacing-lg);
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            animation: pulse 8s ease-in-out infinite;
-        }
-
-        .cta-content {
-            position: relative;
-            z-index: 1;
         }
 
         .cta h2 {
-            font-size: 3.5rem;
-            margin-bottom: var(--spacing-md);
-            font-weight: 800;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
         }
 
         .cta p {
-            font-size: 1.4rem;
-            margin-bottom: var(--spacing-xl);
-            opacity: 0.95;
-            font-weight: 400;
+            font-size: 1.2rem;
+            color: var(--text-medium);
+            margin-bottom: 2.5rem;
         }
 
-        /* Footer - Modern and clean */
+        /* Footer - Clean minimal */
         footer {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: white;
-            padding: var(--spacing-3xl) var(--spacing-lg) var(--spacing-lg);
+            background: var(--text-dark);
+            color: var(--bg-white);
+            padding: 3rem var(--spacing-lg) 1.5rem;
         }
 
         .footer-content {
-            max-width: 1280px;
+            max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--spacing-xl);
-            margin-bottom: var(--spacing-xl);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
 
         .footer-section h3 {
-            margin-bottom: var(--spacing-md);
-            color: var(--accent-light);
-            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
             font-weight: 700;
+            color: var(--kakao-yellow);
         }
 
         .footer-section p {
             color: rgba(255,255,255,0.7);
-            line-height: 1.8;
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
         .footer-section ul {
@@ -815,225 +409,118 @@
         }
 
         .footer-section ul li {
-            margin-bottom: var(--spacing-xs);
+            margin-bottom: 0.5rem;
         }
 
         .footer-section a {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.7);
             text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-block;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
         }
 
         .footer-section a:hover {
-            color: var(--accent-light);
-            transform: translateX(5px);
+            color: var(--kakao-yellow);
         }
 
         .social-links {
             display: flex;
-            gap: var(--spacing-md);
-            font-size: 1.8rem;
-            margin-top: var(--spacing-sm);
+            gap: 1rem;
+            margin-top: 1rem;
         }
 
         .social-links a {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             background: rgba(255,255,255,0.1);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.2rem;
             transition: all 0.3s ease;
         }
 
         .social-links a:hover {
-            background: var(--primary);
-            transform: translateY(-5px) rotate(5deg);
+            background: var(--kakao-yellow);
+            color: var(--kakao-brown);
         }
 
         .copyright {
             text-align: center;
-            padding-top: var(--spacing-lg);
+            padding-top: 2rem;
             border-top: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.6);
-            margin-top: var(--spacing-xl);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
         }
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        /* Glitch effect for futuristic feel */
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-
-        /* Scroll reveal animation */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.8s ease;
-        }
-
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Coming soon badge - improved */
-        .coming-soon {
-            display: inline-block;
-            background: rgba(255,255,255,0.25);
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-size: 0.75em;
-            margin-left: 0.5rem;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        /* Responsive Design - Enhanced */
+        /* Responsive Design */
         @media (max-width: 968px) {
-            .hero {
-                padding: 140px var(--spacing-md) 80px;
-                min-height: 90vh;
+            .hero h1 {
+                font-size: 2.8rem;
             }
 
-            .hero h1 {
-                font-size: 3rem;
-            }
-            
-            .hero .subtitle {
-                font-size: 1.2rem;
+            .hero p {
+                font-size: 1.1rem;
             }
 
             .section-title {
-                font-size: 2.2rem;
-            }
-
-            .cta h2 {
-                font-size: 2.5rem;
-            }
-
-            /* Reduce geometric shapes on tablets */
-            .hexagon,
-            .triangle,
-            .circle {
-                opacity: 0.05;
-            }
-
-            .particle {
-                width: 3px;
-                height: 3px;
+                font-size: 2rem;
             }
         }
 
         @media (max-width: 768px) {
-            .hero {
-                padding: 120px var(--spacing-sm) 60px;
-                min-height: 100vh;
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-                line-height: 1.3;
-            }
-            
-            .hero .subtitle {
-                font-size: 1.1rem;
-                margin-bottom: var(--spacing-lg);
-            }
-
             .nav-links {
                 display: none;
             }
 
-            .download-buttons {
-                flex-direction: column;
-                gap: var(--spacing-md);
-                padding: 0 var(--spacing-sm);
+            .hero {
+                padding: 100px var(--spacing-md) 60px;
+                min-height: auto;
             }
 
-            .download-btn {
-                width: 100%;
-                max-width: 100%;
-                padding: 1rem 1.5rem;
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero h1 .emoji {
+                font-size: 2.8rem;
+            }
+
+            .hero p {
                 font-size: 1rem;
             }
 
-            .download-btn i {
-                font-size: 1.5rem;
+            .download-buttons {
+                flex-direction: column;
+                gap: 0.8rem;
             }
 
-            .features {
-                padding: var(--spacing-2xl) var(--spacing-sm);
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
 
             .features-grid,
             .steps {
                 grid-template-columns: 1fr;
-                gap: var(--spacing-md);
+                gap: 1rem;
             }
 
             .feature-card {
-                padding: var(--spacing-lg);
+                padding: 2rem 1.5rem;
             }
 
             .section-title {
-                font-size: 2rem;
-                margin-bottom: var(--spacing-lg);
-            }
-
-            .cta {
-                padding: var(--spacing-2xl) var(--spacing-sm);
+                font-size: 1.8rem;
             }
 
             .cta h2 {
                 font-size: 2rem;
             }
 
-            /* Hide geometric shapes on mobile for performance */
-            .hexagon,
-            .triangle,
-            .circle {
-                display: none;
-            }
-
-            /* Reduce particles on mobile */
-            .particle:nth-child(n+26) {
-                display: none;
-            }
-
-            /* Simplify scan line on mobile */
-            .scan-line {
-                opacity: 0.5;
-            }
-
-            /* Footer mobile optimization */
             .footer-content {
                 grid-template-columns: 1fr;
-                gap: var(--spacing-lg);
                 text-align: center;
             }
 
@@ -1042,42 +529,29 @@
             }
         }
 
-        /* Extra small devices (phones in portrait) */
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 2rem;
+        /* Smooth animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-
-            .hero .subtitle {
-                font-size: 1rem;
-            }
-
-            .download-btn {
-                padding: 0.9rem 1.2rem;
-                font-size: 0.95rem;
-            }
-
-            .feature-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
-            }
-
-            .step-number {
-                width: 60px;
-                height: 60px;
-                font-size: 1.5rem;
-            }
-
-            .section-title {
-                font-size: 1.8rem;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        /* Loading animation */
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Subtle hover effect */
+        .hover-lift {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
         }
     </style>
 </head>
@@ -1087,7 +561,7 @@
         <nav>
             <div class="logo">
                 <i class="fas fa-qrcode"></i>
-                QRChat
+                <span>QRChat</span>
             </div>
             <ul class="nav-links">
                 <li><a href="#features">기능</a></li>
@@ -1100,53 +574,28 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <!-- Futuristic Background Elements -->
-        <div class="geometric-bg">
-            <!-- Hexagons -->
-            <div class="hexagon" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
-            <div class="hexagon" style="top: 60%; left: 80%; animation-delay: 3s;"></div>
-            <div class="hexagon" style="top: 30%; left: 70%; animation-delay: 6s;"></div>
-            
-            <!-- Triangles -->
-            <div class="triangle" style="top: 20%; right: 15%; animation-delay: 2s;"></div>
-            <div class="triangle" style="bottom: 30%; left: 20%; animation-delay: 5s;"></div>
-            
-            <!-- Circles -->
-            <div class="circle" style="top: 50%; right: 10%; animation-delay: 1s;"></div>
-            <div class="circle" style="bottom: 20%; left: 15%; animation-delay: 4s;"></div>
-        </div>
-        
-        <!-- Particle System -->
-        <div class="particles" id="particles"></div>
-        
-        <!-- Scan Line Effect -->
-        <div class="scan-line"></div>
-        
-        <div class="hero-content">
-            <h1 class="neon-text">🔐 QRChat</h1>
-            <p class="subtitle">QR 코드로 친구를 추가하고<br>안전하게 채팅하세요</p>
+        <div class="hero-content fade-in">
+            <h1>
+                <span class="emoji">💬</span><br>
+                QR 코드로 시작하는<br>
+                간편하고 안전한 채팅
+            </h1>
+            <p>
+                복잡한 ID나 전화번호 없이 QR 코드 하나로<br>
+                친구를 추가하고 바로 대화를 시작하세요
+            </p>
             <div class="download-buttons">
-                <a href="https://github.com/Stevewon/qrchat/releases/latest" class="download-btn android">
-                    <i class="fab fa-google-play"></i>
-                    <div>
-                        <small>지금 다운로드</small>
-                        <strong>Android APK</strong>
-                    </div>
+                <a href="https://github.com/Stevewon/qrchat/releases/latest" class="btn btn-primary hover-lift">
+                    <i class="fab fa-android"></i>
+                    <span>Android 다운로드</span>
                 </a>
-                <a href="https://github.com/Stevewon/qrchat" class="download-btn ios">
+                <a href="https://github.com/Stevewon/qrchat" class="btn btn-secondary hover-lift">
                     <i class="fab fa-apple"></i>
-                    <div>
-                        <small>개발 중</small>
-                        <strong>iOS 버전</strong>
-                        <span class="coming-soon">준비 중</span>
-                    </div>
+                    <span>iOS<span class="badge">준비 중</span></span>
                 </a>
-                <a href="https://github.com/Stevewon/qrchat/releases" class="download-btn direct">
+                <a href="https://github.com/Stevewon/qrchat/releases" class="btn btn-outline hover-lift">
                     <i class="fas fa-download"></i>
-                    <div>
-                        <small>직접 다운로드</small>
-                        <strong>APK 파일</strong>
-                    </div>
+                    <span>APK 직접 다운로드</span>
                 </a>
             </div>
         </div>
@@ -1154,110 +603,102 @@
 
     <!-- Features Section -->
     <section id="features" class="features">
-        <h2 class="section-title reveal">주요 기능</h2>
+        <h2 class="section-title">왜 QRChat을 선택해야 할까요?</h2>
+        <p class="section-subtitle">간편함과 보안, 두 마리 토끼를 모두 잡았습니다</p>
+        
         <div class="features-grid">
-            <div class="feature-card reveal">
+            <div class="feature-card hover-lift">
                 <div class="feature-icon">
-                    <i class="fas fa-qrcode"></i>
+                    <i class="fas fa-qrcode" style="color: #FFD500;"></i>
                 </div>
                 <h3>QR 코드 친구 추가</h3>
-                <p>복잡한 ID나 전화번호 없이 QR 코드만으로 간편하게 친구를 추가하세요.</p>
+                <p>ID나 전화번호 없이 QR 코드만으로 친구를 추가하세요</p>
             </div>
 
-            <div class="feature-card reveal">
+            <div class="feature-card hover-lift">
                 <div class="feature-icon">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-shield-alt" style="color: #00C73C;"></i>
                 </div>
-                <h3>보안 채팅 (Securet)</h3>
-                <p>민감한 대화는 보안 채팅으로! 종단간 암호화로 안전하게 대화하세요.</p>
+                <h3>보안 채팅</h3>
+                <p>종단간 암호화로 안전하게 대화하는 시크릿 채팅</p>
             </div>
 
-            <div class="feature-card reveal">
+            <div class="feature-card hover-lift">
                 <div class="feature-icon">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-users" style="color: #5B5B5B;"></i>
                 </div>
                 <h3>그룹 채팅</h3>
-                <p>친구들과 함께 그룹 채팅을 만들고 동시에 대화를 나누세요.</p>
+                <p>친구들과 함께 그룹 채팅을 만들고 대화를 나누세요</p>
             </div>
 
-            <div class="feature-card reveal">
+            <div class="feature-card hover-lift">
                 <div class="feature-icon">
-                    <i class="fas fa-image"></i>
+                    <i class="fas fa-image" style="color: #FF6B6B;"></i>
                 </div>
-                <h3>사진/동영상 공유</h3>
-                <p>사진, 동영상, 파일을 빠르고 안전하게 공유하세요.</p>
+                <h3>미디어 공유</h3>
+                <p>사진, 동영상, 파일을 빠르고 안전하게 공유하세요</p>
             </div>
 
-            <div class="feature-card reveal">
+            <div class="feature-card hover-lift">
                 <div class="feature-icon">
-                    <i class="fas fa-bell"></i>
+                    <i class="fas fa-bell" style="color: #4ECDC4;"></i>
                 </div>
                 <h3>스마트 알림</h3>
-                <p>2회당 1회 알림음으로 배터리를 절약하면서도 메시지를 놓치지 마세요.</p>
+                <p>2회당 1회 알림으로 배터리를 절약하면서 메시지를 확인하세요</p>
             </div>
 
-            <div class="feature-card reveal">
+            <div class="feature-card hover-lift">
                 <div class="feature-icon">
-                    <i class="fas fa-gift"></i>
+                    <i class="fas fa-gift" style="color: #FFD500;"></i>
                 </div>
-                <h3>로그인 보너스</h3>
-                <p>매일 로그인하고 보너스를 받으세요. 재미있는 리워드 시스템!</p>
+                <h3>매일 로그인 보너스</h3>
+                <p>매일 앱을 열고 재미있는 리워드를 받아보세요</p>
             </div>
         </div>
     </section>
 
     <!-- How It Works -->
     <section id="how-it-works" class="how-it-works">
-        <h2 class="section-title reveal">사용 방법</h2>
+        <h2 class="section-title">어떻게 사용하나요?</h2>
+        <p class="section-subtitle">4단계로 끝나는 간단한 시작</p>
+        
         <div class="steps">
-            <div class="step reveal">
+            <div class="step">
                 <div class="step-number">1</div>
                 <h3>앱 다운로드</h3>
-                <p>GitHub Releases에서 최신 Android APK를 다운로드하세요.</p>
+                <p>Android APK를 다운로드하고 설치하세요</p>
             </div>
-            <div class="step reveal">
+            <div class="step">
                 <div class="step-number">2</div>
                 <h3>QR 주소 생성</h3>
-                <p>고유한 QR 주소를 생성하여 나만의 계정을 만드세요.</p>
+                <p>나만의 고유한 QR 주소를 만드세요</p>
             </div>
-            <div class="step reveal">
+            <div class="step">
                 <div class="step-number">3</div>
                 <h3>친구 추가</h3>
-                <p>QR 코드를 스캔하거나 내 QR 코드를 공유하여 친구를 추가하세요.</p>
+                <p>QR 코드를 스캔하거나 공유하세요</p>
             </div>
-            <div class="step reveal">
+            <div class="step">
                 <div class="step-number">4</div>
-                <h3>채팅 시작!</h3>
-                <p>친구와 안전하게 채팅을 시작하세요. 보안 채팅도 사용해보세요!</p>
+                <h3>채팅 시작</h3>
+                <p>안전하고 편리하게 대화를 시작하세요</p>
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
     <section id="download" class="cta">
-        <div class="cta-content">
-            <h2>지금 시작하세요!</h2>
-            <p>QRChat과 함께 더 안전하고 편리한 채팅을 경험해보세요.</p>
-            <div class="download-buttons">
-                <a href="https://github.com/Stevewon/qrchat/releases/latest" class="download-btn android">
-                    <i class="fab fa-android"></i>
-                    <div>
-                        <strong>Android APK 다운로드</strong>
-                    </div>
-                </a>
-                <a href="https://github.com/Stevewon/qrchat" class="download-btn ios">
-                    <i class="fab fa-apple"></i>
-                    <div>
-                        <strong>iOS 버전 준비 중</strong>
-                    </div>
-                </a>
-                <a href="https://github.com/Stevewon/qrchat/releases" class="download-btn direct">
-                    <i class="fas fa-download"></i>
-                    <div>
-                        <strong>직접 다운로드</strong>
-                    </div>
-                </a>
-            </div>
+        <h2>지금 바로 시작하세요</h2>
+        <p>QRChat과 함께 더 쉽고 안전한 채팅을 경험해보세요</p>
+        <div class="download-buttons">
+            <a href="https://github.com/Stevewon/qrchat/releases/latest" class="btn btn-primary hover-lift">
+                <i class="fab fa-android"></i>
+                <span>Android 다운로드</span>
+            </a>
+            <a href="https://github.com/Stevewon/qrchat" class="btn btn-secondary hover-lift">
+                <i class="fab fa-apple"></i>
+                <span>iOS 버전 준비 중</span>
+            </a>
         </div>
     </section>
 
@@ -1266,7 +707,7 @@
         <div class="footer-content">
             <div class="footer-section">
                 <h3>QRChat</h3>
-                <p>QR 코드 기반 보안 채팅 앱</p>
+                <p>QR 코드 기반의<br>간편하고 안전한 메신저</p>
                 <div class="social-links">
                     <a href="https://github.com/Stevewon/qrchat" target="_blank" aria-label="GitHub">
                         <i class="fab fa-github"></i>
@@ -1277,36 +718,45 @@
             <div class="footer-section">
                 <h3>다운로드</h3>
                 <ul>
-                    <li><a href="https://github.com/Stevewon/qrchat/releases/latest">Android APK 다운로드</a></li>
-                    <li><a href="https://github.com/Stevewon/qrchat">iOS 버전 (준비 중)</a></li>
-                    <li><a href="https://github.com/Stevewon/qrchat/releases/latest">APK 다운로드</a></li>
+                    <li><a href="https://github.com/Stevewon/qrchat/releases/latest">Android APK</a></li>
+                    <li><a href="https://github.com/Stevewon/qrchat">iOS (준비 중)</a></li>
                 </ul>
             </div>
 
             <div class="footer-section">
-                <h3>정보</h3>
+                <h3>링크</h3>
                 <ul>
-                    <li><a href="https://github.com/Stevewon/qrchat">GitHub 소스</a></li>
+                    <li><a href="https://github.com/Stevewon/qrchat">소스 코드</a></li>
                     <li><a href="https://github.com/Stevewon/qrchat/releases">릴리스 노트</a></li>
                     <li><a href="https://github.com/Stevewon/qrchat/issues">버그 리포트</a></li>
                 </ul>
             </div>
 
             <div class="footer-section">
-                <h3>개발자</h3>
+                <h3>정보</h3>
                 <ul>
-                    <li><a href="https://github.com/Stevewon">Stevewon</a></li>
-                    <li>Version: v1.0.100</li>
-                    <li>Build: 200</li>
+                    <li><a href="https://github.com/Stevewon">개발자: Stevewon</a></li>
+                    <li>버전: v1.0.100</li>
+                    <li>빌드: 200</li>
                 </ul>
             </div>
         </div>
         <div class="copyright">
-            <p>&copy; 2026 QRChat. All rights reserved. | Made with ❤️ by Stevewon</p>
+            <p>&copy; 2026 QRChat. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -1321,126 +771,29 @@
             });
         });
 
-        // Header scroll effect - glassmorphism
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
+        // Simple fade-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-        // Scroll reveal animation
-        const reveals = document.querySelectorAll('.reveal');
-        
-        function checkReveal() {
-            reveals.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-                const elementVisible = 100;
-                
-                if (elementTop < window.innerHeight - elementVisible) {
-                    element.classList.add('active');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
                 }
             });
-        }
+        }, observerOptions);
 
-        window.addEventListener('scroll', checkReveal);
-        checkReveal(); // Check on page load
-
-        // Add floating animation to hero buttons
-        const heroButtons = document.querySelectorAll('.hero .download-btn');
-        heroButtons.forEach((btn, index) => {
-            btn.style.animation = `float 3s ease-in-out ${index * 0.2}s infinite`;
+        // Observe all feature cards and steps
+        document.querySelectorAll('.feature-card, .step').forEach(el => {
+            observer.observe(el);
         });
 
-        // Parallax effect DISABLED to fix overlap issue
-        // The parallax was causing content to overlap when scrolling
-        // window.addEventListener('scroll', () => {
-        //     const scrolled = window.pageYOffset;
-        //     const hero = document.querySelector('.hero');
-        //     if (hero && scrolled < window.innerHeight) {
-        //         hero.style.transform = `translateY(${scrolled * 0.3}px)`;
-        //     }
-        // });
-
-        // Add ripple effect to buttons
-        document.querySelectorAll('.download-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                const ripple = document.createElement('span');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
-                
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.classList.add('ripple');
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => ripple.remove(), 600);
-            });
-        });
-
-        // Console welcome message
-        console.log('%c🔐 QRChat', 'font-size: 30px; font-weight: bold; color: #6366f1;');
-        console.log('%cWelcome to QRChat! 안전한 채팅을 경험하세요.', 'font-size: 14px; color: #64748b;');
-        console.log('%cGitHub: https://github.com/Stevewon/qrchat', 'font-size: 12px; color: #10b981;');
-
-        // Futuristic particle system
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            if (!particlesContainer) return;
-            
-            // Reduce particles on mobile for better performance
-            const isMobile = window.innerWidth <= 768;
-            const particleCount = isMobile ? 25 : 50;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                
-                // Random positioning
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 20 + 's';
-                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-                
-                // Random size variation (smaller on mobile)
-                const baseSize = isMobile ? 2 : 2;
-                const size = baseSize + Math.random() * (isMobile ? 2 : 4);
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        // Initialize particles on page load
-        createParticles();
-
-        // Add glitch effect to title on hover
-        const heroTitle = document.querySelector('.hero h1');
-        if (heroTitle) {
-            heroTitle.addEventListener('mouseenter', function() {
-                this.style.animation = 'glitch 0.3s ease-in-out';
-                setTimeout(() => {
-                    this.style.animation = 'fadeInUp 0.8s ease-out';
-                }, 300);
-            });
-        }
-
-        // Cyber grid animation intensity based on scroll
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            if (hero && scrolled < window.innerHeight) {
-                const opacity = 0.3 + (scrolled / window.innerHeight) * 0.3;
-                const gridBefore = hero.querySelector('::before');
-                // Apply via CSS variable if needed
-            }
-        });
+        // Console message
+        console.log('%c💬 QRChat', 'font-size: 24px; font-weight: bold; color: #FFD500;');
+        console.log('%c간편하고 안전한 채팅을 경험하세요!', 'font-size: 14px; color: #666;');
+        console.log('%cGitHub: https://github.com/Stevewon/qrchat', 'font-size: 12px; color: #00C73C;');
     </script>
 </body>
 </html>
