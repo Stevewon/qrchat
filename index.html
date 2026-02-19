@@ -357,6 +357,179 @@
             line-height: 1.6;
         }
 
+        /* Token System Section - Revolutionary feature */
+        .token-system {
+            padding: var(--spacing-3xl) var(--spacing-lg);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .token-system::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .token-system .section-title,
+        .token-system .section-subtitle {
+            color: var(--bg-white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .token-cards {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .token-card {
+            background: var(--bg-white);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .token-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            transition: height 0.3s ease;
+        }
+
+        .token-card.qkey::before {
+            background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+        }
+
+        .token-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .token-card:hover::before {
+            height: 100%;
+            opacity: 0.05;
+        }
+
+        .token-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .token-card.qkey .token-icon {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .token-card h3 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .token-badge {
+            font-size: 0.75rem;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: var(--text-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .token-card.qkey .token-badge {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: var(--bg-white);
+        }
+
+        .token-subtitle {
+            font-size: 1rem;
+            color: var(--text-medium);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .token-description {
+            font-size: 1rem;
+            color: var(--text-medium);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .token-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .token-features li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .token-features li:last-child {
+            border-bottom: none;
+        }
+
+        .token-features li i {
+            color: #FFD700;
+            font-size: 1.2rem;
+        }
+
+        .token-card.qkey .token-features li i {
+            color: #FF6B6B;
+        }
+
+        .token-cta {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .token-cta p {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--qrchat-blue);
+            margin: 0;
+        }
+
         /* CTA Section - Bright and inviting */
         .cta {
             background: var(--bg-light);
@@ -509,6 +682,28 @@
                 gap: 1rem;
             }
 
+            .token-cards {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .token-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .token-card h3 {
+                font-size: 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+
+            .token-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+
             .feature-card {
                 padding: 2rem 1.5rem;
             }
@@ -567,6 +762,7 @@
             </div>
             <ul class="nav-links">
                 <li><a href="#features">기능</a></li>
+                <li><a href="#token-system">토큰</a></li>
                 <li><a href="#how-it-works">사용법</a></li>
                 <li><a href="#download">다운로드</a></li>
                 <li><a href="https://github.com/Stevewon/qrchat" target="_blank">GitHub</a></li>
@@ -655,6 +851,96 @@
                 </div>
                 <h3>매일 로그인 보너스</h3>
                 <p>매일 앱을 열고 재미있는 리워드를 받아보세요</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Token System - Revolutionary Feature -->
+    <section id="token-system" class="token-system">
+        <h2 class="section-title">🪙 혁명적인 토큰 시스템</h2>
+        <p class="section-subtitle">다른 메신저와는 완전히 다른 개념! 채팅하면서 자산을 모으세요</p>
+        
+        <div class="token-cards">
+            <!-- QTA Token Card -->
+            <div class="token-card qta hover-lift">
+                <div class="token-icon">
+                    💎
+                </div>
+                <h3>
+                    퀀타리움코인 (QTA)
+                    <span class="token-badge">MAINNET</span>
+                </h3>
+                <p class="token-subtitle">양자내성 암호화 기반 메인넷 코인</p>
+                <p class="token-description">
+                    QTA는 단순한 포인트가 아닙니다. 양자컴퓨터 시대에도 안전한 
+                    차세대 블록체인 기술을 기반으로 한 <strong>진짜 암호화폐</strong>입니다.
+                </p>
+                <ul class="token-features">
+                    <li>
+                        <i class="fas fa-shield-alt"></i>
+                        <span><strong>양자내성 보안:</strong> 미래 기술에도 안전한 암호화</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-coins"></i>
+                        <span><strong>내재적 가치:</strong> 실제 거래 가능한 메인넷 코인</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-chart-line"></i>
+                        <span><strong>투자 가치:</strong> 장기적 자산 가치 상승 가능</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-exchange-alt"></i>
+                        <span><strong>외부 거래소:</strong> 거래소 상장 및 현금화 가능</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-gift"></i>
+                        <span><strong>보상 지급:</strong> 채팅 활동으로 QTA 획득</span>
+                    </li>
+                </ul>
+                <div class="token-cta">
+                    <p>🌟 진정한 암호화폐로 미래를 준비하세요</p>
+                </div>
+            </div>
+
+            <!-- QKEY Token Card -->
+            <div class="token-card qkey hover-lift">
+                <div class="token-icon">
+                    🍪
+                </div>
+                <h3>
+                    쿠키 (QKEY)
+                    <span class="token-badge">UTILITY</span>
+                </h3>
+                <p class="token-subtitle">QRChat 생태계 전용 유틸리티 토큰</p>
+                <p class="token-description">
+                    QKEY는 QRChat 앱 내에서 <strong>현금처럼 사용할 수 있는</strong> 
+                    포인트성 토큰입니다. 쇼핑부터 프리미엄 기능까지!
+                </p>
+                <ul class="token-features">
+                    <li>
+                        <i class="fas fa-shopping-cart"></i>
+                        <span><strong>앱 내 쇼핑:</strong> 이모티콘, 테마, 스티커 구매</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-crown"></i>
+                        <span><strong>프리미엄 기능:</strong> 특별 기능 잠금 해제</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-star"></i>
+                        <span><strong>사용자 간 거래:</strong> 친구에게 쿠키 선물하기</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-bolt"></i>
+                        <span><strong>즉시 사용:</strong> 복잡한 절차 없이 바로 사용</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-calendar-check"></i>
+                        <span><strong>매일 적립:</strong> 로그인 보너스로 매일 획득</span>
+                    </li>
+                </ul>
+                <div class="token-cta">
+                    <p>🛍️ 현금처럼 쓰고, 선물도 하세요!</p>
+                </div>
             </div>
         </div>
     </section>
