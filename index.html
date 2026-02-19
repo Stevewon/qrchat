@@ -168,9 +168,9 @@
             transform: translateY(-2px);
         }
 
-        /* Hero Section - Stunning gradient with particles */
+        /* Hero Section - Futuristic animated background */
         .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             position: relative;
             color: white;
             padding: 160px var(--spacing-lg) 100px;
@@ -182,6 +182,7 @@
             justify-content: center;
         }
 
+        /* Animated grid background */
         .hero::before {
             content: '';
             position: absolute;
@@ -189,16 +190,177 @@
             left: 0;
             right: 0;
             bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        /* Floating geometric shapes */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(99, 102, 241, 0.2) 0%, transparent 50%);
-            animation: pulse 10s ease-in-out infinite;
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            animation: floatShapes 15s ease-in-out infinite;
+        }
+
+        @keyframes floatShapes {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
+        }
+
+        /* Particle system container */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: particleFloat 20s linear infinite;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.8),
+                        0 0 20px rgba(236, 72, 153, 0.4);
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Geometric shapes */
+        .geometric-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .hexagon {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            opacity: 0.1;
+            animation: rotateHexagon 20s linear infinite;
+        }
+
+        .hexagon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(99, 102, 241, 0.3);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            border: 2px solid rgba(99, 102, 241, 0.5);
+        }
+
+        @keyframes rotateHexagon {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .triangle {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-bottom: 86px solid rgba(236, 72, 153, 0.2);
+            opacity: 0.15;
+            animation: floatTriangle 15s ease-in-out infinite;
+        }
+
+        @keyframes floatTriangle {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-50px) rotate(180deg); }
+        }
+
+        .circle {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 3px solid rgba(245, 158, 11, 0.3);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: pulseCircle 8s ease-in-out infinite;
+        }
+
+        @keyframes pulseCircle {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.3); opacity: 0.4; }
+        }
+
+        /* Scan line effect */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(99, 102, 241, 0.8) 50%, 
+                transparent 100%);
+            animation: scanMove 4s linear infinite;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+        }
+
+        @keyframes scanMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        /* Neon glow text effect */
+        .neon-text {
+            text-shadow: 
+                0 0 10px rgba(99, 102, 241, 0.8),
+                0 0 20px rgba(99, 102, 241, 0.6),
+                0 0 30px rgba(236, 72, 153, 0.4),
+                0 0 40px rgba(236, 72, 153, 0.3);
         }
 
         .hero-content {
@@ -214,8 +376,16 @@
             font-weight: 800;
             line-height: 1.2;
             animation: fadeInUp 0.8s ease-out;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
             letter-spacing: -0.02em;
+        }
+
+        .hero h1.neon-text {
+            text-shadow: 
+                0 0 10px rgba(99, 102, 241, 1),
+                0 0 20px rgba(99, 102, 241, 0.8),
+                0 0 30px rgba(236, 72, 153, 0.6),
+                0 0 40px rgba(236, 72, 153, 0.4),
+                0 0 50px rgba(245, 158, 11, 0.2);
         }
 
         .hero .subtitle {
@@ -706,6 +876,16 @@
             50% { transform: translateY(-20px); }
         }
 
+        /* Glitch effect for futuristic feel */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
         /* Scroll reveal animation */
         .reveal {
             opacity: 0;
@@ -813,8 +993,30 @@
 
     <!-- Hero Section -->
     <section class="hero">
+        <!-- Futuristic Background Elements -->
+        <div class="geometric-bg">
+            <!-- Hexagons -->
+            <div class="hexagon" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
+            <div class="hexagon" style="top: 60%; left: 80%; animation-delay: 3s;"></div>
+            <div class="hexagon" style="top: 30%; left: 70%; animation-delay: 6s;"></div>
+            
+            <!-- Triangles -->
+            <div class="triangle" style="top: 20%; right: 15%; animation-delay: 2s;"></div>
+            <div class="triangle" style="bottom: 30%; left: 20%; animation-delay: 5s;"></div>
+            
+            <!-- Circles -->
+            <div class="circle" style="top: 50%; right: 10%; animation-delay: 1s;"></div>
+            <div class="circle" style="bottom: 20%; left: 15%; animation-delay: 4s;"></div>
+        </div>
+        
+        <!-- Particle System -->
+        <div class="particles" id="particles"></div>
+        
+        <!-- Scan Line Effect -->
+        <div class="scan-line"></div>
+        
         <div class="hero-content">
-            <h1>🔐 QRChat</h1>
+            <h1 class="neon-text">🔐 QRChat</h1>
             <p class="subtitle">QR 코드로 친구를 추가하고<br>안전하게 채팅하세요</p>
             <div class="download-buttons">
                 <a href="https://github.com/Stevewon/qrchat/releases/latest" class="download-btn android">
@@ -1078,6 +1280,56 @@
         console.log('%c🔐 QRChat', 'font-size: 30px; font-weight: bold; color: #6366f1;');
         console.log('%cWelcome to QRChat! 안전한 채팅을 경험하세요.', 'font-size: 14px; color: #64748b;');
         console.log('%cGitHub: https://github.com/Stevewon/qrchat', 'font-size: 12px; color: #10b981;');
+
+        // Futuristic particle system
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            
+            const particleCount = 50; // Number of particles
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random positioning
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                
+                // Random size variation
+                const size = 2 + Math.random() * 4;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize particles on page load
+        createParticles();
+
+        // Add glitch effect to title on hover
+        const heroTitle = document.querySelector('.hero h1');
+        if (heroTitle) {
+            heroTitle.addEventListener('mouseenter', function() {
+                this.style.animation = 'glitch 0.3s ease-in-out';
+                setTimeout(() => {
+                    this.style.animation = 'fadeInUp 0.8s ease-out';
+                }, 300);
+            });
+        }
+
+        // Cyber grid animation intensity based on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero && scrolled < window.innerHeight) {
+                const opacity = 0.3 + (scrolled / window.innerHeight) * 0.3;
+                const gridBefore = hero.querySelector('::before');
+                // Apply via CSS variable if needed
+            }
+        });
     </script>
 </body>
 </html>
