@@ -22,11 +22,13 @@
         }
 
         :root {
-            /* KakaoTalk inspired clean palette */
-            --kakao-yellow: #FEE500;
-            --kakao-brown: #3C1E1E;
-            --primary: #FFD500;
-            --primary-dark: #F5C000;
+            /* QRChat unique blue palette */
+            --qrchat-blue: #4A90E2;
+            --qrchat-blue-dark: #357ABD;
+            --qrchat-blue-light: #6AA3E8;
+            --primary: #4A90E2;
+            --primary-dark: #357ABD;
+            --primary-light: #6AA3E8;
             --secondary: #5B5B5B;
             --accent: #00C73C;
             
@@ -101,7 +103,7 @@
         }
 
         .logo i {
-            color: var(--kakao-yellow);
+            color: var(--qrchat-blue);
             font-size: 1.8rem;
         }
 
@@ -184,14 +186,14 @@
         }
 
         .btn-primary {
-            background: var(--kakao-yellow);
-            color: var(--kakao-brown);
+            background: var(--qrchat-blue);
+            color: var(--bg-white);
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            background: var(--qrchat-blue-dark);
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
         }
 
         .btn-secondary {
@@ -292,7 +294,7 @@
         }
 
         .feature-card:hover .feature-icon {
-            background: var(--kakao-yellow);
+            background: var(--qrchat-blue-light);
             transform: scale(1.1);
         }
 
@@ -331,8 +333,8 @@
         .step-number {
             width: 50px;
             height: 50px;
-            background: var(--kakao-yellow);
-            color: var(--kakao-brown);
+            background: var(--qrchat-blue);
+            color: var(--bg-white);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -395,7 +397,7 @@
             margin-bottom: 1rem;
             font-size: 1rem;
             font-weight: 700;
-            color: var(--kakao-yellow);
+            color: var(--qrchat-blue-light);
         }
 
         .footer-section p {
@@ -420,7 +422,7 @@
         }
 
         .footer-section a:hover {
-            color: var(--kakao-yellow);
+            color: var(--qrchat-blue-light);
         }
 
         .social-links {
@@ -442,8 +444,8 @@
         }
 
         .social-links a:hover {
-            background: var(--kakao-yellow);
-            color: var(--kakao-brown);
+            background: var(--qrchat-blue);
+            color: var(--bg-white);
         }
 
         .copyright {
@@ -609,7 +611,7 @@
         <div class="features-grid">
             <div class="feature-card hover-lift">
                 <div class="feature-icon">
-                    <i class="fas fa-qrcode" style="color: #FFD500;"></i>
+                    <i class="fas fa-qrcode" style="color: #4A90E2;"></i>
                 </div>
                 <h3>QR 코드 친구 추가</h3>
                 <p>ID나 전화번호 없이 QR 코드만으로 친구를 추가하세요</p>
@@ -649,7 +651,7 @@
 
             <div class="feature-card hover-lift">
                 <div class="feature-icon">
-                    <i class="fas fa-gift" style="color: #FFD500;"></i>
+                    <i class="fas fa-gift" style="color: #4A90E2;"></i>
                 </div>
                 <h3>매일 로그인 보너스</h3>
                 <p>매일 앱을 열고 재미있는 리워드를 받아보세요</p>
@@ -791,7 +793,7 @@
         });
 
         // Console message
-        console.log('%c💬 QRChat', 'font-size: 24px; font-weight: bold; color: #FFD500;');
+        console.log('%c💬 QRChat', 'font-size: 24px; font-weight: bold; color: #4A90E2;');
         console.log('%c간편하고 안전한 채팅을 경험하세요!', 'font-size: 14px; color: #666;');
         console.log('%cGitHub: https://github.com/Stevewon/qrchat', 'font-size: 12px; color: #00C73C;');
     </script>
