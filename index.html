@@ -357,32 +357,11 @@
             line-height: 1.6;
         }
 
-        /* Token System Section - Revolutionary feature */
+        /* Token System Section - KakaoTalk style */
         .token-system {
             padding: var(--spacing-3xl) var(--spacing-lg);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-light);
             position: relative;
-            overflow: hidden;
-        }
-
-        .token-system::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .token-system .section-title,
-        .token-system .section-subtitle {
-            color: var(--bg-white);
-            position: relative;
-            z-index: 1;
         }
 
         .token-cards {
@@ -398,55 +377,34 @@
 
         .token-card {
             background: var(--bg-white);
-            border-radius: 24px;
+            border-radius: 16px;
             padding: 2.5rem;
-            box-shadow: var(--shadow-lg);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-        }
-
-        .token-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #FFD700, #FFA500);
-            transition: height 0.3s ease;
-        }
-
-        .token-card.qkey::before {
-            background: linear-gradient(90deg, #FF6B6B, #FF8E53);
         }
 
         .token-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-
-        .token-card:hover::before {
-            height: 100%;
-            opacity: 0.05;
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--qrchat-blue-light);
         }
 
         .token-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            border-radius: 20px;
+            width: 70px;
+            height: 70px;
+            background: #FFF4E0;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1.5rem;
             font-size: 2.5rem;
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
         }
 
         .token-card.qkey .token-icon {
-            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+            background: #FFE8E8;
         }
 
         .token-card h3 {
@@ -460,17 +418,17 @@
         }
 
         .token-badge {
-            font-size: 0.75rem;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
+            font-size: 0.7rem;
+            background: #FFD700;
             color: var(--text-dark);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
+            padding: 0.25rem 0.7rem;
+            border-radius: 12px;
             font-weight: 700;
             letter-spacing: 0.5px;
         }
 
         .token-card.qkey .token-badge {
-            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            background: #FF6B6B;
             color: var(--bg-white);
         }
 
@@ -508,8 +466,10 @@
         }
 
         .token-features li i {
-            color: #FFD700;
-            font-size: 1.2rem;
+            color: #FFA500;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
         }
 
         .token-card.qkey .token-features li i {
