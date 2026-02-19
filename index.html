@@ -180,6 +180,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            /* Fix overlap issue */
+            isolation: isolate;
         }
 
         /* Animated grid background */
@@ -911,8 +913,13 @@
             border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* Responsive Design */
+        /* Responsive Design - Enhanced */
         @media (max-width: 968px) {
+            .hero {
+                padding: 140px var(--spacing-md) 80px;
+                min-height: 90vh;
+            }
+
             .hero h1 {
                 font-size: 3rem;
             }
@@ -928,15 +935,34 @@
             .cta h2 {
                 font-size: 2.5rem;
             }
+
+            /* Reduce geometric shapes on tablets */
+            .hexagon,
+            .triangle,
+            .circle {
+                opacity: 0.05;
+            }
+
+            .particle {
+                width: 3px;
+                height: 3px;
+            }
         }
 
         @media (max-width: 768px) {
+            .hero {
+                padding: 120px var(--spacing-sm) 60px;
+                min-height: 100vh;
+            }
+
             .hero h1 {
                 font-size: 2.5rem;
+                line-height: 1.3;
             }
             
             .hero .subtitle {
                 font-size: 1.1rem;
+                margin-bottom: var(--spacing-lg);
             }
 
             .nav-links {
@@ -946,24 +972,105 @@
             .download-buttons {
                 flex-direction: column;
                 gap: var(--spacing-md);
+                padding: 0 var(--spacing-sm);
             }
 
             .download-btn {
                 width: 100%;
-                max-width: 350px;
+                max-width: 100%;
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .download-btn i {
+                font-size: 1.5rem;
+            }
+
+            .features {
+                padding: var(--spacing-2xl) var(--spacing-sm);
             }
 
             .features-grid,
             .steps {
                 grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+
+            .feature-card {
+                padding: var(--spacing-lg);
             }
 
             .section-title {
                 font-size: 2rem;
+                margin-bottom: var(--spacing-lg);
+            }
+
+            .cta {
+                padding: var(--spacing-2xl) var(--spacing-sm);
             }
 
             .cta h2 {
                 font-size: 2rem;
+            }
+
+            /* Hide geometric shapes on mobile for performance */
+            .hexagon,
+            .triangle,
+            .circle {
+                display: none;
+            }
+
+            /* Reduce particles on mobile */
+            .particle:nth-child(n+26) {
+                display: none;
+            }
+
+            /* Simplify scan line on mobile */
+            .scan-line {
+                opacity: 0.5;
+            }
+
+            /* Footer mobile optimization */
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+                text-align: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+
+        /* Extra small devices (phones in portrait) */
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1rem;
+            }
+
+            .download-btn {
+                padding: 0.9rem 1.2rem;
+                font-size: 0.95rem;
+            }
+
+            .feature-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+
+            .step-number {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
             }
         }
 
@@ -1247,14 +1354,15 @@
             btn.style.animation = `float 3s ease-in-out ${index * 0.2}s infinite`;
         });
 
-        // Parallax effect for hero section
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            if (hero) {
-                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-            }
-        });
+        // Parallax effect DISABLED to fix overlap issue
+        // The parallax was causing content to overlap when scrolling
+        // window.addEventListener('scroll', () => {
+        //     const scrolled = window.pageYOffset;
+        //     const hero = document.querySelector('.hero');
+        //     if (hero && scrolled < window.innerHeight) {
+        //         hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+        //     }
+        // });
 
         // Add ripple effect to buttons
         document.querySelectorAll('.download-btn').forEach(button => {
@@ -1286,7 +1394,9 @@
             const particlesContainer = document.getElementById('particles');
             if (!particlesContainer) return;
             
-            const particleCount = 50; // Number of particles
+            // Reduce particles on mobile for better performance
+            const isMobile = window.innerWidth <= 768;
+            const particleCount = isMobile ? 25 : 50;
             
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -1297,8 +1407,9 @@
                 particle.style.animationDelay = Math.random() * 20 + 's';
                 particle.style.animationDuration = (15 + Math.random() * 10) + 's';
                 
-                // Random size variation
-                const size = 2 + Math.random() * 4;
+                // Random size variation (smaller on mobile)
+                const baseSize = isMobile ? 2 : 2;
+                const size = baseSize + Math.random() * (isMobile ? 2 : 4);
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
                 
