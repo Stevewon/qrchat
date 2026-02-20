@@ -4,6 +4,22 @@ import 'package:audioplayers/audioplayers.dart';
 import 'dart:io' show Platform;
 
 /// 로컬 알림 서비스 (포그라운드 및 백그라운드 알림)
+/// 
+/// ⭐⭐ 주요 기능:
+/// 1. 2회당 1회 알림음 재생 (배터리 절약)
+/// 2. 현재 열린 채팅방에서는 알림 음소거
+/// 3. 채팅방별 독립적인 카운터 관리
+/// 
+/// ⭐⭐ 동작 방식:
+/// - 1번째 메시지: 🔇 알림음 없음 (카운터 = 1)
+/// - 2번째 메시지: 🔊 알림음 재생 (카운터 = 2)
+/// - 3번째 메시지: 🔇 알림음 없음 (카운터 = 3)
+/// - 4번째 메시지: 🔊 알림음 재생 (카운터 = 4)
+/// - 반복...
+/// 
+/// ⭐⭐ 카운터 초기화:
+/// - 채팅방 진입 시 자동 초기화
+/// - 앱 재시작 시 자동 초기화
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   static final AudioPlayer _audioPlayer = AudioPlayer();
@@ -15,11 +31,23 @@ class LocalNotificationService {
   /// ⭐ 알림음 활성화 상태 (기본: true)
   static bool _soundEnabled = true;
   
+  /// ⭐⭐ 2회당 1회 알림음 로직을 위한 카운터 맵 (채팅방별)
+  static final Map<String, int> _notificationCounters = {};
+  
   /// 현재 활성 채팅방 설정 (채팅방 진입 시 호출)
   static void setActiveChatRoom(String? chatRoomId) {
     _activeChatRoomId = chatRoomId;
-    if (kDebugMode) {
-      print('🔇 활성 채팅방 설정: $_activeChatRoomId');
+    
+    // ⭐⭐ 채팅방 진입 시 해당 채팅방의 알림음 카운터 초기화
+    if (chatRoomId != null) {
+      _notificationCounters[chatRoomId] = 0;
+      if (kDebugMode) {
+        print('🔇 활성 채팅방 설정 및 카운터 초기화: $chatRoomId');
+      }
+    } else {
+      if (kDebugMode) {
+        print('🔇 활성 채팅방 해제');
+      }
     }
   }
   
@@ -110,6 +138,26 @@ class LocalNotificationService {
         print('🔔 알림 표시: ${_soundEnabled ? "🔊 소리 O" : "🔇 소리 X"}');
       }
 
+      // ⭐⭐ 2회당 1회 알림음 로직 구현
+      bool shouldPlaySound = false;
+      
+      if (_soundEnabled && payload != null) {
+        // 채팅방별 카운터 증가
+        _notificationCounters[payload] = (_notificationCounters[payload] ?? 0) + 1;
+        
+        // 2회마다 알림음 재생 (홀수번째는 음소거)
+        if (_notificationCounters[payload]! % 2 == 0) {
+          shouldPlaySound = true;
+          if (kDebugMode) {
+            print('🔊 알림음 재생: ${_notificationCounters[payload]}번째 알림 (2회당 1회)');
+          }
+        } else {
+          if (kDebugMode) {
+            print('🔇 알림음 건너뜀: ${_notificationCounters[payload]}번째 알림 (다음 알림에서 재생)');
+          }
+        }
+      }
+
       // 1. 로컬 알림 표시 (음소거 모드 - 소리 없이 배지만)
       await _notifications.show(
         DateTime.now().millisecondsSinceEpoch.remainder(100000), // 고유 ID
@@ -136,15 +184,15 @@ class LocalNotificationService {
         payload: payload,
       );
 
-      // ⭐ 알림음 재생 (매 알림마다)
-      if (_soundEnabled) {
+      // ⭐⭐ 2회당 1회 알림음 재생
+      if (shouldPlaySound) {
         await playNotificationSound();
         if (kDebugMode) {
-          print('🔊 알림음 재생');
+          print('🔊 알림음 재생 완료');
         }
       } else {
         if (kDebugMode) {
-          print('🔇 알림음 꺼짐 (사용자 설정)');
+          print('🔇 알림음 꺼짐 (2회당 1회 로직 또는 사용자 설정)');
         }
       }
 
@@ -216,4 +264,25 @@ class LocalNotificationService {
   
   /// ⭐ 알림음 활성화 여부 가져오기
   static bool isSoundEnabled() => _soundEnabled;
+  
+  /// ⭐⭐ 특정 채팅방의 알림음 카운터 초기화
+  static void resetNotificationCounter(String chatRoomId) {
+    _notificationCounters[chatRoomId] = 0;
+    if (kDebugMode) {
+      print('🔄 알림음 카운터 초기화: $chatRoomId');
+    }
+  }
+  
+  /// ⭐⭐ 모든 채팅방의 알림음 카운터 초기화
+  static void resetAllNotificationCounters() {
+    _notificationCounters.clear();
+    if (kDebugMode) {
+      print('🔄 모든 알림음 카운터 초기화');
+    }
+  }
+  
+  /// ⭐⭐ 특정 채팅방의 현재 카운터 값 가져오기 (디버깅용)
+  static int getNotificationCount(String chatRoomId) {
+    return _notificationCounters[chatRoomId] ?? 0;
+  }
 }
