@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="QRChat - 카카오톡 스타일 메신저">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="QRChat">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  
+  <title>QRChat - 카카오톡 스타일 메신저</title>
+  <link rel="manifest" href="manifest.json">
+  
+  <style>
+    /* 🖥️ 카카오톡 스타일 - 강제 적용 */
+    * {
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      overflow: hidden !important;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    
+    body {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 20px !important;
+    }
+    
+    /* Flutter 루트 요소 - 카카오톡 창 */
+    body > * {
+      width: 1200px !important;
+      height: 800px !important;
+      max-width: 1200px !important;
+      max-height: 800px !important;
+      min-width: 1200px !important;
+      min-height: 800px !important;
+      border-radius: 12px !important;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+      overflow: hidden !important;
+      background: white !important;
+      position: relative !important;
+    }
+    
+    /* 로딩 화면 */
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    
+    .loading-content {
+      text-align: center;
+      color: white;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 모바일 대응 */
+    @media (max-width: 1260px) {
+      body {
+        padding: 10px !important;
+      }
+      body > * {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        min-width: 100% !important;
+        min-height: 100% !important;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 0 !important;
+        background: white !important;
+      }
+      body > * {
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Firebase SDK는 Flutter가 자동으로 로드합니다 -->
+  <script>
+    console.log('🚀 QRChat Desktop Web Starting...');
+    
+    // 로딩 화면 즉시 제거 (테스트용)
+    setTimeout(function() {
+      console.log('🗑️ Removing loading screen...');
+      var loadingElements = document.querySelectorAll('[class*="loading"]');
+      loadingElements.forEach(function(el) {
+        el.style.display = 'none';
+      });
+    }, 500);
+    
+    // Flutter 앱 로드 확인
+    window.addEventListener('load', function() {
+      console.log('✅ Page loaded!');
+    });
+    
+    window.addEventListener('flutter-first-frame', function() {
+      console.log('🎯 Flutter first frame received!');
+    });
+  </script>
+  
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

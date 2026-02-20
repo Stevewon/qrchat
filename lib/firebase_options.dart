@@ -50,12 +50,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDEoFb4ovEEyrSKs7Se9JToLzHA26A6ga8',
-    appId: '1:745884272823:web:bc0cc4d389b36ee1d9e532',
+    apiKey: 'AIzaSyDorAMiylt0Xto1Wym4ADirMM0ABU6o8uU',
+    appId: '1:745884272823:web:f21cf790343d7a0dd9e532',
     messagingSenderId: '745884272823',
     projectId: 'qrchat-b7a67',
     authDomain: 'qrchat-b7a67.firebaseapp.com',
     storageBucket: 'qrchat-b7a67.firebasestorage.app',
+    measurementId: 'G-FS84CC67VQ',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

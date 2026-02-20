@@ -90,20 +90,20 @@ Future<void> _initializeAutoUpdater() async {
   await autoUpdater.setScheduledCheckInterval(3600); // 1시간마다 체크
   await autoUpdater.checkForUpdates();
   
-  // 업데이트 이벤트 리스너
-  autoUpdater.onUpdateAvailable = ((version) {
-    debugPrint('🔄 New version available: $version');
-    // TODO: 사용자에게 업데이트 알림 표시
-  });
+  // 업데이트 이벤트 리스너 (임시 주석 처리 - API 변경됨)
+  // autoUpdater.onUpdateAvailable = ((version) {
+  //   debugPrint('🔄 New version available: $version');
+  //   // TODO: 사용자에게 업데이트 알림 표시
+  // });
   
-  autoUpdater.onUpdateDownloaded = (() {
-    debugPrint('✅ Update downloaded, ready to install');
-    // TODO: 재시작 프롬프트 표시
-  });
+  // autoUpdater.onUpdateDownloaded = (() {
+  //   debugPrint('✅ Update downloaded, ready to install');
+  //   // TODO: 재시작 프롬프트 표시
+  // });
   
-  autoUpdater.onError = ((error) {
-    debugPrint('❌ Update error: $error');
-  });
+  // autoUpdater.onError = ((error) {
+  //   debugPrint('❌ Update error: $error');
+  // });
 }
 
 /// 🎯 시스템 트레이 초기화 (카카오톡처럼)

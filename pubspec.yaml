@@ -2,7 +2,7 @@ name: qrchat
 description: "QRChat Desktop - 카카오톡 스타일 PC 메신저 v2.0.0"
 publish_to: 'none'
 
-version: 2.0.0+200
+version: 2.0.1+201
 
 environment:
   sdk: ^3.9.2

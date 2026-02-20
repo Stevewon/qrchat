@@ -1,0 +1,9 @@
+%no-protection
+Key-Type: RSA
+Key-Length: 4096
+Subkey-Type: RSA
+Subkey-Length: 4096
+Name-Real: QRChat Desktop
+Name-Email: hocu00987@gmail.com
+Name-Comment: QRChat Linux signing key
+Expire-Date: 2y
