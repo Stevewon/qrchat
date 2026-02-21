@@ -670,7 +670,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                               borderRadius: BorderRadius.circular(12),
                               child: Image.network(
                                 imageUrl,
-                                fit: BoxFit.cover,
+                                fit: BoxFit.contain,
                                 loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return Center(
@@ -767,7 +767,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
                 sticker['url']!,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Center(
