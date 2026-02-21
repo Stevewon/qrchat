@@ -39,15 +39,22 @@ class LocalNotificationService {
   static void setActiveChatRoom(String? chatRoomId) {
     _activeChatRoomId = chatRoomId;
     
-    // ⭐⭐ 채팅방 진입 시 해당 채팅방의 알림음 카운터 초기화
+    // ⭐⭐ 채팅방 진입 시 처리
     if (chatRoomId != null) {
+      // 1. 해당 채팅방의 알림음 카운터 초기화
       _notificationCounters[chatRoomId] = 0;
+      
+      // 2. 모든 알림 취소 (바탕화면 아이콘 배지 숫자 삭제)
+      cancelAll();
+      
       if (kDebugMode) {
-        print('🔇 활성 채팅방 설정 및 카운터 초기화: $chatRoomId');
+        print('🔇 활성 채팅방 설정: $chatRoomId');
+        print('   - 알림 카운터 초기화');
+        print('   - 모든 알림 취소 (배지 숫자 삭제)');
       }
     } else {
       if (kDebugMode) {
-        print('🔇 활성 채팅방 해제');
+        print('🔊 활성 채팅방 해제 - 알림음 재개');
       }
     }
   }
