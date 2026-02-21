@@ -64,7 +64,9 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _showEmojiPicker = false; // 이모티콘 패널 표시 여부
   StreamSubscription? _messagesSubscription;
   StreamSubscription<ChatRoom?>? _chatRoomSubscription;
+  StreamSubscription? _otherUserNicknameSubscription; // 상대방 닉네임 실시간 감지
   late ChatRoom _currentChatRoom; // 채팅방 정보 (업데이트 가능)
+  String _otherUserNickname = ''; // 상대방 닉네임 (실시간 업데이트)
   
   // 🎁 보상 이벤트 (3인 이상일 때)
   List<RewardEvent> _activeRewardEvents = [];
@@ -112,6 +114,11 @@ class _ChatScreenState extends State<ChatScreen> {
     // 채팅방 정보 실시간 업데이트
     _listenToChatRoom();
     
+    // ⭐⭐ 상대방 닉네임 실시간 감지 (1:1 채팅만)
+    if (_currentChatRoom.type == ChatRoomType.oneToOne) {
+      _listenToOtherUserNickname();
+    }
+    
     // 먼저 메시지 리스닝 시작
     _listenToMessages();
     
@@ -138,6 +145,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollController.dispose();
     _messagesSubscription?.cancel();
     _chatRoomSubscription?.cancel();
+    _otherUserNicknameSubscription?.cancel(); // 닉네임 리스너 취소
     _rewardEventsSubscription?.cancel(); // 🎁 보상 이벤트 구독 해제
     
     // QKEY 타이머 제거됨
@@ -165,6 +173,37 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       },
     );
+  }
+
+  /// ⭐⭐ 상대방 닉네임 실시간 감지 (1:1 채팅 전용)
+  void _listenToOtherUserNickname() {
+    final otherUserId = _currentChatRoom.participantIds.firstWhere(
+      (id) => id != widget.currentUserId,
+      orElse: () => '',
+    );
+    
+    if (otherUserId.isEmpty) return;
+    
+    _otherUserNicknameSubscription = FirebaseFirestore.instance
+        .collection('users')
+        .doc(otherUserId)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists && mounted) {
+        final newNickname = snapshot.data()?['nickname'] as String? ?? '알 수 없음';
+        setState(() {
+          _otherUserNickname = newNickname;
+        });
+        
+        if (kDebugMode) {
+          debugPrint('👤 [닉네임 업데이트] 상대방 닉네임: $newNickname');
+        }
+      }
+    }, onError: (error) {
+      if (kDebugMode) {
+        debugPrint('❌ [닉네임 스트림 오류] $error');
+      }
+    });
   }
 
   /// Firebase 실시간 메시지 스트림 구독
@@ -2020,8 +2059,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 채팅방 제목 (1:1은 상대방 이름, 그룹은 그룹 이름)
-    final chatTitle = _currentChatRoom.getTitle(widget.currentUserNickname);
+    // 채팅방 제목 (1:1은 실시간 닉네임, 그룹은 그룹 이름)
+    final chatTitle = _currentChatRoom.type == ChatRoomType.oneToOne
+        ? (_otherUserNickname.isNotEmpty ? _otherUserNickname : _currentChatRoom.getTitle(widget.currentUserNickname))
+        : _currentChatRoom.getTitle(widget.currentUserNickname);
     // 참가자 수
     final participantCount = _currentChatRoom.participantIds.length;
     
