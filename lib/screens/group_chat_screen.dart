@@ -485,9 +485,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 ],
               ),
               
-              // 탭 컨텐츠 (화면 크기에 맞게 동적 조정)
+              // 탭 컨텐츠 (화면 크기에 맞게 동적 조정 - 60%로 증가)
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.5,
+                height: MediaQuery.of(context).size.height * 0.6,
                 child: TabBarView(
                   children: [
                     // 🐱 Firebase 스티커 탭
@@ -521,7 +521,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     ];
     
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 7,
         crossAxisSpacing: 8,
@@ -636,7 +636,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                     }
                     
                     return GridView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(8),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         crossAxisSpacing: 12,
@@ -743,7 +743,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     ];
     
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 12,
@@ -1228,8 +1228,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Column(
@@ -1369,7 +1368,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             ),
         ],
         ),
-      ),
       ),
     );
   }

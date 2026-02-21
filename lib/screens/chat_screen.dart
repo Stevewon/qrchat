@@ -2144,8 +2144,7 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Stack(
         children: [
           // 메인 채팅 UI
-          SafeArea(
-            child: Column(
+          Column(
               children: [
                 // 메시지 목록
                 Expanded(
@@ -2159,7 +2158,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 // 입력 영역
                 _buildInputArea(),
               ],
-            ),
           ),
           
           // 🎁 보상 구체들 (3인 이상일 때만)
@@ -2426,9 +2424,8 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ],
           ),
-          child: SafeArea(
-            child: Row(
-              children: [
+          child: Row(
+            children: [
                 // + 버튼 (카카오톡 스타일)
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline, size: 28),
@@ -2491,7 +2488,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ],
             ),
-          ),
         ),
       ],
     );
@@ -2538,9 +2534,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
               
-              // 탭 컨텐츠 (화면 크기에 맞게 동적 조정)
+              // 탭 컨텐츠 (화면 크기에 맞게 동적 조정 - 60%로 증가)
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.5,
+                height: MediaQuery.of(context).size.height * 0.6,
                 child: TabBarView(
                   children: [
                     // 🐱 Firebase 스티커 탭
@@ -2574,7 +2570,7 @@ class _ChatScreenState extends State<ChatScreen> {
     ];
     
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 7,
         crossAxisSpacing: 8,
@@ -2683,7 +2679,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     }
                     
                     return GridView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(8),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         crossAxisSpacing: 12,
@@ -2784,7 +2780,7 @@ class _ChatScreenState extends State<ChatScreen> {
     ];
     
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 12,
