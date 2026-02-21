@@ -910,7 +910,12 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'zip'],
+        allowedExtensions: [
+          // 문서
+          'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt',
+          // 압축 파일 (모든 형식)
+          'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'tar.gz', 'tgz',
+        ],
       );
 
       if (result != null) {
