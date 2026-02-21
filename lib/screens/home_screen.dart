@@ -108,17 +108,17 @@ class _HomeScreenState extends State<HomeScreen> {
       debugPrint('🔊 [코인음] 재생 시작...');
       final player = AudioPlayer();
       
-      // 음량 설정 (최대)
-      await player.setVolume(1.0);
-      debugPrint('🔊 [코인음] 볼륨 설정: 1.0');
+      // 음량 설정 (적당하게)
+      await player.setVolume(0.6);
+      debugPrint('🔊 [로그인음] 볼륨 설정: 0.6');
       
       // 재생 모드 설정
       await player.setReleaseMode(ReleaseMode.stop);
       debugPrint('🔊 [코인음] ReleaseMode 설정: stop');
       
       // 재생
-      await player.play(AssetSource('sounds/coin_earn.mp3'));
-      debugPrint('🔔 [코인음] 재생 완료 - assets/sounds/coin_earn.mp3');
+      await player.play(AssetSource('sounds/notification.mp3'));
+      debugPrint('🔔 [로그인음] 재생 완료 - assets/sounds/notification.mp3');
     } catch (e) {
       debugPrint('⚠️ [코인음] 재생 실패: $e');
       debugPrint('📋 [코인음] 실패 스택트레이스: ${StackTrace.current}');
