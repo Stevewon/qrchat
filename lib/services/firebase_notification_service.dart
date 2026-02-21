@@ -18,20 +18,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print('   내용: ${message.notification?.body}');
   }
 
-  // ⭐ 핵심: 백그라운드에서도 로컬 알림 + 알림음 표시!
-  final title = message.notification?.title ?? '새 메시지';
-  final body = message.notification?.body ?? '';
-  final chatRoomId = message.data['chat_room_id'] as String?;
-  
-  await LocalNotificationService.showNotification(
-    title: title,
-    body: body,
-    payload: chatRoomId,
-  );
-  
+  // ⭐ 백그라운드 = 앱이 완전히 닫힘 = 별첨2 상태
+  // → 알림음 차단! (시스템 알림만 표시)
   if (kDebugMode) {
-    print('🔔 백그라운드 로컬 알림 + 알림음 표시 완료');
+    print('🔕 백그라운드 상태 - 앱이 닫혀있으므로 알림음 차단 (시스템 알림만)');
   }
+  // 알림음 없이 시스템 알림만 표시됨
 }
 
 class FirebaseNotificationService {
@@ -140,12 +132,31 @@ class FirebaseNotificationService {
       print('   데이터: ${message.data}');
     }
 
-    // ⭐ 포그라운드 = 앱이 열려있음 = 별첨2 상태
-    // → 알림음 완전 차단! (사용자가 이미 앱 안에 있음)
-    if (kDebugMode) {
-      print('🔕 포그라운드 상태 - 앱이 열려있으므로 알림음 차단');
+    // ⭐ 포그라운드 = 앱이 열려있음 = 별첨1 상태 (채팅 목록)
+    // → 2회당 1회 알림음 재생! (사용자가 채팅 목록에 있음)
+    
+    final title = message.notification?.title ?? '새 메시지';
+    final body = message.notification?.body ?? '';
+    final chatRoomId = message.data['chat_room_id'] as String?;
+    
+    // ⭐ 현재 채팅방 안에 있으면 알림 차단
+    if (chatRoomId != null && ChatStateService().isInChatRoom(chatRoomId)) {
+      if (kDebugMode) {
+        print('🔇 채팅방 안에 있어서 알림음 차단: $chatRoomId');
+      }
+      return;
     }
-    return; // 알림 차단!
+    
+    // ⭐ 채팅 목록에 있을 때는 알림음 재생!
+    LocalNotificationService.showNotification(
+      title: title,
+      body: body,
+      payload: chatRoomId,
+    );
+    
+    if (kDebugMode) {
+      print('🔔 포그라운드 로컬 알림 + 알림음 재생 완료 (채팅 목록)');
+    }
   }
 
   /// 백그라운드/종료 상태에서 알림 클릭 시 핸들러
