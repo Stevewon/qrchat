@@ -238,7 +238,17 @@ class LocalNotificationService {
       // 볼륨 최대로 설정
       await _audioPlayer.setVolume(1.0);
       
-      // 기본 알림음 재생 (asset 또는 URL)
+      // PlayerMode를 LOW_LATENCY로 설정 (빠른 재생)
+      await _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
+      
+      // 먼저 이전 재생 중지
+      await _audioPlayer.stop();
+      
+      if (kDebugMode) {
+        print('🔊 [알림음] AudioPlayer 준비 완료, 재생 중...');
+      }
+      
+      // 기본 알림음 재생
       await _audioPlayer.play(
         AssetSource('sounds/notification.mp3'),
         volume: 1.0,
@@ -258,6 +268,7 @@ class LocalNotificationService {
         if (kDebugMode) {
           print('🔄 [알림음] 대체 음원 시도: coin_earn.mp3');
         }
+        await _audioPlayer.stop();
         await _audioPlayer.play(
           AssetSource('sounds/coin_earn.mp3'),
           volume: 1.0,
