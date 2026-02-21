@@ -7,6 +7,7 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:auto_updater/auto_updater.dart';
+import 'package:audioplayers/audioplayers.dart'; // AudioPlayer 추가
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
 import 'services/notification_service.dart';
@@ -19,6 +20,11 @@ void main() async {
   // 🖥️ Desktop 초기화 (Windows, macOS, Linux)
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     await _initializeDesktop();
+  }
+  
+  // 🎵 Android AudioPlayer 전역 설정
+  if (!kIsWeb && Platform.isAndroid) {
+    await _initializeAudioPlayer();
   }
   
   // 🔥 Firebase 초기화 (멀티플랫폼 지원)
@@ -38,6 +44,27 @@ void main() async {
   await LocalNotificationService.initialize();
   
   runApp(const QRChatApp());
+}
+
+/// 🎵 AudioPlayer 전역 초기화 (Android)
+Future<void> _initializeAudioPlayer() async {
+  try {
+    // AudioContext 설정 - 알림음 및 미디어 재생
+    final audioContext = AudioContext(
+      android: AudioContextAndroid(
+        isSpeakerphoneOn: false,
+        stayAwake: true,
+        contentType: AndroidContentType.music, // 미디어 재생 컨텍스트
+        usageType: AndroidUsageType.notificationRingtone, // 알림음 우선
+        audioFocus: AndroidAudioFocus.gain,
+      ),
+    );
+    
+    AudioPlayer.global.setGlobalAudioContext(audioContext);
+    debugPrint('✅ [AudioPlayer] Android 전역 설정 완료');
+  } catch (e) {
+    debugPrint('⚠️ [AudioPlayer] 전역 설정 실패: $e');
+  }
 }
 
 /// 🖥️ Desktop 플랫폼 초기화
