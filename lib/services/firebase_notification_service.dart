@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -255,12 +256,32 @@ class FirebaseNotificationService {
               print('🔔 새 알림 트리거 감지: $senderName - $messageText');
             }
 
-            // 로컬 알림 표시
-            await LocalNotificationService.showNotification(
-              title: senderName,
-              body: messageText,
-              payload: chatRoomId,
-            );
+            // ⭐⭐ 앱 상태 확인: 백그라운드일 때만 알림음 재생!
+            final appLifecycleState = WidgetsBinding.instance.lifecycleState;
+            final isBackground = appLifecycleState == AppLifecycleState.paused ||
+                                 appLifecycleState == AppLifecycleState.inactive ||
+                                 appLifecycleState == AppLifecycleState.detached;
+
+            if (kDebugMode) {
+              print('📱 앱 상태: $appLifecycleState');
+              print('   백그라운드? ${isBackground ? "✅ YES (알림음 재생)" : "❌ NO (알림음 차단)"}');
+            }
+
+            // ⭐ 백그라운드일 때만 로컬 알림 표시 (알림음 포함)
+            if (isBackground) {
+              await LocalNotificationService.showNotification(
+                title: senderName,
+                body: messageText,
+                payload: chatRoomId,
+              );
+              if (kDebugMode) {
+                print('🔊 백그라운드 알림음 재생 (2회당 1회 로직 적용)');
+              }
+            } else {
+              if (kDebugMode) {
+                print('🔇 포그라운드 상태 - 알림음 차단 (채팅 목록에 있음)');
+              }
+            }
 
             // 처리 완료 표시
             await docChange.doc.reference.update({'processed': true});
