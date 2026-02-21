@@ -22,7 +22,8 @@ import 'dart:io' show Platform;
 /// - 앱 재시작 시 자동 초기화
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
-  static final AudioPlayer _audioPlayer = AudioPlayer();
+  static final AudioPlayer _audioPlayer = AudioPlayer()
+    ..setReleaseMode(ReleaseMode.stop); // 재생 완료 후 멈춤
   static bool _isInitialized = false;
   
   /// ⭐ 현재 열려있는 채팅방 ID (알림 음소거용)
@@ -59,6 +60,14 @@ class LocalNotificationService {
     if (_isInitialized) return;
 
     try {
+      // AudioPlayer 초기화
+      await _audioPlayer.setVolume(1.0);
+      await _audioPlayer.setReleaseMode(ReleaseMode.stop);
+      
+      if (kDebugMode) {
+        print('🔊 AudioPlayer 초기화 완료');
+      }
+      
       // Android 알림 설정
       const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -222,23 +231,43 @@ class LocalNotificationService {
   /// 알림음 재생
   static Future<void> playNotificationSound() async {
     try {
+      if (kDebugMode) {
+        print('🔊 [알림음] 재생 시작...');
+      }
+      
+      // 볼륨 최대로 설정
+      await _audioPlayer.setVolume(1.0);
+      
       // 기본 알림음 재생 (asset 또는 URL)
-      await _audioPlayer.play(AssetSource('sounds/notification.mp3'));
+      await _audioPlayer.play(
+        AssetSource('sounds/notification.mp3'),
+        volume: 1.0,
+      );
       
       if (kDebugMode) {
-        print('🔔 알림음 재생');
+        print('🔔 [알림음] 재생 완료 - assets/sounds/notification.mp3');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ 알림음 재생 오류: $e');
+        print('❌ [알림음] 재생 오류: $e');
+        print('📝 [알림음] 스택 트레이스: ${StackTrace.current}');
       }
       
-      // 기본 알림음 실패 시 시스템 알림음 사용
+      // 기본 알림음 실패 시 coin_earn.mp3 사용해보기
       try {
-        await _audioPlayer.play(AssetSource('sounds/default.mp3'));
+        if (kDebugMode) {
+          print('🔄 [알림음] 대체 음원 시도: coin_earn.mp3');
+        }
+        await _audioPlayer.play(
+          AssetSource('sounds/coin_earn.mp3'),
+          volume: 1.0,
+        );
+        if (kDebugMode) {
+          print('✅ [알림음] 대체 음원 재생 성공');
+        }
       } catch (e2) {
         if (kDebugMode) {
-          print('⚠️ 기본 알림음도 재생 실패');
+          print('⚠️ [알림음] 대체 음원도 재생 실패: $e2');
         }
       }
     }
