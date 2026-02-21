@@ -2030,6 +2030,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
     
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: FutureBuilder<String?>(
           future: _getOtherUserProfilePhoto(),
@@ -2537,9 +2538,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
               
-              // 탭 컨텐츠
+              // 탭 컨텐츠 (화면 크기에 맞게 동적 조정)
               SizedBox(
-                height: 350,
+                height: MediaQuery.of(context).size.height * 0.5,
                 child: TabBarView(
                   children: [
                     // 🐱 Firebase 스티커 탭

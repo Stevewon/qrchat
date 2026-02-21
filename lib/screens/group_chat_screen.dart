@@ -485,9 +485,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 ],
               ),
               
-              // 탭 컨텐츠
+              // 탭 컨텐츠 (화면 크기에 맞게 동적 조정)
               SizedBox(
-                height: 350,
+                height: MediaQuery.of(context).size.height * 0.5,
                 child: TabBarView(
                   children: [
                     // 🐱 Firebase 스티커 탭
@@ -1230,6 +1230,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
