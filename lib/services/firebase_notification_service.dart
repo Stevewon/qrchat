@@ -140,36 +140,12 @@ class FirebaseNotificationService {
       print('   데이터: ${message.data}');
     }
 
-    // ⭐ 현재 채팅방 안에 있으면 알림 표시 안 함
-    final chatRoomId = message.data['chat_room_id'] as String?;
-    if (chatRoomId != null && ChatStateService().isInChatRoom(chatRoomId)) {
-      if (kDebugMode) {
-        print('🔕 채팅방 안에 있어서 알림 표시 안 함: $chatRoomId');
-      }
-      return; // 알림 차단!
-    }
-
-    // ⭐ chat_room_id가 없는 경우에도 현재 채팅방이 열려있으면 차단
-    if (ChatStateService().currentChatRoomId != null) {
-      if (kDebugMode) {
-        print('🔕 채팅방 사용 중이므로 알림 표시 안 함 (현재: ${ChatStateService().currentChatRoomId})');
-      }
-      return; // 알림 차단!
-    }
-
-    // ⭐ 채팅방 밖에 있을 때만 로컬 알림 표시
-    final title = message.notification?.title ?? '새 메시지';
-    final body = message.notification?.body ?? '';
-    
-    LocalNotificationService.showNotification(
-      title: title,
-      body: body,
-      payload: chatRoomId,
-    );
-    
+    // ⭐ 포그라운드 = 앱이 열려있음 = 별첨2 상태
+    // → 알림음 완전 차단! (사용자가 이미 앱 안에 있음)
     if (kDebugMode) {
-      print('🔔 포그라운드 로컬 알림 표시 완료');
+      print('🔕 포그라운드 상태 - 앱이 열려있으므로 알림음 차단');
     }
+    return; // 알림 차단!
   }
 
   /// 백그라운드/종료 상태에서 알림 클릭 시 핸들러
