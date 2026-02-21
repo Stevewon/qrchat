@@ -2144,7 +2144,8 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Stack(
         children: [
           // 메인 채팅 UI
-          Column(
+          SafeArea(
+            child: Column(
               children: [
                 // 메시지 목록
                 Expanded(
@@ -2158,6 +2159,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 // 입력 영역
                 _buildInputArea(),
               ],
+            ),
           ),
           
           // 🎁 보상 구체들 (3인 이상일 때만)
